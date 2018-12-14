@@ -38,7 +38,7 @@ Based on mvvm architecture and repository pattern.
 
 #### App Specs
 * Minimum SDK 16
-* Java based (Kotlin version coming soon!)
+* Java (in master branch) & Kotlin (in kotlin_support branch)
 * MVVM Architecture
 * Android Architecture Components (LiveData, Lifecycle, ViewModel, Room Persistence Library, Navigation Component, ConstraintLayout)
 * [RxJava2](https://github.com/ReactiveX/RxJava) for implementing Observable pattern.
