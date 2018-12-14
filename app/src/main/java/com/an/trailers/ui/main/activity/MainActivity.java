@@ -3,6 +3,7 @@ package com.an.trailers.ui.main.activity;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.RadioGroup;
 
@@ -13,7 +14,17 @@ import com.an.trailers.ui.base.custom.menu.MenuDrawerToggle;
 import com.an.trailers.utils.AppUtils;
 import com.an.trailers.utils.NavigationUtils;
 
-public class MainActivity extends BaseActivity {
+import javax.inject.Inject;
+
+import dagger.android.AndroidInjection;
+import dagger.android.DispatchingAndroidInjector;
+import dagger.android.support.HasSupportFragmentInjector;
+
+public class MainActivity extends BaseActivity implements HasSupportFragmentInjector {
+
+    @Inject
+    DispatchingAndroidInjector<Fragment> dispatchingAndroidInjector;
+
 
     private MainActivityBinding binding;
     private MenuDrawerToggle menuDrawerToggle;
@@ -21,6 +32,7 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AndroidInjection.inject(this);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         initialiseView();
     }
@@ -95,5 +107,10 @@ public class MainActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         menuDrawerToggle.onDestroy();
+    }
+
+    @Override
+    public DispatchingAndroidInjector<Fragment> supportFragmentInjector() {
+        return dispatchingAndroidInjector;
     }
 }

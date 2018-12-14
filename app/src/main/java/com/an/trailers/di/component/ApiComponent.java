@@ -1,30 +1,48 @@
 package com.an.trailers.di.component;
 
 
+import android.app.Application;
+
+import com.an.trailers.AppController;
+import com.an.trailers.di.module.ActivityModule;
 import com.an.trailers.di.module.ApiModule;
-import com.an.trailers.di.module.AppModule;
 import com.an.trailers.di.module.DbModule;
-import com.an.trailers.ui.detail.viewmodel.MovieDetailViewModel;
-import com.an.trailers.ui.detail.viewmodel.TvDetailViewModel;
-import com.an.trailers.ui.main.viewmodel.MovieListViewModel;
-import com.an.trailers.ui.main.viewmodel.TvListViewModel;
-import com.an.trailers.ui.search.viewmodel.MovieSearchViewModel;
-import com.an.trailers.ui.search.viewmodel.TvSearchViewModel;
+import com.an.trailers.di.module.FragmentModule;
+import com.an.trailers.di.module.ViewModelModule;
 
 import javax.inject.Singleton;
 
+import dagger.BindsInstance;
 import dagger.Component;
+import dagger.android.support.AndroidSupportInjectionModule;
 
 @Singleton
-@Component(modules = {AppModule.class, ApiModule.class, DbModule.class})
+@Component(modules = {ApiModule.class, DbModule.class, ViewModelModule.class,
+        AndroidSupportInjectionModule.class, ActivityModule.class, FragmentModule.class})
 public interface ApiComponent {
 
-    void inject(MovieListViewModel moviesListViewModel);
-    void inject(MovieDetailViewModel moviesDetailViewModel);
-    void inject(MovieSearchViewModel movieSearchViewModel);
+//    void inject(MovieListViewModel moviesListViewModel);
+//    void inject(MovieDetailViewModel moviesDetailViewModel);
+//    void inject(MovieSearchViewModel movieSearchViewModel);
+//
+//
+//    void inject(TvListViewModel moviesListViewModel);
+//    void inject(TvDetailViewModel tvDetailViewModel);
+//    void inject(TvSearchViewModel tvSearchViewModel);
 
+    @Component.Builder
+    interface Builder {
+        @BindsInstance
+        Builder application(Application application);
 
-    void inject(TvListViewModel moviesListViewModel);
-    void inject(TvDetailViewModel tvDetailViewModel);
-    void inject(TvSearchViewModel tvSearchViewModel);
+        @BindsInstance
+        Builder apiModule(ApiModule apiModule);
+
+        @BindsInstance
+        Builder dbModule(DbModule dbModule);
+
+        ApiComponent build();
+    }
+
+    void inject(AppController appController);
 }

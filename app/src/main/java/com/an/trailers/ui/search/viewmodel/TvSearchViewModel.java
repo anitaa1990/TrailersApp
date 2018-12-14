@@ -2,6 +2,7 @@ package com.an.trailers.ui.search.viewmodel;
 
 import android.app.Application;
 import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.ViewModel;
 import android.support.annotation.NonNull;
 
 import com.an.trailers.AppController;
@@ -19,23 +20,16 @@ import javax.inject.Inject;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-public class TvSearchViewModel extends BaseViewModel {
+public class TvSearchViewModel extends ViewModel {
 
     @Inject
-    TvDao tvDao;
-
-    @Inject
-    TvApiService tvApiService;
+    public TvSearchViewModel(TvDao tvDao, TvApiService tvApiService) {
+        tvRepository = new TvRepository(tvDao, tvApiService);
+    }
 
     private TvRepository tvRepository;
 
     private MutableLiveData<Resource<List<TvEntity>>> tvsLiveData = new MutableLiveData<>();
-
-    public TvSearchViewModel(@NonNull Application application) {
-        super(application);
-        ((AppController) application).getApiComponent().inject(this);
-        tvRepository = new TvRepository(tvDao, tvApiService);
-    }
 
     public void searchTv(String text) {
         tvRepository.searchTvs(text)

@@ -32,6 +32,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import dagger.android.AndroidInjection;
+
 public class MovieDetailActivity extends BaseActivity {
 
     @Inject
@@ -43,6 +45,7 @@ public class MovieDetailActivity extends BaseActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AndroidInjection.inject(this);
         initialiseView();
         initialiseViewModel();
     }

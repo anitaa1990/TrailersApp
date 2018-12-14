@@ -2,6 +2,7 @@ package com.an.trailers.ui.detail.viewmodel;
 
 import android.app.Application;
 import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.ViewModel;
 import android.support.annotation.NonNull;
 
 import com.an.trailers.AppController;
@@ -14,23 +15,16 @@ import javax.inject.Inject;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-public class MovieDetailViewModel extends BaseViewModel {
+public class MovieDetailViewModel extends ViewModel {
 
     @Inject
-    MovieDao movieDao;
-
-    @Inject
-    MovieApiService movieApiService;
+    public MovieDetailViewModel(MovieDao movieDao, MovieApiService movieApiService) {
+        movieRepository = new MovieRepository(movieDao, movieApiService);
+    }
 
     private MovieRepository movieRepository;
 
     private MutableLiveData<MovieEntity> movieDetailsLiveData = new MutableLiveData<>();
-
-    public MovieDetailViewModel(@NonNull Application application) {
-        super(application);
-        ((AppController) application).getApiComponent().inject(this);
-        movieRepository = new MovieRepository(movieDao, movieApiService);
-    }
 
     public void fetchMovieDetail(MovieEntity movieEntity) {
         movieRepository.fetchMovieDetails(movieEntity.getId())

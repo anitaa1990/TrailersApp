@@ -2,6 +2,7 @@ package com.an.trailers.ui.main.viewmodel;
 
 import android.app.Application;
 import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.ViewModel;
 import android.support.annotation.NonNull;
 import com.an.trailers.AppController;
 import com.an.trailers.data.Resource;
@@ -13,28 +14,24 @@ import com.an.trailers.ui.base.BaseViewModel;
 import java.util.List;
 import javax.inject.Inject;
 
-public class MovieListViewModel extends BaseViewModel {
+public class MovieListViewModel extends ViewModel {
 
     @Inject
-    MovieDao movieDao;
-
-    @Inject
-    MovieApiService movieApiService;
+    public MovieListViewModel(MovieDao movieDao, MovieApiService movieApiService) {
+        movieRepository = new MovieRepository(movieDao, movieApiService);
+    }
 
     private MovieRepository movieRepository;
 
     private MutableLiveData<Resource<List<MovieEntity>>> moviesLiveData = new MutableLiveData<>();
 
-    public MovieListViewModel(@NonNull Application application) {
-        super(application);
-        ((AppController) application).getApiComponent().inject(this);
-        movieRepository = new MovieRepository(movieDao, movieApiService);
-    }
-
-
     public void fetchMovies(String type) {
         movieRepository.loadMoviesByType(type)
-        .subscribe(resource -> getMoviesLiveData().postValue(resource));
+        .subscribe(resource -> {
+            System.out.println("@@#@#@Success#@#@#@#" + resource.isLoading()  + "#@#@#@" + resource.data.size()
+            + "@#@#@#" + resource.message);
+            getMoviesLiveData().postValue(resource);
+        });
     }
 
     public MutableLiveData<Resource<List<MovieEntity>>> getMoviesLiveData() {

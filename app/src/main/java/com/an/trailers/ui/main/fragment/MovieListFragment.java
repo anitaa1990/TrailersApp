@@ -30,6 +30,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import dagger.android.support.AndroidSupportInjection;
+
 public class MovieListFragment extends BaseFragment implements RecyclerItemClickListener.OnRecyclerViewItemClickListener {
 
     @Inject
@@ -42,6 +44,7 @@ public class MovieListFragment extends BaseFragment implements RecyclerItemClick
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AndroidSupportInjection.inject(this);
         initialiseViewModel();
     }
 

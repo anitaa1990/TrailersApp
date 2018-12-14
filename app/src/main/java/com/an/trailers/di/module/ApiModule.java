@@ -22,15 +22,11 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static com.an.trailers.AppConstants.BASE_URL;
+
 
 @Module
 public class ApiModule {
-
-    private String mBaseUrl;
-
-    public ApiModule(String mBaseUrl) {
-        this.mBaseUrl = mBaseUrl;
-    }
 
     @Provides
     @Singleton
@@ -77,7 +73,7 @@ public class ApiModule {
         return new Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .baseUrl(mBaseUrl)
+                .baseUrl(BASE_URL)
                 .client(okHttpClient)
                 .build();
     }

@@ -3,6 +3,7 @@ package com.an.trailers.ui.search.viewmodel;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.ViewModel;
 import android.support.annotation.NonNull;
 
 import com.an.trailers.AppController;
@@ -20,23 +21,16 @@ import javax.inject.Inject;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-public class MovieSearchViewModel extends BaseViewModel {
+public class MovieSearchViewModel extends ViewModel {
 
     @Inject
-    MovieApiService movieApiService;
-
-    @Inject
-    MovieDao movieDao;
+    public MovieSearchViewModel(MovieDao movieDao, MovieApiService movieApiService) {
+        movieRepository = new MovieRepository(movieDao, movieApiService);
+    }
 
     private MovieRepository movieRepository;
 
     private MutableLiveData<Resource<List<MovieEntity>>> moviesLiveData = new MutableLiveData<>();
-
-    public MovieSearchViewModel(@NonNull Application application) {
-        super(application);
-        ((AppController) application).getApiComponent().inject(this);
-        movieRepository = new MovieRepository(movieDao, movieApiService);
-    }
 
     public void searchMovie(String text) {
         movieRepository.searchMovies(text)

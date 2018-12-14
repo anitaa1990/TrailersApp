@@ -34,6 +34,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import dagger.android.AndroidInjection;
+
 public class TvSearchActivity extends BaseActivity implements SearchView.OnQueryTextListener, RecyclerItemClickListener.OnRecyclerViewItemClickListener {
 
     @Inject
@@ -46,6 +48,7 @@ public class TvSearchActivity extends BaseActivity implements SearchView.OnQuery
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AndroidInjection.inject(this);
         initialiseView();
         initialiseViewModel();
     }

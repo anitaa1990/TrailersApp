@@ -1,31 +1,35 @@
 package com.an.trailers;
 
+import android.app.Activity;
 import android.app.Application;
-
-import com.an.trailers.di.component.ApiComponent;
 import com.an.trailers.di.component.DaggerApiComponent;
 import com.an.trailers.di.module.ApiModule;
-import com.an.trailers.di.module.AppModule;
 import com.an.trailers.di.module.DbModule;
 
-import static com.an.trailers.AppConstants.BASE_URL;
+import javax.inject.Inject;
+
+import dagger.android.DispatchingAndroidInjector;
+import dagger.android.HasActivityInjector;
 
 
-public class AppController extends Application {
+public class AppController extends Application implements HasActivityInjector {
 
-    private ApiComponent apiComponent;
+    @Inject
+    DispatchingAndroidInjector<Activity> dispatchingAndroidInjector;
+
+    @Override
+    public DispatchingAndroidInjector<Activity> activityInjector() {
+        return dispatchingAndroidInjector;
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        apiComponent = DaggerApiComponent.builder()
-                .appModule(new AppModule(this))
-                .apiModule(new ApiModule(BASE_URL))
+        DaggerApiComponent.builder()
+                .application(this)
+                .apiModule(new ApiModule())
                 .dbModule(new DbModule())
-                .build();
-    }
-
-    public ApiComponent getApiComponent() {
-        return apiComponent;
+                .build()
+            .inject(this);
     }
 }

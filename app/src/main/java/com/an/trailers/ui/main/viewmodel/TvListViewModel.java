@@ -2,6 +2,7 @@ package com.an.trailers.ui.main.viewmodel;
 
 import android.app.Application;
 import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.ViewModel;
 import android.support.annotation.NonNull;
 
 import com.an.trailers.AppController;
@@ -16,23 +17,16 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class TvListViewModel extends BaseViewModel {
+public class TvListViewModel extends ViewModel {
 
     @Inject
-    TvDao tvDao;
-
-    @Inject
-    TvApiService tvApiService;
+    public TvListViewModel(TvDao tvDao, TvApiService tvApiService) {
+        tvRepository = new TvRepository(tvDao, tvApiService);
+    }
 
     private TvRepository tvRepository;
 
     private MutableLiveData<Resource<List<TvEntity>>> tvsLiveData = new MutableLiveData<>();
-
-    public TvListViewModel(@NonNull Application application) {
-        super(application);
-        ((AppController) application).getApiComponent().inject(this);
-        tvRepository = new TvRepository(tvDao, tvApiService);
-    }
 
 
     public void fetchTvs(String type) {
