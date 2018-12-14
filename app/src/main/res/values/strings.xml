@@ -1,0 +1,44 @@
+<resources>
+    <string name="app_name">Trailers</string>
+
+    <string name="search_hint">Search...</string>
+    <string name="search_query_hint">Search Movies...</string>
+    <string name="empty_text">No series in the list</string>
+
+
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
+
+
+    <string name="upcoming">upcoming</string>
+    <string name="popular">popular</string>
+    <string name="top_rated">top_rated</string>
+    <string name="dvd">dvd</string>
+    <string name="favourites">favourites</string>
+
+
+    <string-array name="menu_names">
+        <item>@string/popular</item>
+        <item>@string/upcoming</item>
+        <item>@string/top_rated</item>
+        <item>@string/drawer_close</item>
+    </string-array>
+
+    <integer-array name="menu_icons">
+        <item>@drawable/ic_popular</item>
+        <item>@drawable/ic_upcoming</item>
+        <item>@drawable/ic_toprated</item>
+        <item>@drawable/ic_menu_close</item>
+    </integer-array>
+
+
+    <string name="title_similar_movies">Similar Movies</string>
+    <string name="text_read_more">READ MORE</string>
+    <string name="title_cast">Cast</string>
+    <string name="title_crew">Crew</string>
+    <string name="read_less">READ LESS</string>
+    <string name="read_more">READ MORE</string>
+    <string name="player_error">Error initializing YouTube player: %s</string>
+    <string name="detail_tv_similar">Similar Tv Series</string>
+
+</resources>

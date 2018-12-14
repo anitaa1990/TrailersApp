@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="CradleBall">
+        <attr name="cradle_ball_color" format="color" />
+    </declare-styleable>
+
+
+    <declare-styleable name="ExpandableLayout">
+        <attr name="el_duration" format="integer" />
+        <attr name="el_expanded" format="boolean" />
+        <attr name="el_parallax" format="float" />
+        <attr name="android:orientation"/>
+    </declare-styleable>
+
+
+    <declare-styleable name="CollectionPicker">
+        <attr name="cp_itemRadius" format="dimension" />
+        <attr name="cp_itemBackgroundNormal" format="color" />
+        <attr name="cp_itemBackgroundPressed" format="color" />
+        <attr name="cp_itemBackgroundPressedCorrect" format="color" />
+        <attr name="cp_addIcon" format="reference" />
+        <attr name="cp_cancelIcon" format="reference" />
+        <attr name="cp_itemMargin" format="dimension" />
+        <attr name="cp_itemTextColor" format="color"/>
+        <attr name="cp_textPaddingLeft" format="dimension" />
+        <attr name="cp_textPaddingRight" format="dimension" />
+        <attr name="cp_textPaddingTop" format="dimension" />
+        <attr name="cp_textPaddingBottom" format="dimension" />
+        <attr name="cp_simplified" format="boolean" />
+    </declare-styleable>
+
+
+    <declare-styleable name="CircleImageView">
+        <attr name="civ_border_width" format="dimension" />
+        <attr name="civ_border_color" format="color" />
+        <attr name="civ_border_overlay" format="boolean" />
+        <attr name="civ_fill_color" format="color" />
+    </declare-styleable>
+
+
+    <declare-styleable name="CustomRadioButton">
+        <attr name="leftRadioButton" format="string"/>
+        <attr name="rightRadioButton" format="string"/>
+    </declare-styleable>
+
+</resources>

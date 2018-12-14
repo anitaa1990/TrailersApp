@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="activity_horizontal_margin">18dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="card_bottom_info_height">150dp</dimen>
+    <dimen name="card_extra_height">20dp</dimen>
+
+    <dimen name="design_fab_size_normal">90dp</dimen>
+    <dimen name="design_fab_size_mini">45dp</dimen>
+
+
+    <dimen name="youtube_thumbnail_width">220dp</dimen>
+    <dimen name="youtube_thumbnail_height">120dp</dimen>
+
+
+    <dimen name="padding">10dip</dimen>
+    <dimen name="padding_large">15dip</dimen>
+    <dimen name="padding_xlarge">22dip</dimen>
+    <dimen name="padding_xxlarge">25dip</dimen>
+    <dimen name="padding_xxxlarge">29dip</dimen>
+    <dimen name="padding_xxxxlarge">35dip</dimen>
+    <dimen name="padding_megalarge">40dip</dimen>
+    <dimen name="padding_xxxxxlarge">48dip</dimen>
+    <dimen name="padding_small">5dip</dimen>
+    <dimen name="padding_medium">8dip</dimen>
+    <dimen name="padding_xsmall">4dip</dimen>
+
+
+    <dimen name="margin_reverse">-10dip</dimen>
+    <dimen name="margin">10dip</dimen>
+    <dimen name="margin_xsmall">3dip</dimen>
+    <dimen name="margin_small">5dip</dimen>
+    <dimen name="margin_large">15dip</dimen>
+    <dimen name="margin_medium">12dip</dimen>
+    <dimen name="margin_xlarge">20dip</dimen>
+    <dimen name="margin_xxlarge">22dip</dimen>
+    <dimen name="margin_xxxlarge">29dip</dimen>
+    <dimen name="margin_xxxxlarge">30dip</dimen>
+    <dimen name="margin_xxxxxlarge">40dip</dimen>
+    <dimen name="margin_xxxxxxlarge">50dip</dimen>
+
+    <dimen name="font_xxxxsmall">6sp</dimen>
+    <dimen name="font_xxxsmall">8sp</dimen>
+    <dimen name="font_xxsmall">10sp</dimen>
+    <dimen name="font_xsmall">11sp</dimen>
+    <dimen name="font_small">12sp</dimen>
+    <dimen name="font_small_medium">13sp</dimen>
+    <dimen name="font_xmedium">14sp</dimen>
+    <dimen name="font_medium">16sp</dimen>
+    <dimen name="font_x_medium_large">17sp</dimen>
+    <dimen name="font_medium_large">18sp</dimen>
+    <dimen name="font_large">20sp</dimen>
+    <dimen name="font_xlarge">22sp</dimen>
+    <dimen name="font_xlarge_medium">26sp</dimen>
+    <dimen name="font_xlarge_large">28sp</dimen>
+    <dimen name="font_xxlarge">30sp</dimen>
+    <dimen name="font_amount">36.7sp</dimen>
+    <dimen name="font_xxxlarge">40sp</dimen>
+
+    <dimen name="sliding_menu_width">80dp</dimen>
+
+
+    <dimen name="activity_detail_image_frame_height">190dp</dimen>
+    <dimen name="activity_detail_image_frame_margin_top">120dp</dimen>
+
+
+    <dimen name="activity_detail_circle_size">5dp</dimen>
+    <dimen name="video_item_share_size">80dp</dimen>
+    <dimen name="video_item_image_size">80dp</dimen>
+    <dimen name="profile_item_image_size">70dp</dimen>
+    <dimen name="video_play_image_size">20dp</dimen>
+
+
+    <dimen name="activity_search_fav_icon_size">125dp</dimen>
+    <dimen name="shine_icon_size">25dp</dimen>
+    <dimen name="search_icon_size">45dp</dimen>
+    <dimen name="menu_icon_size">40dp</dimen>
+    <dimen name="search_bottom_layout_height">55dp</dimen>
+
+    <dimen name="list_item_similar_movies_icon_width">145dp</dimen>
+    <dimen name="list_item_similar_movies_icon_height">185dp</dimen>
+
+    <dimen name="fragment_container_height">320dp</dimen>
+</resources>

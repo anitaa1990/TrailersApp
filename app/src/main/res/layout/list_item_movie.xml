@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data class="MoviesListItemBinding" />
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <com.an.trailers.ui.base.custom.AspectRatioCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="@dimen/margin_large"
+            android:layout_marginRight="@dimen/margin_large"
+            app:cardCornerRadius="5dp"
+            app:cardElevation="6dp"
+            app:cardMaxElevation="6dp"
+            android:layout_centerInParent="true">
+
+            <ImageView
+                android:id="@+id/image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:adjustViewBounds="true"
+                android:scaleType="fitXY" />
+
+
+        </com.an.trailers.ui.base.custom.AspectRatioCardView>
+
+
+    </RelativeLayout>
+</layout>

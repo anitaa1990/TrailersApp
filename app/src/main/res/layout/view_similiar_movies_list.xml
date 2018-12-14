@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/margin_small"
+        android:background="@android:color/transparent"
+        android:paddingBottom="@dimen/padding_large">
+
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/movie_similar_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/margin_large"
+            android:fontFamily="@font/gt_medium"
+            android:gravity="left"
+            android:visibility="invisible"
+            android:text="@string/title_similar_movies"
+            android:textAllCaps="true"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/font_medium"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/movies_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/margin_large"
+            android:layout_marginTop="@dimen/margin_medium"
+            android:paddingTop="@dimen/margin_small"
+            app:layout_constraintTop_toBottomOf="@+id/movie_similar_title" />
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

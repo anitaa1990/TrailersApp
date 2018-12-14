@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data class="CreditListWithItemBinding" />
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+
+        <com.an.trailers.ui.base.custom.circleimageview.CircleImageView
+            android:id="@+id/profile_image"
+            android:layout_width="@dimen/profile_item_image_size"
+            android:layout_height="@dimen/profile_item_image_size"
+            android:layout_marginLeft="@dimen/margin"
+            android:layout_marginRight="@dimen/margin"
+            app:civ_border_color="@android:color/transparent"
+            app:civ_border_width="0dp"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintLeft_toRightOf="parent"
+            app:layout_constraintRight_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/txt_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/margin"
+            android:layout_marginTop="@dimen/margin_small"
+            android:layout_marginRight="@dimen/margin"
+            android:ellipsize="end"
+            android:fontFamily="@font/gt_medium"
+            android:maxEms="6"
+            android:maxLines="1"
+            android:textColor="@color/profile_item_name"
+            android:textSize="@dimen/font_small"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintLeft_toRightOf="parent"
+            app:layout_constraintRight_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/profile_image" />
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/txt_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txt_name"
+            android:layout_marginLeft="@dimen/margin_small"
+            android:layout_marginTop="@dimen/margin_xsmall"
+            android:layout_marginRight="@dimen/margin_small"
+            android:ellipsize="end"
+            android:fontFamily="@font/gt_medium"
+            android:maxEms="6"
+            android:maxLines="1"
+            android:textColor="@color/profile_item_info"
+            android:textSize="@dimen/font_xsmall"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintLeft_toRightOf="parent"
+            app:layout_constraintRight_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txt_name" />
+
+    </android.support.constraint.ConstraintLayout>
+
+</layout>

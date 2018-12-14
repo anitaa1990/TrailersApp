@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.an.trailers.ui.base.custom.expandableLayout.ExpandableLayout
+            android:id="@+id/expandable_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:el_duration="1000"
+            app:el_expanded="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/root_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding_xsmall"
+                android:layout_marginBottom="@dimen/margin"
+                android:orientation="vertical"
+                android:paddingRight="@dimen/padding">
+
+                <View
+                    android:id="@+id/line_above_cast_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginRight="@dimen/padding"
+                    android:background="@color/detail_list_item_view"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/title_cast"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin"
+                    android:fontFamily="@font/gt_medium"
+                    android:gravity="left"
+                    android:text="@string/title_cast"
+                    android:textAllCaps="true"
+                    android:textColor="@color/detail_list_item_text"
+                    android:textSize="@dimen/font_small_medium"
+                    app:layout_constraintTop_toBottomOf="@+id/line_above_cast_title" />
+
+
+                <View
+                    android:id="@+id/line_below_cast_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:layout_marginTop="@dimen/margin_small"
+                    android:background="@color/detail_list_item_view"
+                    app:layout_constraintTop_toBottomOf="@+id/title_cast" />
+
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/cast_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_large"
+                    app:layout_constraintTop_toBottomOf="@+id/line_below_cast_title" />
+
+
+                <View
+                    android:id="@+id/line_above_crew_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="@dimen/margin"
+                    android:background="@color/detail_list_item_view"
+                    app:layout_constraintTop_toBottomOf="@+id/cast_list" />
+
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/title_crew"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top"
+                    android:layout_marginTop="@dimen/margin"
+                    android:fontFamily="@font/gt_medium"
+                    android:gravity="left"
+                    android:text="@string/title_crew"
+                    android:textAllCaps="true"
+                    android:textColor="@color/detail_list_item_text"
+                    android:textSize="@dimen/font_small_medium"
+                    app:layout_constraintTop_toBottomOf="@+id/line_above_crew_title" />
+
+
+                <View
+                    android:id="@+id/line_below_crew_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:layout_marginTop="@dimen/margin_small"
+                    android:background="@color/detail_list_item_view"
+                    app:layout_constraintTop_toBottomOf="@+id/title_crew" />
+
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/crew_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_large"
+                    app:layout_constraintTop_toBottomOf="@+id/line_below_crew_title" />
+
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:layout_marginTop="@dimen/margin"
+                    android:background="@color/detail_list_item_view"
+                    app:layout_constraintTop_toBottomOf="@+id/crew_list" />
+
+
+            </android.support.constraint.ConstraintLayout>
+        </com.an.trailers.ui.base.custom.expandableLayout.ExpandableLayout>
+        >
+
+
+    </android.support.constraint.ConstraintLayout>
+
+</layout>

@@ -1,0 +1,40 @@
+{
+  "id": 335983,
+  "results": [{
+    "id": "5a7c6a35c3a3680f7f01053a",
+    "iso_639_1": "en",
+    "iso_3166_1": "US",
+    "key": "dzxFdtWmjto",
+    "name": "VENOM - Official Teaser Trailer (HD)",
+    "site": "YouTube",
+    "size": 1080,
+    "type": "Teaser"
+  }, {
+    "id": "5a7cd5389251414b22019912",
+    "iso_639_1": "en",
+    "iso_3166_1": "US",
+    "key": "MDR3bfmzV8c",
+    "name": "VENOM - Teaser Trailer - In Cinemas October 4",
+    "site": "YouTube",
+    "size": 1080,
+    "type": "Teaser"
+  }, {
+    "id": "5adeb1bf0e0a2615e400435d",
+    "iso_639_1": "en",
+    "iso_3166_1": "US",
+    "key": "u9Mv98Gr5pY",
+    "name": "VENOM - Official Trailer (HD)",
+    "site": "YouTube",
+    "size": 1080,
+    "type": "Trailer"
+  }, {
+    "id": "5b60970d0e0a267ef400031c",
+    "iso_639_1": "en",
+    "iso_3166_1": "US",
+    "key": "xLCn88bfW1o",
+    "name": "VENOM - Official Trailer 2 (HD)",
+    "site": "YouTube",
+    "size": 1080,
+    "type": "Trailer"
+  }]
+}

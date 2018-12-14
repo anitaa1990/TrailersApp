@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+
+    <color name="blue">#ff1d34be</color>
+    <color name="green">#ff228B22</color>
+    <color name="orange">#FF6600</color>
+    <color name="red">#ffbe224e</color>
+    <color name="yellow">#dca926</color>
+    <color name="light_blue">#6cc4fc</color>
+
+
+    <color name="bg_activity_detail">#292631</color>
+    <color name="text_desc_activity_detail">#68666e</color>
+    <color name="text_runtime_activity_detail">#7f7e83</color>
+    <color name="text_more_activity_detail">#7bc9c2</color>
+    <color name="btn_shine">#f64959</color>
+    <color name="btn_shine_fill">#FF6666</color>
+
+    <color name="profile_item_name">#757575</color>
+    <color name="profile_item_info">#7c7d88</color>
+
+    <color name="detail_list_item_view">#cccccc</color>
+    <color name="detail_list_item_text">#111</color>
+
+    <color name="search_overlay">#1A000000</color>
+    <color name="fragment_common_view">#f0f0f0</color>
+    <color name="fragment_overlay_view">#B07986CB</color>
+    <color name="search_color_control_activated">#bdbbce</color>
+
+    <color name="ic_tv_normal">#66D3D3D3</color>
+    <color name="ic_tv_pressed">#a6D3D3D3</color>
+    <color name="ic_tv_selected">@android:color/white</color>
+
+</resources>

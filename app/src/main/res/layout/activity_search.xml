@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data class="SearchActivityBinding" />
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/bg_activity_detail">
+
+
+        <RelativeLayout
+            android:id="@+id/search_view"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/search_bottom_layout_height"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <android.support.v7.widget.SearchView
+                android:id="@+id/search"
+                style="@style/SearchViewTheme"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/margin_small"
+                app:closeIcon="@drawable/ic_close"
+                app:goIcon="@drawable/ic_search"
+                app:queryHint="@string/search_query_hint"
+                app:searchHintIcon="@drawable/ic_search"
+                app:searchIcon="@drawable/ic_search" />
+
+        </RelativeLayout>
+
+
+        <com.an.trailers.ui.base.custom.BackgroundSwitcherView
+            android:id="@+id/overlay_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/search_overlay"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+
+        <include
+            android:id="@+id/included_layout"
+            layout="@layout/fragment_movie_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/search_view" />
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

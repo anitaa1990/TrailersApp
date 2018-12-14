@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout
+        android:visibility="gone"
+        android:id="@+id/root_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent">
+
+
+        <com.an.trailers.ui.base.custom.loaders.NewtonCradleLoading
+            android:id="@+id/loader"
+            android:layout_centerInParent="true"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </com.an.trailers.ui.base.custom.loaders.NewtonCradleLoading>
+
+
+    </RelativeLayout>
+</layout>
