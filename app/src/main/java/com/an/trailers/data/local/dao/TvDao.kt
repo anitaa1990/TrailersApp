@@ -1,0 +1,21 @@
+package com.an.trailers.data.local.dao
+
+import android.arch.persistence.room.*
+import com.an.trailers.data.local.entity.TvEntity
+import io.reactivex.Flowable
+
+@Dao
+interface TvDao {
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertTvList(tvEntities: List<TvEntity>): LongArray
+
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    fun updateTv(tvEntity: TvEntity): Int
+
+    @Query("SELECT * FROM `TvEntity` where id = :id")
+    fun getTvDetailById(id: Long?): Flowable<TvEntity>
+
+    @Query("SELECT * FROM `TvEntity` where categoryType = :type")
+    fun getTvListByType(type: String): Flowable<List<TvEntity>>
+}
