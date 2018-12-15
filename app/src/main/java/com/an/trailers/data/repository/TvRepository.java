@@ -68,7 +68,9 @@ public class TvRepository {
         return new NetworkBoundResource<TvEntity, TvEntity>() {
             @Override
             protected void saveCallResult(@NonNull TvEntity item) {
-                tvDao.updateTv(item);
+                TvEntity tvEntity = tvDao.getTvEntityById(item.getId());
+                if(tvEntity == null) tvDao.insertTv(item);
+                else tvDao.updateTv(item);
             }
 
             @Override
@@ -79,7 +81,9 @@ public class TvRepository {
             @NonNull
             @Override
             protected Flowable<TvEntity> loadFromDb() {
-                return tvDao.getTvDetailById(tvId);
+                TvEntity tvEntity = tvDao.getTvEntityById(tvId);
+                if(tvEntity == null) return Flowable.empty();
+                return Flowable.just(tvEntity);
             }
 
             @NonNull

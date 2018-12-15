@@ -67,7 +67,9 @@ public class MovieRepository {
         return new NetworkBoundResource<MovieEntity, MovieEntity>() {
             @Override
             protected void saveCallResult(@NonNull MovieEntity item) {
-                movieDao.updateMovie(item);
+                MovieEntity movieEntity = movieDao.getMovieById(item.getId());
+                if(movieEntity == null) movieDao.insertMovie(item);
+                else movieDao.updateMovie(item);
             }
 
             @Override
@@ -78,7 +80,9 @@ public class MovieRepository {
             @NonNull
             @Override
             protected Flowable<MovieEntity> loadFromDb() {
-                return movieDao.getMovieDetailById(movieId);
+                MovieEntity movieEntity = movieDao.getMovieById(movieId);
+                if(movieEntity == null) return Flowable.empty();
+                return Flowable.just(movieEntity);
             }
 
             @NonNull

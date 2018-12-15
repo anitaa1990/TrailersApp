@@ -28,8 +28,6 @@ public class MovieDetailViewModel extends ViewModel {
 
     public void fetchMovieDetail(MovieEntity movieEntity) {
         movieRepository.fetchMovieDetails(movieEntity.getId())
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
         .subscribe(resource -> {
             if(resource.isLoaded()) getMovieDetailsLiveData().postValue(resource.data);
         });

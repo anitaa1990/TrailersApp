@@ -5,6 +5,8 @@ import android.databinding.DataBindingUtil;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.util.Pair;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
@@ -125,6 +127,13 @@ public class TvDetailActivity extends BaseActivity {
         binding.includedSimilarLayout.moviesList.setVisibility(View.VISIBLE);
         SimilarTvListAdapter similarTvListAdapter = new SimilarTvListAdapter(this, tvEntities);
         binding.includedSimilarLayout.moviesList.setAdapter(similarTvListAdapter);
+
+        binding.includedSimilarLayout.moviesList.addOnItemTouchListener(new RecyclerItemClickListener(this, (parentView, childView, position) -> {
+            TvEntity tvEntity = similarTvListAdapter.getItem(position);
+            ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this,
+                    new Pair(childView, TRANSITION_IMAGE_NAME));
+            NavigationUtils.redirectToTvDetailScreen(this, tvEntity, options);
+        }));
         binding.includedSimilarLayout.movieSimilarTitle.setVisibility(View.VISIBLE);
     }
 

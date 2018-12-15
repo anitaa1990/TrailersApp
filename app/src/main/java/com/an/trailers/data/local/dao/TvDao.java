@@ -15,8 +15,14 @@ public interface TvDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long[] insertTvList(List<TvEntity> tvEntities);
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    long insertTv(TvEntity tvEntity);
+
     @Update(onConflict = OnConflictStrategy.REPLACE)
     int updateTv(TvEntity tvEntity);
+
+    @Query("SELECT * FROM `TvEntity` where id = :id")
+    TvEntity getTvEntityById(Long id);
 
     @Query("SELECT * FROM `TvEntity` where id = :id")
     Flowable<TvEntity> getTvDetailById(Long id);

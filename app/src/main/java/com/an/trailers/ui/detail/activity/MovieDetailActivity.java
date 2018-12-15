@@ -125,13 +125,13 @@ public class MovieDetailActivity extends BaseActivity {
         binding.includedSimilarLayout.moviesList.setVisibility(View.VISIBLE);
         SimilarMoviesListAdapter similarMoviesListAdapter = new SimilarMoviesListAdapter(this, movies);
         binding.includedSimilarLayout.moviesList.setAdapter(similarMoviesListAdapter);
-//
-//        binding.includedSimilarLayout.moviesList.addOnItemTouchListener(new RecyclerItemClickListener(this, (parentView, childView, position) -> {
-//            MovieEntity movie = similarMoviesListAdapter.getItem(position);
-//            ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this,
-//                    new Pair(childView, TRANSITION_IMAGE_NAME));
-//            NavigationUtils.redirectToDetailScreen(this, movie, options);
-//        }));
+
+        binding.includedSimilarLayout.moviesList.addOnItemTouchListener(new RecyclerItemClickListener(this, (parentView, childView, position) -> {
+            MovieEntity movie = similarMoviesListAdapter.getItem(position);
+            ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this,
+                    new Pair(childView, TRANSITION_IMAGE_NAME));
+            NavigationUtils.redirectToDetailScreen(this, movie, options);
+        }));
         binding.includedSimilarLayout.movieSimilarTitle.setVisibility(View.VISIBLE);
     }
 
