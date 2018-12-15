@@ -61,7 +61,9 @@ class MovieRepository(
     fun fetchMovieDetails(movieId: Long?): Observable<Resource<MovieEntity>> {
         return object : NetworkBoundResource<MovieEntity, MovieEntity>() {
             override fun saveCallResult(item: MovieEntity) {
-                movieDao.updateMovie(item)
+                val movieEntity: MovieEntity = movieDao.getMovieById(movieId)
+                if(null == movieEntity) movieDao.insertMovie(item)
+                else movieDao.updateMovie(item)
             }
 
             override fun shouldFetch(): Boolean {
@@ -69,7 +71,9 @@ class MovieRepository(
             }
 
             override fun loadFromDb(): Flowable<MovieEntity> {
-                return movieDao.getMovieDetailById(movieId)
+                val movieEntity: MovieEntity = movieDao.getMovieById(movieId)
+                if(null == movieEntity) return Flowable.empty()
+                return Flowable.just(movieEntity)
             }
 
             override fun createCall(): Observable<Resource<MovieEntity>> {

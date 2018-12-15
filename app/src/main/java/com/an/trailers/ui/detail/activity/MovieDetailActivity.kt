@@ -5,6 +5,8 @@ import android.arch.lifecycle.ViewModelProviders
 import android.databinding.DataBindingUtil
 import android.graphics.Paint
 import android.os.Bundle
+import android.support.v4.app.ActivityOptionsCompat
+import android.support.v4.util.Pair
 import android.support.v4.view.ViewCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
@@ -131,6 +133,18 @@ class MovieDetailActivity : BaseActivity() {
         binding.includedSimilarLayout.moviesList.visibility = View.VISIBLE
         val similarMoviesListAdapter = SimilarMoviesListAdapter(this, movies)
         binding.includedSimilarLayout.moviesList.adapter = similarMoviesListAdapter
+
+        binding.includedSimilarLayout.moviesList.addOnItemTouchListener(
+                RecyclerItemClickListener(applicationContext,
+                        object : RecyclerItemClickListener.OnRecyclerViewItemClickListener {
+                            override fun onItemClick(parentView: View, childView: View, position: Int) {
+                                val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                                        this@MovieDetailActivity, childView, TRANSITION_IMAGE_NAME)
+
+                                NavigationUtils.redirectToDetailScreen(
+                                        this@MovieDetailActivity, similarMoviesListAdapter.getItem(position), options)
+                            }
+                        }))
         binding.includedSimilarLayout.movieSimilarTitle.visibility = View.VISIBLE
     }
 

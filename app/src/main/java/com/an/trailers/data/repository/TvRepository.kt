@@ -61,7 +61,9 @@ class TvRepository(
     fun fetchTvDetails(tvId: Long?): Observable<Resource<TvEntity>> {
         return object : NetworkBoundResource<TvEntity, TvEntity>() {
             override fun saveCallResult(item: TvEntity) {
-                tvDao.updateTv(item)
+                val tvEntity: TvEntity = tvDao.getTvById(tvId)
+                if(null == tvEntity) tvDao.insertTv(item)
+                else tvDao.updateTv(item)
             }
 
             override fun shouldFetch(): Boolean {
@@ -69,7 +71,9 @@ class TvRepository(
             }
 
             override fun loadFromDb(): Flowable<TvEntity> {
-                return tvDao.getTvDetailById(tvId)
+                val tvEntity: TvEntity = tvDao.getTvById(tvId)
+                if(null == tvEntity) return Flowable.empty()
+                return Flowable.just(tvEntity)
             }
 
             override fun createCall(): Observable<Resource<TvEntity>> {

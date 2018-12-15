@@ -10,8 +10,14 @@ interface MovieDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertMovies(movies: List<MovieEntity>): LongArray
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertMovie(movie: MovieEntity): Long
+
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun updateMovie(movie: MovieEntity): Int
+
+    @Query("SELECT * FROM `MovieEntity` where id = :id")
+    fun getMovieById(id: Long?): MovieEntity
 
     @Query("SELECT * FROM `MovieEntity` where id = :id")
     fun getMovieDetailById(id: Long?): Flowable<MovieEntity>
