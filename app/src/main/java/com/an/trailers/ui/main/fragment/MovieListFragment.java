@@ -90,7 +90,7 @@ public class MovieListFragment extends BaseFragment implements RecyclerItemClick
 
     private void handleSuccessResponse(List<MovieEntity> movies) {
         hideLoader();
-        moviesListViewModel.getMoviesLiveData().removeObservers(this);
+        moviesListViewModel.onStop();
         binding.emptyLayout.emptyContainer.setVisibility(View.GONE);
         binding.moviesList.setVisibility(View.VISIBLE);
         moviesListAdapter.setItems(movies);
@@ -126,10 +126,9 @@ public class MovieListFragment extends BaseFragment implements RecyclerItemClick
 
     @Override
     public void onItemClick(View parentView, View childView, int position) {
-        moviesListViewModel.getMoviesLiveData().removeObservers(this);
         ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity,
                 new Pair(childView.findViewById(R.id.image), TRANSITION_IMAGE_NAME));
-        NavigationUtils.redirectToDetailScreen(activity,
+        NavigationUtils.redirectToDetailScreen(requireActivity(),
                 moviesListAdapter.getItem(position),
                 options);
     }

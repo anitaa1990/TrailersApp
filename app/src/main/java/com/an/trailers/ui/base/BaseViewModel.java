@@ -1,12 +1,20 @@
 package com.an.trailers.ui.base;
 
-import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.support.annotation.NonNull;
+import android.arch.lifecycle.ViewModel;
 
-public class BaseViewModel extends AndroidViewModel {
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 
-    public BaseViewModel(@NonNull Application application) {
-        super(application);
+public class BaseViewModel extends ViewModel {
+
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+
+    protected void addToDisposable(Disposable disposable) {
+        compositeDisposable.remove(disposable);
+        compositeDisposable.add(disposable);
+    }
+
+    public void onStop() {
+        compositeDisposable.clear();
     }
 }

@@ -1,10 +1,6 @@
 package com.an.trailers.ui.main.viewmodel;
 
-import android.app.Application;
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.ViewModel;
-import android.support.annotation.NonNull;
-import com.an.trailers.AppController;
 import com.an.trailers.data.Resource;
 import com.an.trailers.data.local.dao.MovieDao;
 import com.an.trailers.data.local.entity.MovieEntity;
@@ -14,7 +10,7 @@ import com.an.trailers.ui.base.BaseViewModel;
 import java.util.List;
 import javax.inject.Inject;
 
-public class MovieListViewModel extends ViewModel {
+public class MovieListViewModel extends BaseViewModel {
 
     @Inject
     public MovieListViewModel(MovieDao movieDao, MovieApiService movieApiService) {
@@ -27,11 +23,8 @@ public class MovieListViewModel extends ViewModel {
 
     public void fetchMovies(String type) {
         movieRepository.loadMoviesByType(type)
-        .subscribe(resource -> {
-            System.out.println("@@#@#@Success#@#@#@#" + resource.isLoading()  + "#@#@#@" + resource.data.size()
-            + "@#@#@#" + resource.message);
-            getMoviesLiveData().postValue(resource);
-        });
+                .doOnSubscribe(disposable -> addToDisposable(disposable))
+        .subscribe(resource -> getMoviesLiveData().postValue(resource));
     }
 
     public MutableLiveData<Resource<List<MovieEntity>>> getMoviesLiveData() {

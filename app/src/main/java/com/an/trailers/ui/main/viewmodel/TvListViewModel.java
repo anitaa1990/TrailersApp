@@ -1,11 +1,6 @@
 package com.an.trailers.ui.main.viewmodel;
 
-import android.app.Application;
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.ViewModel;
-import android.support.annotation.NonNull;
-
-import com.an.trailers.AppController;
 import com.an.trailers.data.Resource;
 import com.an.trailers.data.local.dao.TvDao;
 import com.an.trailers.data.local.entity.TvEntity;
@@ -17,7 +12,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class TvListViewModel extends ViewModel {
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+
+public class TvListViewModel extends BaseViewModel {
 
     @Inject
     public TvListViewModel(TvDao tvDao, TvApiService tvApiService) {
@@ -31,6 +29,7 @@ public class TvListViewModel extends ViewModel {
 
     public void fetchTvs(String type) {
         tvRepository.loadTvsByType(type)
+                .doOnSubscribe(disposable -> addToDisposable(disposable))
         .subscribe(resource -> getTvsLiveData().postValue(resource));
     }
 

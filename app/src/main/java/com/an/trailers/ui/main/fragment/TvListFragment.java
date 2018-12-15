@@ -90,7 +90,7 @@ public class TvListFragment extends BaseFragment implements RecyclerItemClickLis
 
     private void handleSuccessResponse(List<TvEntity> movies) {
         hideLoader();
-        tvListViewModel.getTvsLiveData().removeObservers(this);
+        tvListViewModel.onStop();
         binding.emptyLayout.emptyContainer.setVisibility(View.GONE);
         binding.moviesList.setVisibility(View.VISIBLE);
         tvListAdapter.setItems(movies);
@@ -126,10 +126,9 @@ public class TvListFragment extends BaseFragment implements RecyclerItemClickLis
 
     @Override
     public void onItemClick(View parentView, View childView, int position) {
-        tvListViewModel.getTvsLiveData().removeObservers(this);
         ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity,
                 new Pair(childView.findViewById(R.id.image), TRANSITION_IMAGE_NAME));
-        NavigationUtils.redirectToTvDetailScreen(activity,
+        NavigationUtils.redirectToTvDetailScreen(requireActivity(),
                 tvListAdapter.getItem(position),
                 options);
     }

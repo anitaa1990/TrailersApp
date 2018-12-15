@@ -63,6 +63,7 @@ public class NavigationUtils implements AppConstants {
         bundle.putInt(INTENT_CATEGORY, selectedPosition);
         Navigation.findNavController(activity, R.id.fragment_nav_host)
                 .navigate(navId, bundle, new NavOptions.Builder()
+                        .setLaunchSingleTop(true)
                         .setEnterAnim(R.anim.flip_right_in)
                         .setExitAnim(R.anim.flip_right_out)
                         .setPopEnterAnim(R.anim.flip_left_in)
