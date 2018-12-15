@@ -1,18 +1,18 @@
 package com.an.trailers.ui.main.viewmodel
 
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
 import com.an.trailers.data.Resource
 import com.an.trailers.data.local.dao.TvDao
 import com.an.trailers.data.local.entity.TvEntity
 import com.an.trailers.data.remote.api.TvApiService
 import com.an.trailers.data.repository.TvRepository
+import com.an.trailers.ui.base.BaseViewModel
 
 import javax.inject.Inject
 
 class TvListViewModel @Inject constructor(
                       tvDao: TvDao,
-                      tvApiService: TvApiService) : ViewModel() {
+                      tvApiService: TvApiService) : BaseViewModel() {
 
     private val tvRepository: TvRepository = TvRepository(tvDao, tvApiService)
 
@@ -21,6 +21,7 @@ class TvListViewModel @Inject constructor(
 
     fun fetchTvs(type: String) {
         tvRepository.loadTvsByType(type)
+            .doOnSubscribe { addToDisposable(it) }
             .subscribe { resource -> tvsLiveData.postValue(resource) }
     }
 

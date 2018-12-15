@@ -92,7 +92,7 @@ class MovieListFragment : BaseFragment(), RecyclerItemClickListener.OnRecyclerVi
 
     private fun handleSuccessResponse(movies: List<MovieEntity>) {
         hideLoader()
-        moviesListViewModel.getMoviesLiveData().removeObservers(this)
+        moviesListViewModel.onStop()
         binding.emptyLayout.emptyContainer.visibility = View.GONE
         binding.moviesList.visibility = View.VISIBLE
         moviesListAdapter.setItems(movies)
@@ -127,12 +127,11 @@ class MovieListFragment : BaseFragment(), RecyclerItemClickListener.OnRecyclerVi
     }
 
     override fun onItemClick(parentView: View, childView: View, position: Int) {
-        moviesListViewModel.getMoviesLiveData().removeObservers(this)
         val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-            activity, Pair(childView.findViewById(R.id.image), TRANSITION_IMAGE_NAME))
+            requireActivity(), Pair(childView.findViewById(R.id.image), TRANSITION_IMAGE_NAME))
 
         NavigationUtils.redirectToDetailScreen(
-            activity, moviesListAdapter.getItem(position), options
+            requireActivity(), moviesListAdapter.getItem(position), options
         )
     }
 }

@@ -88,7 +88,7 @@ class TvListFragment : BaseFragment(), RecyclerItemClickListener.OnRecyclerViewI
 
     private fun handleSuccessResponse(movies: List<TvEntity>) {
         hideLoader()
-        tvListViewModel.getTvListLiveData().removeObservers(this)
+        tvListViewModel.onStop()
         binding.emptyLayout.emptyContainer.visibility = View.GONE
         binding.moviesList.visibility = View.VISIBLE
         tvListAdapter.setItems(movies)
@@ -122,7 +122,6 @@ class TvListFragment : BaseFragment(), RecyclerItemClickListener.OnRecyclerViewI
     }
 
     override fun onItemClick(parentView: View, childView: View, position: Int) {
-        tvListViewModel.getTvListLiveData().removeObservers(this)
         val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
             activity, Pair(childView.findViewById(R.id.image), TRANSITION_IMAGE_NAME))
 
