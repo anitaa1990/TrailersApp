@@ -73,7 +73,7 @@ public class TvListAdapter extends RecyclerView.Adapter<TvListAdapter.CustomView
 
         public void bindTo(TvEntity tvEntity) {
             Picasso.get().load(tvEntity.getPosterPath())
-                    .placeholder(R.drawable.ic_placeholder_empty)
+                    .placeholder(R.drawable.ic_placeholder)
                     .into(binding.image);
         }
     }

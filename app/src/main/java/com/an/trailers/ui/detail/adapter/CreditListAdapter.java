@@ -60,7 +60,7 @@ public class CreditListAdapter extends RecyclerView.Adapter<CreditListAdapter.Cu
         if(isCast()) {
             Cast cast = getCastItem(position);
             Picasso.get().load(String.format(AppConstants.IMAGE_URL, cast.getProfilePath()))
-                    .error(R.drawable.ic_profile_placeholder)
+                    .error(R.drawable.ic_placeholder_profile)
                     .into(holder.binding.profileImage);
             holder.binding.txtName.setText(cast.getName());
             holder.binding.txtInfo.setText(cast.getCharacter());
@@ -68,7 +68,7 @@ public class CreditListAdapter extends RecyclerView.Adapter<CreditListAdapter.Cu
         } else {
             Crew crew = getCrewItem(position);
             Picasso.get().load(String.format(AppConstants.IMAGE_URL, crew.getProfilePath()))
-                    .error(R.drawable.ic_profile_placeholder)
+                    .error(R.drawable.ic_placeholder_profile)
                     .into(holder.binding.profileImage);
             holder.binding.txtName.setText(crew.getName());
             holder.binding.txtInfo.setText(crew.getJob());

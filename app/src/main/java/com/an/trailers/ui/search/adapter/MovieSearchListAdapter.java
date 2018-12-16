@@ -74,7 +74,7 @@ public class MovieSearchListAdapter extends RecyclerView.Adapter<MovieSearchList
 
         public void bindTo(MovieEntity trailer) {
             Picasso.get().load(trailer.getPosterPath())
-                    .placeholder(R.drawable.ic_placeholder_empty)
+                    .placeholder(R.drawable.ic_placeholder)
                     .into(binding.image);
         }
     }

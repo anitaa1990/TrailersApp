@@ -70,7 +70,7 @@ public class MoviesListAdapter extends RecyclerView.Adapter<MoviesListAdapter.Cu
 
         public void bindTo(MovieEntity movie) {
             Picasso.get().load(movie.getPosterPath())
-                    .placeholder(R.drawable.ic_placeholder_empty)
+                    .placeholder(R.drawable.ic_placeholder)
                     .into(binding.image);
         }
     }

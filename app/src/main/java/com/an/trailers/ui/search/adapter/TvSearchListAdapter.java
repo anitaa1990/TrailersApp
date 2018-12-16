@@ -73,7 +73,7 @@ public class TvSearchListAdapter extends RecyclerView.Adapter<TvSearchListAdapte
 
         public void bindTo(TvEntity trailer) {
             Picasso.get().load(trailer.getPosterPath())
-                    .placeholder(R.drawable.ic_placeholder_empty)
+                    .placeholder(R.drawable.ic_placeholder)
                     .into(binding.image);
         }
     }

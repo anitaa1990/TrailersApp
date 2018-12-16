@@ -15,7 +15,7 @@
             android:layout_width="@dimen/activity_search_fav_icon_size"
             android:layout_height="@dimen/activity_search_fav_icon_size"
             android:layout_gravity="center"
-            android:src="@drawable/ic_placeholder_empty" />
+            android:src="@drawable/ic_empty" />
 
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/fav_display_text"
