@@ -55,7 +55,7 @@ class CreditListAdapter : RecyclerView.Adapter<CreditListAdapter.CustomViewHolde
         if (isCast) {
             val cast = getCastItem(position)
             Picasso.get().load(String.format(AppConstants.IMAGE_URL, cast.profilePath))
-                .error(R.drawable.ic_profile_placeholder)
+                .error(R.drawable.ic_placeholder_profile)
                 .into(holder.binding.profileImage)
             holder.binding.txtName.text = cast.name
             holder.binding.txtInfo.text = cast.character
@@ -63,7 +63,7 @@ class CreditListAdapter : RecyclerView.Adapter<CreditListAdapter.CustomViewHolde
         } else {
             val crew = getCrewItem(position)
             Picasso.get().load(String.format(AppConstants.IMAGE_URL, crew.profilePath))
-                .error(R.drawable.ic_profile_placeholder)
+                .error(R.drawable.ic_placeholder_profile)
                 .into(holder.binding.profileImage)
             holder.binding.txtName.text = crew.name
             holder.binding.txtInfo.text = crew.job

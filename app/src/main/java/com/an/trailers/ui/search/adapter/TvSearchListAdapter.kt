@@ -62,7 +62,7 @@ class TvSearchListAdapter(private val activity: Activity) :
 
         fun bindTo(trailer: TvEntity) {
             Picasso.get().load(trailer.getFormattedPosterPath())
-                .placeholder(R.drawable.ic_placeholder_empty)
+                .placeholder(R.drawable.ic_placeholder)
                 .into(binding.image)
         }
     }

@@ -55,7 +55,7 @@ class MoviesListAdapter(private val activity: Activity) : RecyclerView.Adapter<M
 
         fun bindTo(movie: MovieEntity) {
             Picasso.get().load(movie.getFormattedPosterPath())
-                .placeholder(R.drawable.ic_placeholder_empty)
+                .placeholder(R.drawable.ic_placeholder)
                 .into(binding.image)
         }
     }

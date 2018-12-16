@@ -59,7 +59,7 @@ class TvListAdapter(private val activity: Activity) : RecyclerView.Adapter<TvLis
 
         fun bindTo(tvEntity: TvEntity) {
             Picasso.get().load(tvEntity.getFormattedPosterPath())
-                .placeholder(R.drawable.ic_placeholder_empty)
+                .placeholder(R.drawable.ic_placeholder)
                 .into(binding.image)
         }
     }

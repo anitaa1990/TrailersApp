@@ -64,7 +64,7 @@ class MovieSearchListAdapter(private val activity: Activity) :
 
         fun bindTo(trailer: MovieEntity) {
             Picasso.get().load(trailer.getFormattedPosterPath())
-                .placeholder(R.drawable.ic_placeholder_empty)
+                .placeholder(R.drawable.ic_placeholder)
                 .into(binding.image)
         }
     }
