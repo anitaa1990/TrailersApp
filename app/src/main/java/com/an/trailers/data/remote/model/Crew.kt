@@ -8,10 +8,10 @@ data class Crew(
     val id: Long,
     @SerializedName("credit_id")
     val creditId: String,
-    val name: String?,
+    var name: String?,
     @SerializedName("profile_path")
-    val profilePath: String,
-    val job: String,
+    var profilePath: String?,
+    val job: String?,
     val department: String
 ) : Parcelable {
     constructor(source: Parcel) : this(

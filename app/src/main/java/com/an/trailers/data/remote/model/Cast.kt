@@ -8,12 +8,12 @@ data class Cast(
     val id: Long,
     @SerializedName("cast_id")
     val castId: Long,
-    var character: String,
+    var character: String?,
     @SerializedName("credit_id")
     val creditId: String,
-    val name: String,
+    val name: String?,
     @SerializedName("profile_path")
-    var profilePath: String,
+    var profilePath: String?,
     val order: Int
 ) : Parcelable {
     constructor(source: Parcel) : this(
