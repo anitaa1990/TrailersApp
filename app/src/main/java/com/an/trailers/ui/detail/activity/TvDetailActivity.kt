@@ -16,6 +16,7 @@ import com.an.trailers.R
 import com.an.trailers.data.local.entity.TvEntity
 import com.an.trailers.data.remote.model.Cast
 import com.an.trailers.data.remote.model.Crew
+import com.an.trailers.data.remote.model.Video
 import com.an.trailers.databinding.DetailActivityBinding
 import com.an.trailers.factory.ViewModelFactory
 import com.an.trailers.ui.base.BaseActivity
@@ -91,7 +92,7 @@ class TvDetailActivity : BaseActivity() {
                 AppUtils.getSeasonNumber(tvEntity.numberOfSeasons)
     }
 
-    private fun updateMovieVideos(videos: List<String>) {
+    private fun updateMovieVideos(videos: List<Video>) {
         val linearLayoutManager = LinearLayoutManager(this)
         linearLayoutManager.orientation = LinearLayoutManager.HORIZONTAL
         binding.recyclerView.layoutManager = linearLayoutManager
@@ -105,7 +106,7 @@ class TvDetailActivity : BaseActivity() {
                     override fun onItemClick(parentView: View, childView: View, position: Int) {
 
                         NavigationUtils.redirectToVideoScreen(
-                             applicationContext, videoListAdapter.getItem(position)
+                             applicationContext, videoListAdapter.getItem(position).key
                         )
                     }
                 })

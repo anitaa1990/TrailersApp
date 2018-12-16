@@ -17,6 +17,7 @@ import com.an.trailers.R
 import com.an.trailers.data.local.entity.MovieEntity
 import com.an.trailers.data.remote.model.Cast
 import com.an.trailers.data.remote.model.Crew
+import com.an.trailers.data.remote.model.Video
 import com.an.trailers.databinding.DetailActivityBinding
 import com.an.trailers.factory.ViewModelFactory
 import com.an.trailers.ui.base.BaseActivity
@@ -91,7 +92,7 @@ class MovieDetailActivity : BaseActivity() {
         binding.txtRuntime.text = AppUtils.getRunTimeInMins(movie.status, movie.runTime, movie.releaseDate)
     }
 
-    private fun updateMovieVideos(videos: List<String>) {
+    private fun updateMovieVideos(videos: List<Video>) {
         val linearLayoutManager = LinearLayoutManager(this)
         linearLayoutManager.orientation = LinearLayoutManager.HORIZONTAL
         binding.recyclerView.layoutManager = linearLayoutManager
@@ -104,7 +105,7 @@ class MovieDetailActivity : BaseActivity() {
                 this, object : RecyclerItemClickListener.OnRecyclerViewItemClickListener {
                     override fun onItemClick(parentView: View, childView: View, position: Int) {
                         NavigationUtils.redirectToVideoScreen(
-                            applicationContext, videoListAdapter.getItem(position)
+                            applicationContext, videoListAdapter.getItem(position).key
                         )
                     }
                 })

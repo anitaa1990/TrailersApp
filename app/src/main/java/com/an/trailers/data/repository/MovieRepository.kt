@@ -90,8 +90,7 @@ class MovieRepository(
                       movieApiResponse: MovieApiResponse ->
 
                         if (videoResponse != null) {
-                            movieEntity.videos = VideoListTypeConverter()
-                                .fromVideos(videoResponse.results)
+                            movieEntity.videos = videoResponse.results
                         }
 
                         if (creditResponse != null) {

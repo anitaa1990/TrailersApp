@@ -9,6 +9,7 @@ import com.an.trailers.data.local.converter.*
 import com.an.trailers.data.remote.model.Cast
 import com.an.trailers.data.remote.model.Crew
 import com.an.trailers.data.remote.model.Genre
+import com.an.trailers.data.remote.model.Video
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
@@ -16,41 +17,41 @@ import java.util.ArrayList
 
 @Entity(primaryKeys = ["id"])
 data class MovieEntity(
-    @SerializedName("id")
-    val id: Long,
+        @SerializedName("id")
+        val id: Long,
 
-    @SerializedName(value = "header", alternate = ["title", "name"])
-    val header: String,
+        @SerializedName(value = "header", alternate = ["title", "name"])
+        val header: String,
 
-    @SerializedName("poster_path")
-    var posterPath: String?,
+        @SerializedName("poster_path")
+        var posterPath: String?,
 
-    @SerializedName(value = "description", alternate = ["overview", "synopsis"])
-    var description: String?,
+        @SerializedName(value = "description", alternate = ["overview", "synopsis"])
+        var description: String?,
 
-    @SerializedName("release_date")
-    var releaseDate: String?,
+        @SerializedName("release_date")
+        var releaseDate: String?,
 
-    @TypeConverters(GenreListTypeConverter::class)
-    var genres: List<Genre>? = ArrayList(),
+        @TypeConverters(GenreListTypeConverter::class)
+        var genres: List<Genre>? = ArrayList(),
 
-    @SerializedName("videos")
-    @TypeConverters(StringListConverter::class)
-    var videos: List<String>? = ArrayList(),
+        @SerializedName("videos")
+        @TypeConverters(VideoListTypeConverter::class)
+        var videos: List<Video>? = ArrayList(),
 
-    @TypeConverters(CrewListTypeConverter::class)
-    var crews: List<Crew>? = ArrayList(),
+        @TypeConverters(CrewListTypeConverter::class)
+        var crews: List<Crew>? = ArrayList(),
 
-    @TypeConverters(CastListTypeConverter::class)
-    var casts: List<Cast>? = ArrayList(),
+        @TypeConverters(CastListTypeConverter::class)
+        var casts: List<Cast>? = ArrayList(),
 
-    @TypeConverters(MovieListTypeConverter::class)
-    var similarMovies: List<MovieEntity>? = ArrayList(),
+        @TypeConverters(MovieListTypeConverter::class)
+        var similarMovies: List<MovieEntity>? = ArrayList(),
 
-    @SerializedName("runtime")
-    var runTime: Long,
-    var status: String?,
-    var categoryType: String?
+        @SerializedName("runtime")
+        var runTime: Long,
+        var status: String?,
+        var categoryType: String?
 ) : Parcelable {
     fun getFormattedPosterPath(): String? {
         if (posterPath != null && !posterPath!!.startsWith("http")) {
@@ -60,19 +61,19 @@ data class MovieEntity(
     }
 
     constructor(source: Parcel) : this(
-        source.readLong(),
-        source.readString(),
-        source.readString(),
-        source.readString(),
-        source.readString(),
-        source.createTypedArrayList(Genre.CREATOR),
-        source.createStringArrayList(),
-        source.createTypedArrayList(Crew.CREATOR),
-        source.createTypedArrayList(Cast.CREATOR),
-        source.createTypedArrayList(MovieEntity.CREATOR),
-        source.readLong(),
-        source.readString(),
-        source.readString()
+            source.readLong(),
+            source.readString(),
+            source.readString(),
+            source.readString(),
+            source.readString(),
+            source.createTypedArrayList(Genre.CREATOR),
+            source.createTypedArrayList(Video.CREATOR),
+            source.createTypedArrayList(Crew.CREATOR),
+            source.createTypedArrayList(Cast.CREATOR),
+            source.createTypedArrayList(MovieEntity.CREATOR),
+            source.readLong(),
+            source.readString(),
+            source.readString()
     )
 
     override fun describeContents() = 0
@@ -84,7 +85,7 @@ data class MovieEntity(
         writeString(description)
         writeString(releaseDate)
         writeTypedList(genres)
-        writeStringList(videos)
+        writeTypedList(videos)
         writeTypedList(crews)
         writeTypedList(casts)
         writeTypedList(similarMovies)

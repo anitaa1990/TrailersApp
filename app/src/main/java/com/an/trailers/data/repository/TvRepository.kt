@@ -90,8 +90,7 @@ class TvRepository(
                       tvApiResponse: TvApiResponse ->
 
                         if (videoResponse != null) {
-                            tvEntity.videos = VideoListTypeConverter()
-                                .fromVideos(videoResponse.results)
+                            tvEntity.videos = videoResponse.results
                         }
 
                         if (creditResponse != null) {

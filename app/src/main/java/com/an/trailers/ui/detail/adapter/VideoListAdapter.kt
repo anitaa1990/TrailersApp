@@ -8,13 +8,14 @@ import android.view.View
 import android.view.ViewGroup
 import com.an.trailers.AppConstants
 import com.an.trailers.R
+import com.an.trailers.data.remote.model.Video
 import com.an.trailers.databinding.VideoListItemBinding
 import com.an.trailers.utils.AppUtils
 import com.google.android.youtube.player.YouTubeInitializationResult
 import com.google.android.youtube.player.YouTubeThumbnailLoader
 import com.google.android.youtube.player.YouTubeThumbnailView
 
-class VideoListAdapter(context: Context, private val videoList: List<String>) :
+class VideoListAdapter(context: Context, private val videoList: List<Video>) :
     RecyclerView.Adapter<VideoListAdapter.CustomViewHolder>() {
 
     private val screenWidth: Int = AppUtils.getScreenWidth(context)
@@ -38,7 +39,7 @@ class VideoListAdapter(context: Context, private val videoList: List<String>) :
                     youTubeThumbnailLoader: YouTubeThumbnailLoader
                 ) {
                     val item = getItem(position)
-                    youTubeThumbnailLoader.setVideo(item)
+                    youTubeThumbnailLoader.setVideo(item.key)
                     youTubeThumbnailView.setImageBitmap(null)
 
                     youTubeThumbnailLoader.setOnThumbnailLoadedListener(object :
@@ -74,7 +75,7 @@ class VideoListAdapter(context: Context, private val videoList: List<String>) :
         return videoList.size
     }
 
-    fun getItem(position: Int): String {
+    fun getItem(position: Int): Video {
         return videoList[position]
     }
 
