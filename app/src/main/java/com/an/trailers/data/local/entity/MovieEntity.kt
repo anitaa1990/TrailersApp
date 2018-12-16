@@ -20,6 +20,9 @@ data class MovieEntity(
         @SerializedName("id")
         val id: Long,
 
+        var page: Long,
+        var totalPages: Long,
+
         @SerializedName(value = "header", alternate = ["title", "name"])
         val header: String,
 
@@ -39,6 +42,10 @@ data class MovieEntity(
         @TypeConverters(VideoListTypeConverter::class)
         var videos: List<Video>? = ArrayList(),
 
+
+        @TypeConverters(StringListConverter::class)
+        var categoryTypes: List<String>? = ArrayList(),
+
         @TypeConverters(CrewListTypeConverter::class)
         var crews: List<Crew>? = ArrayList(),
 
@@ -50,8 +57,7 @@ data class MovieEntity(
 
         @SerializedName("runtime")
         var runTime: Long,
-        var status: String?,
-        var categoryType: String?
+        var status: String?
 ) : Parcelable {
     fun getFormattedPosterPath(): String? {
         if (posterPath != null && !posterPath!!.startsWith("http")) {
@@ -60,7 +66,13 @@ data class MovieEntity(
         return posterPath
     }
 
+    fun isLastPage() : Boolean {
+        return page >= totalPages
+    }
+
     constructor(source: Parcel) : this(
+            source.readLong(),
+            source.readLong(),
             source.readLong(),
             source.readString(),
             source.readString(),
@@ -68,11 +80,11 @@ data class MovieEntity(
             source.readString(),
             source.createTypedArrayList(Genre.CREATOR),
             source.createTypedArrayList(Video.CREATOR),
+            source.createStringArrayList(),
             source.createTypedArrayList(Crew.CREATOR),
             source.createTypedArrayList(Cast.CREATOR),
             source.createTypedArrayList(MovieEntity.CREATOR),
             source.readLong(),
-            source.readString(),
             source.readString()
     )
 
@@ -80,18 +92,20 @@ data class MovieEntity(
 
     override fun writeToParcel(dest: Parcel, flags: Int) = with(dest) {
         writeLong(id)
+        writeLong(page)
+        writeLong(totalPages)
         writeString(header)
         writeString(posterPath)
         writeString(description)
         writeString(releaseDate)
         writeTypedList(genres)
         writeTypedList(videos)
+        writeStringList(categoryTypes)
         writeTypedList(crews)
         writeTypedList(casts)
         writeTypedList(similarMovies)
         writeLong(runTime)
         writeString(status)
-        writeString(categoryType)
     }
 
     companion object {

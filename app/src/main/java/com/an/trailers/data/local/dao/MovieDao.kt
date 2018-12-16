@@ -22,6 +22,6 @@ interface MovieDao {
     @Query("SELECT * FROM `MovieEntity` where id = :id")
     fun getMovieDetailById(id: Long?): Flowable<MovieEntity>
 
-    @Query("SELECT * FROM `MovieEntity` where categoryType = :type")
-    fun getMoviesByType(type: String): Flowable<List<MovieEntity>>
+    @Query("SELECT * FROM `MovieEntity` where page = :page")
+    fun getMoviesByPage(page: Long): List<MovieEntity>
 }

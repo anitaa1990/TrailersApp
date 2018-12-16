@@ -20,7 +20,7 @@ class TvSearchViewModel @Inject constructor(
     private val tvsLiveData = MutableLiveData<Resource<List<TvEntity>>>()
 
     fun searchTv(text: String) {
-        tvRepository.searchTvs(text)
+        tvRepository.searchTvs(1, text)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { resource -> tvsLiveData.postValue(resource) }

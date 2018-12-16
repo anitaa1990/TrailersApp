@@ -3,10 +3,8 @@ package com.an.trailers.ui.main.fragment
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
-import android.content.Context
 import android.databinding.DataBindingUtil
 import android.os.Bundle
-import android.os.Handler
 import android.support.v4.app.ActivityOptionsCompat
 import android.support.v4.util.Pair
 import android.support.v7.widget.LinearLayoutManager
@@ -19,7 +17,6 @@ import com.an.trailers.AppConstants.Companion.TRANSITION_IMAGE_NAME
 import com.an.trailers.R
 import com.an.trailers.data.local.entity.MovieEntity
 import com.an.trailers.databinding.MoviesListFragmentBinding
-import com.an.trailers.factory.ViewModelFactory
 import com.an.trailers.ui.base.BaseFragment
 import com.an.trailers.ui.base.custom.recyclerview.PagerSnapHelper
 import com.an.trailers.ui.base.custom.recyclerview.RecyclerItemClickListener
@@ -31,6 +28,9 @@ import com.an.trailers.utils.NavigationUtils
 import dagger.android.support.AndroidSupportInjection
 
 import javax.inject.Inject
+import com.an.trailers.ui.base.custom.recyclerview.RecyclerViewPaginator
+
+
 
 class MovieListFragment : BaseFragment(), RecyclerItemClickListener.OnRecyclerViewItemClickListener {
 
@@ -71,37 +71,42 @@ class MovieListFragment : BaseFragment(), RecyclerItemClickListener.OnRecyclerVi
         )
         startSnapHelper.attachToRecyclerView(binding.moviesList)
         binding.moviesList.addOnItemTouchListener(RecyclerItemClickListener(requireContext(), this))
+
+        binding.moviesList.addOnScrollListener(object : RecyclerViewPaginator(binding.moviesList) {
+            override val isLastPage: Boolean
+                get() = moviesListViewModel.isLastPage()
+
+            override fun loadMore(page: Long) {
+                moviesListViewModel.loadMoreMovies(page)
+            }
+
+            override fun loadFirstData(page: Long) {
+                displayLoader()
+                moviesListViewModel.loadMoreMovies(page)
+            }
+        })
     }
 
 
     private fun initialiseViewModel() {
         moviesListViewModel = ViewModelProviders.of(this, viewModelFactory).get(MovieListViewModel::class.java)
-        moviesListViewModel.fetchMovies(MENU_MOVIE_ITEM[if (arguments == null) 0 else arguments!!.getInt(INTENT_CATEGORY)]!!
-        )
+        moviesListViewModel.setType(MENU_MOVIE_ITEM[if (arguments == null) 0 else arguments!!.getInt(INTENT_CATEGORY)]!!)
         moviesListViewModel.getMoviesLiveData().observe(this, Observer { resource ->
             if (resource!!.isLoading) {
-                displayLoader()
 
             } else if (resource.data != null && !resource.data.isEmpty()) {
-                handleSuccessResponse(resource.data)
+                updateMoviesList(resource.data)
 
             } else
                 handleErrorResponse()
         })
     }
 
-    private fun handleSuccessResponse(movies: List<MovieEntity>) {
+    private fun updateMoviesList(movies: List<MovieEntity>) {
         hideLoader()
-        moviesListViewModel.onStop()
         binding.emptyLayout.emptyContainer.visibility = View.GONE
         binding.moviesList.visibility = View.VISIBLE
         moviesListAdapter.setItems(movies)
-        Handler().postDelayed({
-            if (moviesListAdapter.itemCount > 0) {
-                (activity as MainActivity).updateBackground(moviesListAdapter.getItem(0).getFormattedPosterPath())
-            }
-
-        }, 400)
     }
 
     private fun handleErrorResponse() {
@@ -127,6 +132,7 @@ class MovieListFragment : BaseFragment(), RecyclerItemClickListener.OnRecyclerVi
     }
 
     override fun onItemClick(parentView: View, childView: View, position: Int) {
+        moviesListViewModel.onStop()
         val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
             requireActivity(), Pair(childView.findViewById(R.id.image), TRANSITION_IMAGE_NAME))
 

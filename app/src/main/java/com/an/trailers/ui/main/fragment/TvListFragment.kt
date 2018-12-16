@@ -22,6 +22,7 @@ import com.an.trailers.ui.base.BaseFragment
 import com.an.trailers.ui.base.custom.recyclerview.PagerSnapHelper
 import com.an.trailers.ui.base.custom.recyclerview.RecyclerItemClickListener
 import com.an.trailers.ui.base.custom.recyclerview.RecyclerSnapItemListener
+import com.an.trailers.ui.base.custom.recyclerview.RecyclerViewPaginator
 import com.an.trailers.ui.main.activity.MainActivity
 import com.an.trailers.ui.main.adapter.TvListAdapter
 import com.an.trailers.ui.main.viewmodel.TvListViewModel
@@ -68,35 +69,42 @@ class TvListFragment : BaseFragment(), RecyclerItemClickListener.OnRecyclerViewI
         })
         startSnapHelper.attachToRecyclerView(binding.moviesList)
         binding.moviesList.addOnItemTouchListener(RecyclerItemClickListener(requireContext(), this))
+
+        binding.moviesList.addOnScrollListener(object : RecyclerViewPaginator(binding.moviesList) {
+            override val isLastPage: Boolean
+                get() = tvListViewModel.isLastPage()
+
+            override fun loadMore(page: Long) {
+                tvListViewModel.loadMoreTvs(page)
+            }
+
+            override fun loadFirstData(page: Long) {
+                displayLoader()
+                tvListViewModel.loadMoreTvs(page)
+            }
+        })
     }
 
 
     private fun initialiseViewModel() {
         tvListViewModel = ViewModelProviders.of(this, viewModelFactory).get(TvListViewModel::class.java)
-        tvListViewModel.fetchTvs(MENU_TV_ITEM.get(arguments!!.getInt(INTENT_CATEGORY))!!)
+        tvListViewModel.setType(MENU_TV_ITEM.get(arguments!!.getInt(INTENT_CATEGORY))!!)
         tvListViewModel.getTvListLiveData().observe(this, Observer { resource ->
             if (resource!!.isLoading) {
-                displayLoader()
 
             } else if (resource.data != null && !resource.data.isEmpty()) {
-                handleSuccessResponse(resource.data)
+                updateTvsList(resource.data)
 
             } else
                 handleErrorResponse()
         })
     }
 
-    private fun handleSuccessResponse(movies: List<TvEntity>) {
+    private fun updateTvsList(movies: List<TvEntity>) {
         hideLoader()
-        tvListViewModel.onStop()
         binding.emptyLayout.emptyContainer.visibility = View.GONE
         binding.moviesList.visibility = View.VISIBLE
         tvListAdapter.setItems(movies)
-        Handler().postDelayed({
-            if (tvListAdapter.itemCount > 0) {
-                (activity as MainActivity).updateBackground(tvListAdapter.getItem(0).getFormattedPosterPath())
-            }
-        }, 400)
     }
 
     private fun handleErrorResponse() {
@@ -122,6 +130,7 @@ class TvListFragment : BaseFragment(), RecyclerItemClickListener.OnRecyclerViewI
     }
 
     override fun onItemClick(parentView: View, childView: View, position: Int) {
+        tvListViewModel.onStop()
         val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
             activity, Pair(childView.findViewById(R.id.image), TRANSITION_IMAGE_NAME))
 

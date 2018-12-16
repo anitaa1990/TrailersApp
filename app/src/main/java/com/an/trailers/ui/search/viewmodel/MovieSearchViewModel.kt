@@ -21,7 +21,7 @@ class MovieSearchViewModel @Inject constructor(
     private val moviesLiveData = MutableLiveData<Resource<List<MovieEntity>>>()
 
     fun searchMovie(text: String) {
-        movieRepository.searchMovies(text)
+        movieRepository.searchMovies(1, text)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { resource -> moviesLiveData.postValue(resource) }

@@ -20,6 +20,9 @@ data class TvEntity(
         @SerializedName("id")
         val id: Long,
 
+        var page: Long,
+        var totalPages: Long,
+
         @SerializedName(value = "header", alternate = ["title", "name"])
         val header: String,
 
@@ -45,14 +48,18 @@ data class TvEntity(
         @TypeConverters(CastListTypeConverter::class)
         var casts: List<Cast>? = ArrayList(),
 
+        @TypeConverters(StringListConverter::class)
+        var categoryTypes: List<String>? = ArrayList(),
+
         @TypeConverters(TvListTypeConverter::class)
         var similarTvEntities: List<TvEntity>? = ArrayList(),
 
         @SerializedName("number_of_seasons")
         var numberOfSeasons: Long?,
-        var status: String?,
-        var categoryType: String?
+        var status: String?
 ) : Parcelable {
+
+
     fun getFormattedPosterPath(): String? {
         if (posterPath != null && !posterPath!!.startsWith("http")) {
             posterPath = String.format(AppConstants.IMAGE_URL, posterPath)
@@ -60,7 +67,13 @@ data class TvEntity(
         return posterPath
     }
 
+    fun isLastPage() : Boolean {
+        return page >= totalPages
+    }
+
     constructor(source: Parcel) : this(
+            source.readLong(),
+            source.readLong(),
             source.readLong(),
             source.readString(),
             source.readString(),
@@ -70,9 +83,9 @@ data class TvEntity(
             source.createTypedArrayList(Video.CREATOR),
             source.createTypedArrayList(Crew.CREATOR),
             source.createTypedArrayList(Cast.CREATOR),
+            source.createStringArrayList(),
             source.createTypedArrayList(TvEntity.CREATOR),
             source.readValue(Long::class.java.classLoader) as Long?,
-            source.readString(),
             source.readString()
     )
 
@@ -80,6 +93,8 @@ data class TvEntity(
 
     override fun writeToParcel(dest: Parcel, flags: Int) = with(dest) {
         writeLong(id)
+        writeLong(page)
+        writeLong(totalPages)
         writeString(header)
         writeString(posterPath)
         writeString(description)
@@ -88,10 +103,10 @@ data class TvEntity(
         writeTypedList(videos)
         writeTypedList(crews)
         writeTypedList(casts)
+        writeStringList(categoryTypes)
         writeTypedList(similarTvEntities)
         writeValue(numberOfSeasons)
         writeString(status)
-        writeString(categoryType)
     }
 
     companion object {

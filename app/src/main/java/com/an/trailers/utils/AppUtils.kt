@@ -14,6 +14,8 @@ import com.an.trailers.ui.base.custom.menu.SlideMenuItem
 import java.text.ParsePosition
 import java.text.SimpleDateFormat
 import java.util.*
+import com.an.trailers.data.local.entity.MovieEntity
+import com.an.trailers.data.local.entity.TvEntity
 
 
 object AppUtils {
@@ -94,6 +96,40 @@ object AppUtils {
         return slideMenuItems
     }
 
+    fun getMoviesByType(type: String,
+                        movieEntities: List<MovieEntity>): List<MovieEntity> {
+        val finalList: MutableList<MovieEntity> = ArrayList()
+        for (movieEntity in movieEntities) {
+            var add = false
+            if(movieEntity.categoryTypes != null) {
+                for (categoryType in movieEntity.categoryTypes!!) {
+                    if (type.equals(categoryType, ignoreCase = true)) {
+                        add = true
+                    }
+                }
+            }
+            if (add) finalList.add(movieEntity)
+        }
+        return finalList
+    }
+
+
+    fun getTvsByType(type: String,
+                     tvEntities: List<TvEntity>): List<TvEntity> {
+        val finalList: MutableList<TvEntity> = ArrayList()
+        for (tvEntity in tvEntities) {
+            var add = false
+            if(tvEntity.categoryTypes != null) {
+                for (categoryType in tvEntity.categoryTypes!!) {
+                    if (type.equals(categoryType, ignoreCase = true)) {
+                        add = true
+                    }
+                }
+            }
+            if (add) finalList.add(tvEntity)
+        }
+        return finalList
+    }
 
     fun getRunTimeInMins(
         status: String?,

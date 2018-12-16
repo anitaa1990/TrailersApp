@@ -13,7 +13,7 @@ import com.squareup.picasso.Picasso
 import java.util.ArrayList
 
 class TvListAdapter(private val activity: Activity) : RecyclerView.Adapter<TvListAdapter.CustomViewHolder>() {
-    private var tvEntities: List<TvEntity>
+    private var tvEntities: MutableList<TvEntity> = mutableListOf()
 
     init {
         this.tvEntities = ArrayList()
@@ -26,8 +26,9 @@ class TvListAdapter(private val activity: Activity) : RecyclerView.Adapter<TvLis
     }
 
     fun setItems(tvEntities: List<TvEntity>) {
-        this.tvEntities = tvEntities
-        notifyDataSetChanged()
+        val startPosition = this.tvEntities.size
+        this.tvEntities.addAll(tvEntities)
+        notifyItemRangeChanged(startPosition, tvEntities.size)
     }
 
     override fun getItemCount(): Int {

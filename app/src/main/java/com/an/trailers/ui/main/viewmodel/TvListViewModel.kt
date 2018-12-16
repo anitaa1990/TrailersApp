@@ -14,15 +14,29 @@ class TvListViewModel @Inject constructor(
                       tvDao: TvDao,
                       tvApiService: TvApiService) : BaseViewModel() {
 
+    private lateinit var type: String
     private val tvRepository: TvRepository = TvRepository(tvDao, tvApiService)
-
     private val tvsLiveData = MutableLiveData<Resource<List<TvEntity>>>()
 
+    fun setType(type: String) {
+        this.type = type
+    }
 
-    fun fetchTvs(type: String) {
-        tvRepository.loadTvsByType(type)
-            .doOnSubscribe { addToDisposable(it) }
-            .subscribe { resource -> tvsLiveData.postValue(resource) }
+
+    fun loadMoreTvs(currentPage: Long) {
+        tvRepository.loadTvsByType(currentPage, type)
+                .doOnSubscribe { disposable -> addToDisposable(disposable) }
+                .subscribe { resource -> getTvListLiveData().postValue(resource) }
+    }
+
+    fun isLastPage(): Boolean {
+        if(getTvListLiveData().value != null &&
+                getTvListLiveData().value!!.data != null &&
+                !getTvListLiveData().value!!.data!!.isEmpty()) {
+            return getTvListLiveData().value!!.data!![0].isLastPage()
+        }
+
+        return true
     }
 
     fun getTvListLiveData() = tvsLiveData

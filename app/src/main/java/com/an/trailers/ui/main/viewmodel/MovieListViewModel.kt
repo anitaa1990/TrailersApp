@@ -13,14 +13,29 @@ class MovieListViewModel@Inject constructor(
     movieDao: MovieDao,
     movieApiService: MovieApiService) : BaseViewModel() {
 
+    private lateinit var type: String
     private val movieRepository: MovieRepository = MovieRepository(movieDao, movieApiService)
     private val moviesLiveData = MutableLiveData<Resource<List<MovieEntity>>>()
 
 
-    fun fetchMovies(type: String) {
-        movieRepository.loadMoviesByType(type)
-            .doOnSubscribe { addToDisposable(it) }
-            .subscribe { resource -> moviesLiveData.postValue(resource) }
+    fun setType(type: String) {
+        this.type = type
+    }
+
+    fun loadMoreMovies(currentPage: Long) {
+        movieRepository.loadMoviesByType(currentPage, type)
+                .doOnSubscribe { disposable -> addToDisposable(disposable) }
+                .subscribe { resource -> getMoviesLiveData().postValue(resource) }
+    }
+
+    fun isLastPage(): Boolean {
+        if(moviesLiveData.value != null &&
+                moviesLiveData.value!!.data != null &&
+                !moviesLiveData.value!!.data!!.isEmpty()) {
+            return moviesLiveData.value!!.data!![0].isLastPage()
+        }
+
+        return true
     }
 
     fun getMoviesLiveData() = moviesLiveData

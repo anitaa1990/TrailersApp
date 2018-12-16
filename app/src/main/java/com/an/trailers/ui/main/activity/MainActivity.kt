@@ -84,6 +84,7 @@ class MainActivity : BaseActivity(), HasSupportFragmentInjector {
     }
 
     fun onCheckedChanged(radioGroup: RadioGroup, i: Int) {
+        binding.overlayLayout.clearImage()
         when (i) {
             R.id.btn_movie -> NavigationUtils.replaceFragment(
                 this,

@@ -8,7 +8,7 @@ data class Crew(
     val id: Long,
     @SerializedName("credit_id")
     val creditId: String,
-    val name: String,
+    val name: String?,
     @SerializedName("profile_path")
     val profilePath: String,
     val job: String,

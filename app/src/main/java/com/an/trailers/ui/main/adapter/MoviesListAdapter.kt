@@ -10,14 +10,10 @@ import com.an.trailers.data.local.entity.MovieEntity
 import com.an.trailers.databinding.MoviesListItemBinding
 import com.squareup.picasso.Picasso
 
-import java.util.ArrayList
+
 
 class MoviesListAdapter(private val activity: Activity) : RecyclerView.Adapter<MoviesListAdapter.CustomViewHolder>() {
-    private var movies: List<MovieEntity>
-
-    init {
-        this.movies = ArrayList()
-    }
+    private var movies: MutableList<MovieEntity> = mutableListOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MoviesListAdapter.CustomViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -26,8 +22,9 @@ class MoviesListAdapter(private val activity: Activity) : RecyclerView.Adapter<M
     }
 
     fun setItems(movies: List<MovieEntity>) {
-        this.movies = movies
-        notifyDataSetChanged()
+        val startPosition = this.movies.size
+        this.movies.addAll(movies)
+        notifyItemRangeChanged(startPosition, movies.size)
     }
 
     override fun getItemCount(): Int {
