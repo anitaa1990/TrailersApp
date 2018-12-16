@@ -3,14 +3,25 @@ package com.an.trailers.data.remote.model;
 
 
 import com.an.trailers.data.local.entity.TvEntity;
+import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TvApiResponse {
 
+    public TvApiResponse() {
+        this.results = new ArrayList<>();
+    }
+
     private long page;
+
+    @SerializedName("total_pages")
     private long totalPages;
+
+    @SerializedName("total_results")
     private long totalResults;
+
     private List<TvEntity> results;
 
     public long getPage() {

@@ -3,6 +3,7 @@ package com.an.trailers.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Movie;
 import android.graphics.Point;
 import android.os.Build;
 import android.view.Display;
@@ -10,6 +11,8 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
 import com.an.trailers.R;
+import com.an.trailers.data.local.entity.MovieEntity;
+import com.an.trailers.data.local.entity.TvEntity;
 import com.an.trailers.data.remote.model.Genre;
 import com.an.trailers.ui.base.custom.menu.SlideMenuItem;
 import java.text.ParsePosition;
@@ -108,6 +111,36 @@ public class AppUtils {
 
         menuIcons.recycle();
         return slideMenuItems;
+    }
+
+    public static List<MovieEntity> getMoviesByType(String type,
+                                                    List<MovieEntity> movieEntities) {
+        List<MovieEntity> finalList = new ArrayList<>();
+        for(MovieEntity movieEntity: movieEntities) {
+            boolean add = false;
+            for(String categoryType : movieEntity.getCategoryTypes()) {
+                if(type.equalsIgnoreCase(categoryType)) {
+                    add = true;
+                }
+            }
+            if(add) finalList.add(movieEntity);
+        }
+        return finalList;
+    }
+
+    public static List<TvEntity> getTvListByType(String type,
+                                                 List<TvEntity> tvEntities) {
+        List<TvEntity> finalList = new ArrayList<>();
+        for(TvEntity tvEntity: tvEntities) {
+            boolean add = false;
+            for(String categoryType : tvEntity.getCategoryTypes()) {
+                if(type.equalsIgnoreCase(categoryType)) {
+                    add = true;
+                }
+            }
+            if(add) finalList.add(tvEntity);
+        }
+        return finalList;
     }
 
 

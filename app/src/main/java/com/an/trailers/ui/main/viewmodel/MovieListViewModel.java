@@ -17,14 +17,25 @@ public class MovieListViewModel extends BaseViewModel {
         movieRepository = new MovieRepository(movieDao, movieApiService);
     }
 
+    private String type;
     private MovieRepository movieRepository;
-
     private MutableLiveData<Resource<List<MovieEntity>>> moviesLiveData = new MutableLiveData<>();
 
-    public void fetchMovies(String type) {
-        movieRepository.loadMoviesByType(type)
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void loadMoreMovies(Long currentPage) {
+        movieRepository.loadMoviesByType(currentPage, type)
                 .doOnSubscribe(disposable -> addToDisposable(disposable))
-        .subscribe(resource -> getMoviesLiveData().postValue(resource));
+                .subscribe(resource -> getMoviesLiveData().postValue(resource));
+    }
+
+    public boolean isLastPage() {
+        return moviesLiveData.getValue() != null &&
+                !moviesLiveData.getValue().data.isEmpty() ?
+                moviesLiveData.getValue().data.get(0).isLastPage() :
+                false;
     }
 
     public MutableLiveData<Resource<List<MovieEntity>>> getMoviesLiveData() {

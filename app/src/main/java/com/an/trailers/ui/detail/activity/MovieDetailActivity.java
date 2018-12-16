@@ -15,6 +15,7 @@ import com.an.trailers.R;
 import com.an.trailers.data.local.entity.MovieEntity;
 import com.an.trailers.data.remote.model.Cast;
 import com.an.trailers.data.remote.model.Crew;
+import com.an.trailers.data.remote.model.Video;
 import com.an.trailers.databinding.DetailActivityBinding;
 import com.an.trailers.factory.ViewModelFactory;
 import com.an.trailers.ui.base.BaseActivity;
@@ -93,7 +94,7 @@ public class MovieDetailActivity extends BaseActivity {
         binding.txtRuntime.setText(AppUtils.getRunTimeInMins(movie.getStatus(), movie.getRuntime(), movie.getReleaseDate()));
     }
 
-    private void updateMovieVideos(List<String> videos) {
+    private void updateMovieVideos(List<Video> videos) {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         binding.recyclerView.setLayoutManager(linearLayoutManager);
@@ -102,7 +103,7 @@ public class MovieDetailActivity extends BaseActivity {
         VideoListAdapter videoListAdapter = new VideoListAdapter(getApplicationContext(), videos);
         binding.recyclerView.setAdapter(videoListAdapter);
         binding.recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, (parentView, childView, position) -> {
-            NavigationUtils.redirectToVideoScreen(this, videoListAdapter.getItem(position));
+            NavigationUtils.redirectToVideoScreen(this, videoListAdapter.getItem(position).getKey());
         }));
     }
 

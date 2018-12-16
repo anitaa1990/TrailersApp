@@ -1,6 +1,5 @@
 package com.an.trailers.data.local.dao;
 
-import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
@@ -29,6 +28,6 @@ public interface MovieDao {
     @Query("SELECT * FROM `MovieEntity` where id = :id")
     Flowable<MovieEntity> getMovieDetailById(Long id);
 
-    @Query("SELECT * FROM `MovieEntity` where categoryType = :type")
-    Flowable<List<MovieEntity>> getMoviesByType(String type);
+    @Query("SELECT * FROM `MovieEntity` where page = :page")
+    List<MovieEntity> getMoviesByPage(Long page);
 }

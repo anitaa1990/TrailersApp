@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 
 import com.an.trailers.AppConstants;
 import com.an.trailers.R;
+import com.an.trailers.data.remote.model.Video;
 import com.an.trailers.databinding.VideoListItemBinding;
 import com.an.trailers.utils.AppUtils;
 import com.google.android.youtube.player.YouTubeInitializationResult;
@@ -24,8 +25,8 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Cust
     private final double ASPECT_RATIO_WIDTH = 61.1;
     private final double ASPECT_RATIO_HEIGHT = 20.27;
 
-    private List<String> videoList;
-    public VideoListAdapter(Context context, List<String> videos) {
+    private List<Video> videoList;
+    public VideoListAdapter(Context context, List<Video> videos) {
         this.videoList = videos;
         this.screenWidth = AppUtils.getScreenWidth(context);
         this.screenHeight = AppUtils.getScreenHeight(context);
@@ -46,8 +47,8 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Cust
         holder.binding.youtubeThumbnail.initialize(AppConstants.YOUTUBE_API_KEY, new YouTubeThumbnailView.OnInitializedListener() {
             @Override
             public void onInitializationSuccess(YouTubeThumbnailView youTubeThumbnailView, YouTubeThumbnailLoader youTubeThumbnailLoader) {
-                final String item = getItem(position);
-                youTubeThumbnailLoader.setVideo(item);
+                final Video item = getItem(position);
+                youTubeThumbnailLoader.setVideo(item.getKey());
                 youTubeThumbnailView.setImageBitmap(null);
 
                 youTubeThumbnailLoader.setOnThumbnailLoadedListener(new YouTubeThumbnailLoader.OnThumbnailLoadedListener() {
@@ -78,7 +79,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Cust
         return videoList.size();
     }
 
-    public String getItem(int position) {
+    public Video getItem(int position) {
         return videoList.get(position);
     }
 

@@ -27,6 +27,6 @@ public interface TvDao {
     @Query("SELECT * FROM `TvEntity` where id = :id")
     Flowable<TvEntity> getTvDetailById(Long id);
 
-    @Query("SELECT * FROM `TvEntity` where categoryType = :type")
-    Flowable<List<TvEntity>> getTvListByType(String type);
+    @Query("SELECT * FROM `TvEntity` where page = :page")
+    List<TvEntity> getTvListByPage(Long page);
 }

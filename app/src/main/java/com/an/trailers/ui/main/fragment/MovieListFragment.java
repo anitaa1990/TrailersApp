@@ -3,7 +3,6 @@ package com.an.trailers.ui.main.fragment;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityOptionsCompat;
@@ -21,6 +20,7 @@ import com.an.trailers.factory.ViewModelFactory;
 import com.an.trailers.ui.base.BaseFragment;
 import com.an.trailers.ui.base.custom.recyclerview.PagerSnapHelper;
 import com.an.trailers.ui.base.custom.recyclerview.RecyclerItemClickListener;
+import com.an.trailers.ui.base.custom.recyclerview.RecyclerViewPaginator;
 import com.an.trailers.ui.main.activity.MainActivity;
 import com.an.trailers.ui.main.adapter.MoviesListAdapter;
 import com.an.trailers.ui.main.viewmodel.MovieListViewModel;
@@ -65,42 +65,58 @@ public class MovieListFragment extends BaseFragment implements RecyclerItemClick
         moviesListAdapter = new MoviesListAdapter(activity);
         binding.moviesList.setLayoutManager(new LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false));
         binding.moviesList.setAdapter(moviesListAdapter);
+        binding.moviesList.addOnItemTouchListener(new RecyclerItemClickListener(getContext(), this));
+
+        /* SnapHelper to change the background of the activity based on the list item
+         * currently visible */
         SnapHelper startSnapHelper = new PagerSnapHelper(position -> {
             MovieEntity movie = moviesListAdapter.getItem(position);
             ((MainActivity)activity).updateBackground(movie.getPosterPath());
         });
         startSnapHelper.attachToRecyclerView(binding.moviesList);
-        binding.moviesList.addOnItemTouchListener(new RecyclerItemClickListener(getContext(), this));
+
+        /* RecyclerViewPaginator to handle pagination */
+        binding.moviesList.addOnScrollListener(new RecyclerViewPaginator(binding.moviesList) {
+            @Override
+            public boolean isLastPage() {
+                return moviesListViewModel.isLastPage();
+            }
+
+            @Override
+            public void loadMore(Long page) {
+                moviesListViewModel.loadMoreMovies(page);
+            }
+
+            @Override
+            public void loadFirstData(Long page) {
+                displayLoader();
+                moviesListViewModel.loadMoreMovies(page);
+            }
+        });
     }
 
 
     private void initialiseViewModel() {
         moviesListViewModel = ViewModelProviders.of(this, viewModelFactory).get(MovieListViewModel.class);
-        moviesListViewModel.fetchMovies(MENU_MOVIE_ITEM.get(getArguments() == null ? 0: getArguments().getInt(INTENT_CATEGORY)));
+        moviesListViewModel.setType(MENU_MOVIE_ITEM.get(getArguments() == null ? 0: getArguments().getInt(INTENT_CATEGORY)));
+
         moviesListViewModel.getMoviesLiveData().observe(this, resource -> {
             if(resource.isLoading()) {
-                displayLoader();
 
-            } else if(resource.data != null && !resource.data.isEmpty()) {
-                handleSuccessResponse(resource.data);
+            } else if(!resource.data.isEmpty()) {
+                updateMoviesList(resource.data);
 
             } else handleErrorResponse();
         });
     }
 
-    private void handleSuccessResponse(List<MovieEntity> movies) {
+    private void updateMoviesList(List<MovieEntity> movies) {
         hideLoader();
-        moviesListViewModel.onStop();
         binding.emptyLayout.emptyContainer.setVisibility(View.GONE);
         binding.moviesList.setVisibility(View.VISIBLE);
         moviesListAdapter.setItems(movies);
-        new Handler().postDelayed(() -> {
-            if(moviesListAdapter.getItemCount() > 0) {
-                ((MainActivity) activity).updateBackground(moviesListAdapter.getItem(0).getPosterPath());
-            }
-
-        }, 400);
     }
+
 
     private void handleErrorResponse() {
         hideLoader();
@@ -126,6 +142,7 @@ public class MovieListFragment extends BaseFragment implements RecyclerItemClick
 
     @Override
     public void onItemClick(View parentView, View childView, int position) {
+        moviesListViewModel.onStop();
         ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity,
                 new Pair(childView.findViewById(R.id.image), TRANSITION_IMAGE_NAME));
         NavigationUtils.redirectToDetailScreen(requireActivity(),

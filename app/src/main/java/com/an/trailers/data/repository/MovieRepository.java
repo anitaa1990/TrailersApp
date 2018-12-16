@@ -5,12 +5,14 @@ import android.support.annotation.NonNull;
 import com.an.trailers.data.NetworkBoundResource;
 
 import com.an.trailers.data.Resource;
-import com.an.trailers.data.local.converter.VideoListTypeConverter;
 import com.an.trailers.data.local.dao.MovieDao;
 import com.an.trailers.data.local.entity.MovieEntity;
 import com.an.trailers.data.remote.api.MovieApiService;
 import com.an.trailers.data.remote.model.MovieApiResponse;
+import com.an.trailers.utils.AppUtils;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.inject.Singleton;
 import io.reactivex.Flowable;
@@ -27,14 +29,25 @@ public class MovieRepository {
         this.movieApiService = movieApiService;
     }
 
-    public Observable<Resource<List<MovieEntity>>> loadMoviesByType(String type) {
+    public Observable<Resource<List<MovieEntity>>> loadMoviesByType(Long page,
+                                                                    String type) {
         return new NetworkBoundResource<List<MovieEntity>, MovieApiResponse>() {
 
             @Override
             protected void saveCallResult(@NonNull MovieApiResponse item) {
                 List<MovieEntity> movieEntities = new ArrayList<>();
                 for(MovieEntity movieEntity : item.getResults()) {
-                    movieEntity.setCategoryType(type);
+
+                    MovieEntity storedMovieEntity = movieDao.getMovieById(movieEntity.getId());
+                    if(storedMovieEntity == null) movieEntity.setCategoryTypes(Arrays.asList(type));
+                    else {
+                        List<String> categories = storedMovieEntity.getCategoryTypes();
+                        categories.add(type);
+                        movieEntity.setCategoryTypes(categories);
+                    }
+
+                    movieEntity.setPage(item.getPage());
+                    movieEntity.setTotalPages(item.getTotalPages());
                     movieEntities.add(movieEntity);
                 }
                 movieDao.insertMovies(movieEntities);
@@ -48,13 +61,17 @@ public class MovieRepository {
             @NonNull
             @Override
             protected Flowable<List<MovieEntity>> loadFromDb() {
-                return movieDao.getMoviesByType(type);
+                List<MovieEntity> movieEntities = movieDao.getMoviesByPage(page);
+                if(movieEntities == null || movieEntities.isEmpty()) {
+                    return Flowable.empty();
+                }
+                return Flowable.just(AppUtils.getMoviesByType(type, movieEntities));
             }
 
             @NonNull
             @Override
             protected Observable<Resource<MovieApiResponse>> createCall() {
-                return movieApiService.fetchMoviesByType(type, 1)
+                return movieApiService.fetchMoviesByType(type, page)
                         .flatMap(movieApiResponse -> Observable.just(movieApiResponse == null
                                 ? Resource.error("", new MovieApiResponse())
                                 : Resource.success(movieApiResponse)));
@@ -96,8 +113,7 @@ public class MovieRepository {
                         (movieEntity, videoResponse, creditResponse, movieApiResponse) -> {
 
                             if(videoResponse != null) {
-                                movieEntity.setVideos(new VideoListTypeConverter()
-                                        .fromVideos(videoResponse.getResults()));
+                                movieEntity.setVideos(videoResponse.getResults());
                             }
 
                             if(creditResponse != null) {
@@ -115,14 +131,25 @@ public class MovieRepository {
     }
 
 
-    public Observable<Resource<List<MovieEntity>>> searchMovies(String query) {
+    public Observable<Resource<List<MovieEntity>>> searchMovies(Long page,
+                                                                String query) {
         return new NetworkBoundResource<List<MovieEntity>, MovieApiResponse>() {
 
             @Override
             protected void saveCallResult(@NonNull MovieApiResponse item) {
                 List<MovieEntity> movieEntities = new ArrayList<>();
                 for(MovieEntity movieEntity : item.getResults()) {
-                    movieEntity.setCategoryType(query);
+
+                    MovieEntity storedMovieEntity = movieDao.getMovieById(movieEntity.getId());
+                    if(storedMovieEntity == null) movieEntity.setCategoryTypes(Arrays.asList(query));
+                    else {
+                        List<String> categories = storedMovieEntity.getCategoryTypes();
+                        categories.add(query);
+                        movieEntity.setCategoryTypes(categories);
+                    }
+
+                    movieEntity.setPage(item.getPage());
+                    movieEntity.setTotalPages(item.getTotalPages());
                     movieEntities.add(movieEntity);
                 }
                 movieDao.insertMovies(movieEntities);
@@ -136,7 +163,11 @@ public class MovieRepository {
             @NonNull
             @Override
             protected Flowable<List<MovieEntity>> loadFromDb() {
-                return movieDao.getMoviesByType(query);
+                List<MovieEntity> movieEntities = movieDao.getMoviesByPage(page);
+                if(movieEntities == null || movieEntities.isEmpty()) {
+                    return Flowable.empty();
+                }
+                return Flowable.just(AppUtils.getMoviesByType(query, movieEntities));
             }
 
             @NonNull

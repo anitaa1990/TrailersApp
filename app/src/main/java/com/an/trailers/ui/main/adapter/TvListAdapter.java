@@ -37,8 +37,9 @@ public class TvListAdapter extends RecyclerView.Adapter<TvListAdapter.CustomView
     }
 
     public void setItems(List<TvEntity> tvEntities) {
-        this.tvEntities = tvEntities;
-        notifyDataSetChanged();
+        int startPosition = this.tvEntities.size();
+        this.tvEntities.addAll(tvEntities);
+        notifyItemRangeChanged(startPosition, tvEntities.size());
     }
 
     @Override

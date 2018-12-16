@@ -3,7 +3,6 @@ package com.an.trailers.ui.main.fragment;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityOptionsCompat;
@@ -21,6 +20,7 @@ import com.an.trailers.factory.ViewModelFactory;
 import com.an.trailers.ui.base.BaseFragment;
 import com.an.trailers.ui.base.custom.recyclerview.PagerSnapHelper;
 import com.an.trailers.ui.base.custom.recyclerview.RecyclerItemClickListener;
+import com.an.trailers.ui.base.custom.recyclerview.RecyclerViewPaginator;
 import com.an.trailers.ui.main.activity.MainActivity;
 import com.an.trailers.ui.main.adapter.TvListAdapter;
 import com.an.trailers.ui.main.viewmodel.TvListViewModel;
@@ -65,41 +65,58 @@ public class TvListFragment extends BaseFragment implements RecyclerItemClickLis
         tvListAdapter = new TvListAdapter(activity);
         binding.moviesList.setLayoutManager(new LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false));
         binding.moviesList.setAdapter(tvListAdapter);
+        binding.moviesList.addOnItemTouchListener(new RecyclerItemClickListener(getContext(), this));
+
         SnapHelper startSnapHelper = new PagerSnapHelper(position -> {
             TvEntity movie = tvListAdapter.getItem(position);
             ((MainActivity)activity).updateBackground(movie.getPosterPath());
         });
         startSnapHelper.attachToRecyclerView(binding.moviesList);
-        binding.moviesList.addOnItemTouchListener(new RecyclerItemClickListener(getContext(), this));
+
+        binding.moviesList.addOnScrollListener(new RecyclerViewPaginator(binding.moviesList) {
+            @Override
+            public boolean isLastPage() {
+                return tvListViewModel.isLastPage();
+            }
+
+            @Override
+            public void loadMore(Long page) {
+                tvListViewModel.loadMoreTvs(page);
+            }
+
+            @Override
+            public void loadFirstData(Long page) {
+                displayLoader();
+                tvListViewModel.loadMoreTvs(page);
+            }
+        });
     }
 
 
     private void initialiseViewModel() {
         tvListViewModel = ViewModelProviders.of(this, viewModelFactory).get(TvListViewModel.class);
-        tvListViewModel.fetchTvs(MENU_TV_ITEM.get(getArguments() == null ? 0: getArguments().getInt(INTENT_CATEGORY)));
+        tvListViewModel.setType(MENU_TV_ITEM.get(getArguments() == null ? 0: getArguments().getInt(INTENT_CATEGORY)));
         tvListViewModel.getTvsLiveData().observe(this, resource -> {
             if(resource.isLoading()) {
-                displayLoader();
 
-            } else if(resource.data != null && !resource.data.isEmpty()) {
-                handleSuccessResponse(resource.data);
+            } else if(!resource.data.isEmpty()) {
+                updateTvsList(resource.data);
 
             } else handleErrorResponse();
         });
     }
 
-    private void handleSuccessResponse(List<TvEntity> movies) {
+    private void updateTvsList(List<TvEntity> movies) {
         hideLoader();
-        tvListViewModel.onStop();
         binding.emptyLayout.emptyContainer.setVisibility(View.GONE);
         binding.moviesList.setVisibility(View.VISIBLE);
         tvListAdapter.setItems(movies);
-        new Handler().postDelayed(() -> {
-            if(tvListAdapter.getItemCount() > 0) {
-                ((MainActivity) activity).updateBackground(tvListAdapter.getItem(0).getPosterPath());
-            }
-
-        }, 400);
+//        new Handler().postDelayed(() -> {
+//            if(tvListAdapter.getItemCount() > 0) {
+//                ((MainActivity) activity).updateBackground(tvListAdapter.getItem(0).getPosterPath());
+//            }
+//
+//        }, 400);
     }
 
     private void handleErrorResponse() {
@@ -126,6 +143,7 @@ public class TvListFragment extends BaseFragment implements RecyclerItemClickLis
 
     @Override
     public void onItemClick(View parentView, View childView, int position) {
+        tvListViewModel.onStop();
         ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity,
                 new Pair(childView.findViewById(R.id.image), TRANSITION_IMAGE_NAME));
         NavigationUtils.redirectToTvDetailScreen(requireActivity(),

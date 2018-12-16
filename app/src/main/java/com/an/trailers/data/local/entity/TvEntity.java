@@ -10,9 +10,11 @@ import com.an.trailers.data.local.converter.CastListTypeConverter;
 import com.an.trailers.data.local.converter.CrewListTypeConverter;
 import com.an.trailers.data.local.converter.StringListConverter;
 import com.an.trailers.data.local.converter.TvListTypeConverter;
+import com.an.trailers.data.local.converter.VideoListTypeConverter;
 import com.an.trailers.data.remote.model.Cast;
 import com.an.trailers.data.remote.model.Crew;
 import com.an.trailers.data.remote.model.Genre;
+import com.an.trailers.data.remote.model.Video;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -25,6 +27,12 @@ public class TvEntity implements Parcelable {
     @SerializedName("id")
     @Expose
     private Long id;
+
+    @Expose
+    private Long page;
+
+    @Expose
+    private Long totalPages;
 
     @SerializedName(value="header", alternate={"title", "name"})
     @Expose
@@ -45,18 +53,21 @@ public class TvEntity implements Parcelable {
 
     @SerializedName("videos")
     @Expose
-    @TypeConverters(StringListConverter.class)
-    private List<String> videos;
+    @TypeConverters(VideoListTypeConverter.class)
+    private List<Video> videos;
 
     @Expose
     @TypeConverters(CrewListTypeConverter.class)
-    private List<Crew> crews = null;
+    private List<Crew> crews;
 
 
     @Expose
     @TypeConverters(CastListTypeConverter.class)
-    private List<Cast> casts = null;
+    private List<Cast> casts;
 
+    @Expose
+    @TypeConverters(StringListConverter.class)
+    private List<String> categoryTypes;
 
     @Expose
     @TypeConverters(TvListTypeConverter.class)
@@ -70,8 +81,6 @@ public class TvEntity implements Parcelable {
     @SerializedName("number_of_seasons")
     @Expose
     private Long numberOfSeasons;
-
-    private String categoryType;
 
     public Long getId() {
         return id;
@@ -116,11 +125,11 @@ public class TvEntity implements Parcelable {
         this.genres = genres;
     }
 
-    public List<String> getVideos() {
+    public List<Video> getVideos() {
         return videos;
     }
 
-    public void setVideos(List<String> videos) {
+    public void setVideos(List<Video> videos) {
         this.videos = videos;
     }
 
@@ -165,12 +174,42 @@ public class TvEntity implements Parcelable {
         this.numberOfSeasons = numberOfSeasons;
     }
 
-    public String getCategoryType() {
-        return categoryType;
+    public Long getPage() {
+        return page;
     }
 
-    public void setCategoryType(String categoryType) {
-        this.categoryType = categoryType;
+    public void setPage(Long page) {
+        this.page = page;
+    }
+
+    public Long getTotalPages() {
+        return totalPages;
+    }
+
+    public void setTotalPages(Long totalPages) {
+        this.totalPages = totalPages;
+    }
+
+    public List<String> getCategoryTypes() {
+        return categoryTypes;
+    }
+
+    public void setCategoryTypes(List<String> categoryTypes) {
+        this.categoryTypes = categoryTypes;
+    }
+
+    public boolean isLastPage() {
+        return getPage() >= getTotalPages();
+    }
+
+
+    public TvEntity() {
+        this.casts = new ArrayList<>();
+        this.crews = new ArrayList<>();
+        this.genres = new ArrayList<>();
+        this.videos = new ArrayList<>();
+        this.categoryTypes = new ArrayList<>();
+        this.similarTvEntities = new ArrayList<>();
     }
 
 
@@ -182,40 +221,36 @@ public class TvEntity implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeValue(this.id);
+        dest.writeValue(this.page);
+        dest.writeValue(this.totalPages);
         dest.writeString(this.header);
         dest.writeString(this.posterPath);
         dest.writeString(this.description);
         dest.writeTypedList(this.genres);
-        dest.writeStringList(this.videos);
+        dest.writeTypedList(this.videos);
         dest.writeTypedList(this.crews);
         dest.writeTypedList(this.casts);
+        dest.writeStringList(this.categoryTypes);
         dest.writeTypedList(this.similarTvEntities);
         dest.writeString(this.status);
         dest.writeValue(this.numberOfSeasons);
-        dest.writeString(this.categoryType);
-    }
-
-    public TvEntity() {
-        this.casts = new ArrayList<>();
-        this.crews = new ArrayList<>();
-        this.genres = new ArrayList<>();
-        this.videos = new ArrayList<>();
-        this.similarTvEntities = new ArrayList<>();
     }
 
     protected TvEntity(Parcel in) {
         this.id = (Long) in.readValue(Long.class.getClassLoader());
+        this.page = (Long) in.readValue(Long.class.getClassLoader());
+        this.totalPages = (Long) in.readValue(Long.class.getClassLoader());
         this.header = in.readString();
         this.posterPath = in.readString();
         this.description = in.readString();
         this.genres = in.createTypedArrayList(Genre.CREATOR);
-        this.videos = in.createStringArrayList();
+        this.videos = in.createTypedArrayList(Video.CREATOR);
         this.crews = in.createTypedArrayList(Crew.CREATOR);
         this.casts = in.createTypedArrayList(Cast.CREATOR);
+        this.categoryTypes = in.createStringArrayList();
         this.similarTvEntities = in.createTypedArrayList(TvEntity.CREATOR);
         this.status = in.readString();
         this.numberOfSeasons = (Long) in.readValue(Long.class.getClassLoader());
-        this.categoryType = in.readString();
     }
 
     public static final Creator<TvEntity> CREATOR = new Creator<TvEntity>() {

@@ -7,13 +7,8 @@ import com.an.trailers.data.local.entity.TvEntity;
 import com.an.trailers.data.remote.api.TvApiService;
 import com.an.trailers.data.repository.TvRepository;
 import com.an.trailers.ui.base.BaseViewModel;
-
 import java.util.List;
-
 import javax.inject.Inject;
-
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 
 public class TvListViewModel extends BaseViewModel {
 
@@ -22,15 +17,25 @@ public class TvListViewModel extends BaseViewModel {
         tvRepository = new TvRepository(tvDao, tvApiService);
     }
 
+    private String type;
     private TvRepository tvRepository;
-
     private MutableLiveData<Resource<List<TvEntity>>> tvsLiveData = new MutableLiveData<>();
 
+    public void setType(String type) {
+        this.type = type;
+    }
 
-    public void fetchTvs(String type) {
-        tvRepository.loadTvsByType(type)
+    public void loadMoreTvs(Long currentPage) {
+        tvRepository.loadTvsByType(currentPage, type)
                 .doOnSubscribe(disposable -> addToDisposable(disposable))
-        .subscribe(resource -> getTvsLiveData().postValue(resource));
+                .subscribe(resource -> getTvsLiveData().postValue(resource));
+    }
+
+    public boolean isLastPage() {
+        return tvsLiveData.getValue() != null &&
+                !tvsLiveData.getValue().data.isEmpty() ?
+                tvsLiveData.getValue().data.get(0).isLastPage() :
+                false;
     }
 
     public MutableLiveData<Resource<List<TvEntity>>> getTvsLiveData() {

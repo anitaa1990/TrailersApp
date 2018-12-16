@@ -10,8 +10,10 @@ import com.an.trailers.data.local.dao.TvDao;
 import com.an.trailers.data.local.entity.TvEntity;
 import com.an.trailers.data.remote.api.TvApiService;
 import com.an.trailers.data.remote.model.TvApiResponse;
+import com.an.trailers.utils.AppUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.inject.Singleton;
 import io.reactivex.Flowable;
@@ -28,14 +30,24 @@ public class TvRepository {
         this.tvApiService = tvApiService;
     }
 
-    public Observable<Resource<List<TvEntity>>> loadTvsByType(String type) {
+    public Observable<Resource<List<TvEntity>>> loadTvsByType(Long page,
+                                                              String type) {
         return new NetworkBoundResource<List<TvEntity>, TvApiResponse>() {
 
             @Override
             protected void saveCallResult(@NonNull TvApiResponse item) {
                 List<TvEntity> tvEntities = new ArrayList<>();
                 for(TvEntity tvEntity : item.getResults()) {
-                    tvEntity.setCategoryType(type);
+                    TvEntity storedTvEntity = tvDao.getTvEntityById(tvEntity.getId());
+                    if(storedTvEntity == null) tvEntity.setCategoryTypes(Arrays.asList(type));
+                    else {
+                        List<String> categories = storedTvEntity.getCategoryTypes();
+                        categories.add(type);
+                        tvEntity.setCategoryTypes(categories);
+                    }
+
+                    tvEntity.setPage(item.getPage());
+                    tvEntity.setTotalPages(item.getTotalPages());
                     tvEntities.add(tvEntity);
                 }
                 tvDao.insertTvList(tvEntities);
@@ -49,13 +61,18 @@ public class TvRepository {
             @NonNull
             @Override
             protected Flowable<List<TvEntity>> loadFromDb() {
-                return tvDao.getTvListByType(type);
+
+                List<TvEntity> tvEntities = tvDao.getTvListByPage(page);
+                if(tvEntities == null || tvEntities.isEmpty()) {
+                    return Flowable.empty();
+                }
+                return Flowable.just(AppUtils.getTvListByType(type, tvEntities));
             }
 
             @NonNull
             @Override
             protected Observable<Resource<TvApiResponse>> createCall() {
-                return tvApiService.fetchTvListByType(type, 1)
+                return tvApiService.fetchTvListByType(type, page)
                         .flatMap(tvApiResponse -> Observable.just(tvApiResponse == null
                                 ? Resource.error("", new TvApiResponse())
                                 : Resource.success(tvApiResponse)));
@@ -97,8 +114,7 @@ public class TvRepository {
                         (tvEntity, videoResponse, creditResponse, tvApiResponse) -> {
 
                             if(videoResponse != null) {
-                                tvEntity.setVideos(new VideoListTypeConverter()
-                                        .fromVideos(videoResponse.getResults()));
+                                tvEntity.setVideos(videoResponse.getResults());
                             }
 
                             if(creditResponse != null) {
@@ -116,14 +132,24 @@ public class TvRepository {
     }
 
 
-    public Observable<Resource<List<TvEntity>>> searchTvs(String query) {
+    public Observable<Resource<List<TvEntity>>> searchTvs(Long page,
+                                                          String query) {
         return new NetworkBoundResource<List<TvEntity>, TvApiResponse>() {
 
             @Override
             protected void saveCallResult(@NonNull TvApiResponse item) {
                 List<TvEntity> tvEntities = new ArrayList<>();
                 for(TvEntity tvEntity : item.getResults()) {
-                    tvEntity.setCategoryType(query);
+                    TvEntity storedTvEntity = tvDao.getTvEntityById(tvEntity.getId());
+                    if(storedTvEntity == null) tvEntity.setCategoryTypes(Arrays.asList(query));
+                    else {
+                        List<String> categories = storedTvEntity.getCategoryTypes();
+                        categories.add(query);
+                        tvEntity.setCategoryTypes(categories);
+                    }
+
+                    tvEntity.setPage(item.getPage());
+                    tvEntity.setTotalPages(item.getTotalPages());
                     tvEntities.add(tvEntity);
                 }
                 tvDao.insertTvList(tvEntities);
@@ -137,7 +163,11 @@ public class TvRepository {
             @NonNull
             @Override
             protected Flowable<List<TvEntity>> loadFromDb() {
-                return tvDao.getTvListByType(query);
+                List<TvEntity> tvEntities = tvDao.getTvListByPage(page);
+                if(tvEntities == null || tvEntities.isEmpty()) {
+                    return Flowable.empty();
+                }
+                return Flowable.just(AppUtils.getTvListByType(query, tvEntities));
             }
 
             @NonNull

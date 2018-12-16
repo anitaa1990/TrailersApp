@@ -32,7 +32,7 @@ public class TvSearchViewModel extends ViewModel {
     private MutableLiveData<Resource<List<TvEntity>>> tvsLiveData = new MutableLiveData<>();
 
     public void searchTv(String text) {
-        tvRepository.searchTvs(text)
+        tvRepository.searchTvs(1l, text)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(resource -> getTvsLiveData().postValue(resource));

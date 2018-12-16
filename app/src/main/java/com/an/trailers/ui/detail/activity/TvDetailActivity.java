@@ -15,6 +15,7 @@ import com.an.trailers.R;
 import com.an.trailers.data.local.entity.TvEntity;
 import com.an.trailers.data.remote.model.Cast;
 import com.an.trailers.data.remote.model.Crew;
+import com.an.trailers.data.remote.model.Video;
 import com.an.trailers.databinding.DetailActivityBinding;
 import com.an.trailers.factory.ViewModelFactory;
 import com.an.trailers.ui.base.BaseActivity;
@@ -95,7 +96,7 @@ public class TvDetailActivity extends BaseActivity {
         if(tvEntity.getNumberOfSeasons() != null) binding.txtRuntime.setText(AppUtils.getSeasonNumber(tvEntity.getNumberOfSeasons()));
     }
 
-    private void updateMovieVideos(List<String> videos) {
+    private void updateMovieVideos(List<Video> videos) {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         binding.recyclerView.setLayoutManager(linearLayoutManager);
@@ -104,7 +105,7 @@ public class TvDetailActivity extends BaseActivity {
         VideoListAdapter videoListAdapter = new VideoListAdapter(getApplicationContext(), videos);
         binding.recyclerView.setAdapter(videoListAdapter);
         binding.recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, (parentView, childView, position) -> {
-            NavigationUtils.redirectToVideoScreen(this, videoListAdapter.getItem(position));
+            NavigationUtils.redirectToVideoScreen(this, videoListAdapter.getItem(position).getKey());
         }));
     }
 

@@ -17,9 +17,6 @@ import java.util.List;
 
 public class MoviesListAdapter extends RecyclerView.Adapter<MoviesListAdapter.CustomViewHolder> {
 
-    private static final int TYPE_PROGRESS = 0;
-    private static final int TYPE_ITEM = 1;
-
     private Activity activity;
     private List<MovieEntity> movies;
     public MoviesListAdapter(Activity activity) {
@@ -37,8 +34,9 @@ public class MoviesListAdapter extends RecyclerView.Adapter<MoviesListAdapter.Cu
     }
 
     public void setItems(List<MovieEntity> movies) {
-        this.movies = movies;
-        notifyDataSetChanged();
+        int startPosition = this.movies.size();
+        this.movies.addAll(movies);
+        notifyItemRangeChanged(startPosition, movies.size());
     }
 
     @Override

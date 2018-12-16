@@ -46,11 +46,4 @@ public interface AppConstants {
                 put(1, TV_ON_THE_AIR);
                 put(2, MOVIES_TOP_RATED);
             }});
-
-
-    Map<Integer, String> MENU_ITEM = Collections.unmodifiableMap(
-            new HashMap<Integer, String>() {{
-                put(R.id.btn_movie, TYPE_MOVIES);
-                put(R.id.btn_tv, TYPE_TVS);
-            }});
 }
