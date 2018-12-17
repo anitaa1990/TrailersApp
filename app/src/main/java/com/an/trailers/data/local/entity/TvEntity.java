@@ -8,12 +8,14 @@ import android.os.Parcelable;
 import com.an.trailers.AppConstants;
 import com.an.trailers.data.local.converter.CastListTypeConverter;
 import com.an.trailers.data.local.converter.CrewListTypeConverter;
+import com.an.trailers.data.local.converter.ReviewListTypeConverter;
 import com.an.trailers.data.local.converter.StringListConverter;
 import com.an.trailers.data.local.converter.TvListTypeConverter;
 import com.an.trailers.data.local.converter.VideoListTypeConverter;
 import com.an.trailers.data.remote.model.Cast;
 import com.an.trailers.data.remote.model.Crew;
 import com.an.trailers.data.remote.model.Genre;
+import com.an.trailers.data.remote.model.Review;
 import com.an.trailers.data.remote.model.Video;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -64,6 +66,10 @@ public class TvEntity implements Parcelable {
     @Expose
     @TypeConverters(CastListTypeConverter.class)
     private List<Cast> casts;
+
+    @Expose
+    @TypeConverters(ReviewListTypeConverter.class)
+    private List<Review> reviews;
 
     @Expose
     @TypeConverters(StringListConverter.class)
@@ -149,6 +155,14 @@ public class TvEntity implements Parcelable {
         this.casts = casts;
     }
 
+    public List<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
+    }
+
     public List<TvEntity> getSimilarTvEntities() {
         return similarTvEntities;
     }
@@ -208,6 +222,7 @@ public class TvEntity implements Parcelable {
         this.crews = new ArrayList<>();
         this.genres = new ArrayList<>();
         this.videos = new ArrayList<>();
+        this.reviews = new ArrayList<>();
         this.categoryTypes = new ArrayList<>();
         this.similarTvEntities = new ArrayList<>();
     }
@@ -230,6 +245,7 @@ public class TvEntity implements Parcelable {
         dest.writeTypedList(this.videos);
         dest.writeTypedList(this.crews);
         dest.writeTypedList(this.casts);
+        dest.writeTypedList(this.reviews);
         dest.writeStringList(this.categoryTypes);
         dest.writeTypedList(this.similarTvEntities);
         dest.writeString(this.status);
@@ -247,6 +263,7 @@ public class TvEntity implements Parcelable {
         this.videos = in.createTypedArrayList(Video.CREATOR);
         this.crews = in.createTypedArrayList(Crew.CREATOR);
         this.casts = in.createTypedArrayList(Cast.CREATOR);
+        this.reviews = in.createTypedArrayList(Review.CREATOR);
         this.categoryTypes = in.createStringArrayList();
         this.similarTvEntities = in.createTypedArrayList(TvEntity.CREATOR);
         this.status = in.readString();

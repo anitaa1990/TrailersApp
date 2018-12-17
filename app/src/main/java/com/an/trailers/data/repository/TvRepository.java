@@ -111,7 +111,8 @@ public class TvRepository {
                         tvApiService.fetchTvVideo(id),
                         tvApiService.fetchCastDetail(id),
                         tvApiService.fetchSimilarTvList(id, 1),
-                        (tvEntity, videoResponse, creditResponse, tvApiResponse) -> {
+                        tvApiService.fetchTvReviews(id),
+                        (tvEntity, videoResponse, creditResponse, tvApiResponse, reviewApiResponse) -> {
 
                             if(videoResponse != null) {
                                 tvEntity.setVideos(videoResponse.getResults());
@@ -124,6 +125,10 @@ public class TvRepository {
 
                             if(tvApiResponse != null) {
                                 tvEntity.setSimilarTvEntities(tvApiResponse.getResults());
+                            }
+
+                            if(reviewApiResponse != null) {
+                                tvEntity.setReviews(reviewApiResponse.getResults());
                             }
                             return Resource.success(tvEntity);
                         });

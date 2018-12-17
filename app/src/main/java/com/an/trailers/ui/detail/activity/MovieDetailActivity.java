@@ -15,12 +15,14 @@ import com.an.trailers.R;
 import com.an.trailers.data.local.entity.MovieEntity;
 import com.an.trailers.data.remote.model.Cast;
 import com.an.trailers.data.remote.model.Crew;
+import com.an.trailers.data.remote.model.Review;
 import com.an.trailers.data.remote.model.Video;
 import com.an.trailers.databinding.DetailActivityBinding;
 import com.an.trailers.factory.ViewModelFactory;
 import com.an.trailers.ui.base.BaseActivity;
 import com.an.trailers.ui.base.custom.recyclerview.RecyclerItemClickListener;
 import com.an.trailers.ui.detail.adapter.CreditListAdapter;
+import com.an.trailers.ui.detail.adapter.ReviewListAdapter;
 import com.an.trailers.ui.detail.adapter.SimilarMoviesListAdapter;
 import com.an.trailers.ui.detail.adapter.VideoListAdapter;
 import com.an.trailers.ui.detail.viewmodel.MovieDetailViewModel;
@@ -58,9 +60,8 @@ public class MovieDetailActivity extends BaseActivity {
         Picasso.get().load(movie.getPosterPath()).into(binding.image);
         ViewCompat.setTransitionName(binding.image, TRANSITION_IMAGE_NAME);
         binding.expandButton.setPaintFlags(binding.expandButton.getPaintFlags() |  Paint.UNDERLINE_TEXT_FLAG);
-
-
     }
+
 
     private void initialiseViewModel() {
         movieDetailViewModel = ViewModelProviders.of(this, viewModelFactory).get(MovieDetailViewModel.class);
@@ -81,6 +82,9 @@ public class MovieDetailActivity extends BaseActivity {
             if(movieEntity.getSimilarMovies() != null && !movieEntity.getSimilarMovies().isEmpty()) {
                 updateSimilarMoviesView(movieEntity.getSimilarMovies());
             }
+            if(movieEntity.getReviews() != null && !movieEntity.getReviews().isEmpty()) {
+                updateMovieReviews(movieEntity.getReviews());
+            } else binding.includedReviewsLayout.reviewView.setVisibility(View.GONE);
         });
     }
 
@@ -119,6 +123,15 @@ public class MovieDetailActivity extends BaseActivity {
         binding.includedLayout.castList.setVisibility(View.VISIBLE);
         CreditListAdapter creditListAdapter = new CreditListAdapter(getApplicationContext(), CREDIT_CREW, crews);
         binding.includedLayout.crewList.setAdapter(creditListAdapter);
+    }
+
+
+    private void updateMovieReviews(List<Review> reviews) {
+        binding.includedReviewsLayout.reviewsList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        binding.includedReviewsLayout.reviewsList.setVisibility(View.VISIBLE);
+        ReviewListAdapter reviewListAdapter = new ReviewListAdapter(reviews);
+        binding.includedReviewsLayout.reviewsList.setAdapter(reviewListAdapter);
+        binding.includedReviewsLayout.reviewView.setVisibility(View.VISIBLE);
     }
 
     private void updateSimilarMoviesView(List<MovieEntity> movies) {

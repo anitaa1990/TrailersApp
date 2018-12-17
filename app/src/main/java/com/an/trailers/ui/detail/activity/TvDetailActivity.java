@@ -15,12 +15,14 @@ import com.an.trailers.R;
 import com.an.trailers.data.local.entity.TvEntity;
 import com.an.trailers.data.remote.model.Cast;
 import com.an.trailers.data.remote.model.Crew;
+import com.an.trailers.data.remote.model.Review;
 import com.an.trailers.data.remote.model.Video;
 import com.an.trailers.databinding.DetailActivityBinding;
 import com.an.trailers.factory.ViewModelFactory;
 import com.an.trailers.ui.base.BaseActivity;
 import com.an.trailers.ui.base.custom.recyclerview.RecyclerItemClickListener;
 import com.an.trailers.ui.detail.adapter.CreditListAdapter;
+import com.an.trailers.ui.detail.adapter.ReviewListAdapter;
 import com.an.trailers.ui.detail.adapter.SimilarTvListAdapter;
 import com.an.trailers.ui.detail.adapter.VideoListAdapter;
 import com.an.trailers.ui.detail.viewmodel.TvDetailViewModel;
@@ -82,6 +84,9 @@ public class TvDetailActivity extends BaseActivity {
                 if(tvEntity.getSimilarTvEntities() != null && !tvEntity.getSimilarTvEntities().isEmpty()) {
                     updateSimilarMoviesView(tvEntity.getSimilarTvEntities());
                 }
+                if(tvEntity.getReviews() != null && !tvEntity.getReviews().isEmpty()) {
+                    updateTvReviews(tvEntity.getReviews());
+                } else binding.includedReviewsLayout.reviewView.setVisibility(View.GONE);
             }
         });
     }
@@ -121,6 +126,14 @@ public class TvDetailActivity extends BaseActivity {
         binding.includedLayout.castList.setVisibility(View.VISIBLE);
         CreditListAdapter creditListAdapter = new CreditListAdapter(getApplicationContext(), CREDIT_CREW, crews);
         binding.includedLayout.crewList.setAdapter(creditListAdapter);
+    }
+
+    private void updateTvReviews(List<Review> reviews) {
+        binding.includedReviewsLayout.reviewsList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        binding.includedReviewsLayout.reviewsList.setVisibility(View.VISIBLE);
+        ReviewListAdapter reviewListAdapter = new ReviewListAdapter(reviews);
+        binding.includedReviewsLayout.reviewsList.setAdapter(reviewListAdapter);
+        binding.includedReviewsLayout.reviewView.setVisibility(View.VISIBLE);
     }
 
     private void updateSimilarMoviesView(List<TvEntity> tvEntities) {

@@ -110,7 +110,8 @@ public class MovieRepository {
                         movieApiService.fetchMovieVideo(id),
                         movieApiService.fetchCastDetail(id),
                         movieApiService.fetchSimilarMovie(id, 1),
-                        (movieEntity, videoResponse, creditResponse, movieApiResponse) -> {
+                        movieApiService.fetchMovieReviews(id),
+                        (movieEntity, videoResponse, creditResponse, movieApiResponse, reviewApiResponse) -> {
 
                             if(videoResponse != null) {
                                 movieEntity.setVideos(videoResponse.getResults());
@@ -123,6 +124,10 @@ public class MovieRepository {
 
                             if(movieApiResponse != null) {
                                 movieEntity.setSimilarMovies(movieApiResponse.getResults());
+                            }
+
+                            if(reviewApiResponse != null) {
+                                movieEntity.setReviews(reviewApiResponse.getResults());
                             }
                             return Resource.success(movieEntity);
                         });

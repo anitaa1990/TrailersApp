@@ -9,11 +9,13 @@ import com.an.trailers.data.local.converter.CastListTypeConverter;
 import com.an.trailers.data.local.converter.CrewListTypeConverter;
 import com.an.trailers.data.local.converter.GenreListTypeConverter;
 import com.an.trailers.data.local.converter.MovieListTypeConverter;
+import com.an.trailers.data.local.converter.ReviewListTypeConverter;
 import com.an.trailers.data.local.converter.StringListConverter;
 import com.an.trailers.data.local.converter.VideoListTypeConverter;
 import com.an.trailers.data.remote.model.Cast;
 import com.an.trailers.data.remote.model.Crew;
 import com.an.trailers.data.remote.model.Genre;
+import com.an.trailers.data.remote.model.Review;
 import com.an.trailers.data.remote.model.Video;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -69,6 +71,11 @@ public class MovieEntity  implements Parcelable {
     @Expose
     @TypeConverters(CastListTypeConverter.class)
     private List<Cast> casts;
+
+
+    @Expose
+    @TypeConverters(ReviewListTypeConverter.class)
+    private List<Review> reviews;
 
 
     @Expose
@@ -178,6 +185,14 @@ public class MovieEntity  implements Parcelable {
         this.casts = casts;
     }
 
+    public List<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
+    }
+
     public List<MovieEntity> getSimilarMovies() {
         return similarMovies;
     }
@@ -219,6 +234,7 @@ public class MovieEntity  implements Parcelable {
         this.crews = new ArrayList<>();
         this.genres = new ArrayList<>();
         this.videos = new ArrayList<>();
+        this.reviews = new ArrayList<>();
         this.categoryTypes = new ArrayList<>();
         this.similarMovies = new ArrayList<>();
     }
@@ -242,6 +258,7 @@ public class MovieEntity  implements Parcelable {
         dest.writeTypedList(this.videos);
         dest.writeTypedList(this.crews);
         dest.writeTypedList(this.casts);
+        dest.writeTypedList(this.reviews);
         dest.writeStringList(this.categoryTypes);
         dest.writeTypedList(this.similarMovies);
         dest.writeValue(this.runtime);
@@ -260,6 +277,7 @@ public class MovieEntity  implements Parcelable {
         this.videos = in.createTypedArrayList(Video.CREATOR);
         this.crews = in.createTypedArrayList(Crew.CREATOR);
         this.casts = in.createTypedArrayList(Cast.CREATOR);
+        this.reviews = in.createTypedArrayList(Review.CREATOR);
         this.categoryTypes = in.createStringArrayList();
         this.similarMovies = in.createTypedArrayList(MovieEntity.CREATOR);
         this.runtime = (Long) in.readValue(Long.class.getClassLoader());

@@ -56,7 +56,6 @@
                     app:cardCornerRadius="2dp"
                     app:cardElevation="0dp"
                     app:cardPreventCornerOverlap="false"
-                    app:layout_constraintHeight_default="wrap"
                     app:layout_constraintTop_toBottomOf="@+id/recyclerView"
                     app:layout_constraintWidth_default="wrap">
 
@@ -242,6 +241,19 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/movie_detail_card" />
+
+
+
+                <include
+                    android:id="@+id/included_reviews_layout"
+                    layout="@layout/view_reviews_list"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_xxlarge"
+                    android:layout_marginBottom="@dimen/margin_xxlarge"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/included_similar_layout" />
 
 
             </android.support.constraint.ConstraintLayout>

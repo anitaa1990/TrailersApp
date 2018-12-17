@@ -4,6 +4,7 @@ package com.an.trailers.data.remote.api;
 import com.an.trailers.data.local.entity.MovieEntity;
 import com.an.trailers.data.remote.model.CreditResponse;
 import com.an.trailers.data.remote.model.MovieApiResponse;
+import com.an.trailers.data.remote.model.ReviewApiResponse;
 import com.an.trailers.data.remote.model.VideoResponse;
 
 import io.reactivex.Observable;
@@ -32,6 +33,10 @@ public interface MovieApiService {
     @GET("/3/movie/{movieId}/similar")
     Observable<MovieApiResponse> fetchSimilarMovie(@Path("movieId") String movieId,
                                                    @Query("page") long page);
+
+
+    @GET("/3/movie/{movieId}/reviews")
+    Observable<ReviewApiResponse> fetchMovieReviews(@Path("movieId") String movieId);
 
 
     @GET("/3/search/movie")

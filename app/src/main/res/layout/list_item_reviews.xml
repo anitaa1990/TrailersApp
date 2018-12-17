@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data class="ReviewItemBinding" />
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/padding_large"
+        android:paddingTop="@dimen/padding_small"
+        android:paddingRight="@dimen/padding_large"
+        android:paddingBottom="@dimen/padding_small">
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/item_review_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="@font/gt_medium"
+            android:maxLines="1"
+            android:paddingTop="@dimen/margin_large"
+            android:paddingEnd="@dimen/padding"
+            android:paddingRight="@dimen/padding"
+            android:paddingBottom="@dimen/padding_xsmall"
+            android:textColor="@color/bg_activity_detail"
+            android:textSize="@dimen/font_x_medium_large"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <com.an.trailers.ui.base.custom.JustifyTextView
+            android:id="@+id/item_review_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:lineSpacingExtra="4dp"
+            android:paddingTop="@dimen/padding_xsmall"
+            android:paddingBottom="@dimen/margin_large"
+            android:textColor="@color/text_desc_activity_detail"
+            android:textSize="@dimen/font_small_medium"
+            app:layout_constraintTop_toBottomOf="@+id/item_review_title" />
+
+
+        <View
+            android:id="@+id/line"
+            android:layout_width="match_parent"
+            android:layout_height="0.7dp"
+            android:background="@color/search_overlay"
+            app:layout_constraintTop_toBottomOf="@+id/item_review_desc" />
+
+    </android.support.constraint.ConstraintLayout>
+</layout>
