@@ -1,6 +1,6 @@
 package com.an.trailers.di.module;
 
-import android.arch.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModel;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

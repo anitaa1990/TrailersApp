@@ -1,7 +1,6 @@
 package com.an.trailers.ui.detail.adapter;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -16,6 +15,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.an.trailers.AppConstants.CREDIT_CAST;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 public class CreditListAdapter extends RecyclerView.Adapter<CreditListAdapter.CustomViewHolder> {
 

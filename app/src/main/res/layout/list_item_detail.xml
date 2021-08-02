@@ -2,7 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -16,14 +16,15 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <android.support.constraint.ConstraintLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/root_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/padding_xsmall"
                 android:layout_marginBottom="@dimen/margin"
                 android:orientation="vertical"
-                android:paddingRight="@dimen/padding">
+                android:paddingRight="@dimen/padding"
+                android:paddingEnd="@dimen/padding">
 
                 <View
                     android:id="@+id/line_above_cast_title"
@@ -33,10 +34,11 @@
                     android:background="@color/detail_list_item_view"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_marginEnd="@dimen/padding" />
 
 
-                <android.support.v7.widget.AppCompatTextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/title_cast"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -59,7 +61,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/title_cast" />
 
 
-                <android.support.v7.widget.RecyclerView
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/cast_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -76,7 +78,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/cast_list" />
 
 
-                <android.support.v7.widget.AppCompatTextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/title_crew"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -100,7 +102,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/title_crew" />
 
 
-                <android.support.v7.widget.RecyclerView
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/crew_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -116,11 +118,9 @@
                     app:layout_constraintTop_toBottomOf="@+id/crew_list" />
 
 
-            </android.support.constraint.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </com.an.trailers.ui.base.custom.expandableLayout.ExpandableLayout>
-        >
 
-
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

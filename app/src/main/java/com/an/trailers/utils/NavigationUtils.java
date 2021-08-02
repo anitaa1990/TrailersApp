@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
 
 import com.an.trailers.AppConstants;
 import com.an.trailers.R;
@@ -17,6 +15,8 @@ import com.an.trailers.ui.detail.activity.VideoActivity;
 import com.an.trailers.ui.search.activity.MovieSearchActivity;
 import com.an.trailers.ui.search.activity.TvSearchActivity;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 

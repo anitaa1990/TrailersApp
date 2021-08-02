@@ -1,8 +1,9 @@
 package com.an.trailers.di.module;
 
 import android.app.Application;
-import android.arch.persistence.room.Room;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
+import androidx.room.Room;
 
 import com.an.trailers.data.local.AppDatabase;
 import com.an.trailers.data.local.dao.MovieDao;

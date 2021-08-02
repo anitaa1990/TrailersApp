@@ -1,11 +1,12 @@
 package com.an.trailers.ui.main.adapter;
 
 import android.app.Activity;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.an.trailers.R;
 import com.an.trailers.data.local.entity.TvEntity;

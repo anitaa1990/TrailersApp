@@ -1,7 +1,7 @@
 package com.an.trailers.data.repository;
 
+import androidx.annotation.NonNull;
 
-import android.support.annotation.NonNull;
 import com.an.trailers.data.NetworkBoundResource;
 
 import com.an.trailers.data.Resource;

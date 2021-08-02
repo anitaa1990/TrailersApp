@@ -1,6 +1,7 @@
 package com.an.trailers.data.local.converter;
 
-import android.arch.persistence.room.TypeConverter;
+
+import androidx.room.TypeConverter;
 
 import com.an.trailers.data.remote.model.Genre;
 import com.google.gson.Gson;

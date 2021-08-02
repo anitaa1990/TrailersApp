@@ -1,14 +1,13 @@
 package com.an.trailers.data.local.converter;
 
-import android.arch.persistence.room.TypeConverter;
+
+import androidx.room.TypeConverter;
 
 import com.an.trailers.data.remote.model.Video;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class VideoListTypeConverter {

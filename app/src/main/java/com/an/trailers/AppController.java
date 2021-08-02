@@ -2,6 +2,7 @@ package com.an.trailers;
 
 import android.app.Activity;
 import android.app.Application;
+
 import com.an.trailers.di.component.DaggerApiComponent;
 import com.an.trailers.di.module.ApiModule;
 import com.an.trailers.di.module.DbModule;

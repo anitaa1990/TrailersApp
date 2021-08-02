@@ -4,19 +4,19 @@
 
     <data class="DetailActivityBinding"/>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/bg_activity_detail"
         android:paddingBottom="@dimen/margin_xlarge">
 
 
-        <android.support.v4.widget.NestedScrollView
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
 
-            <android.support.constraint.ConstraintLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/root_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -34,7 +34,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
 
-                <android.support.v7.widget.RecyclerView
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -45,7 +45,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
 
-                <android.support.v7.widget.CardView
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/movie_detail_card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -57,24 +57,29 @@
                     app:cardElevation="0dp"
                     app:cardPreventCornerOverlap="false"
                     app:layout_constraintTop_toBottomOf="@+id/recyclerView"
-                    app:layout_constraintWidth_default="wrap">
+                    app:layout_constraintWidth_default="wrap"/>
 
 
-                    <android.support.constraint.ConstraintLayout
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/cl_details"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        app:layout_constraintTop_toBottomOf="@+id/recyclerView"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
                         android:layout_marginLeft="@dimen/margin_large"
-                        android:paddingLeft="@dimen/padding_medium"
-                        android:paddingTop="@dimen/padding_large">
+                        android:paddingTop="@dimen/padding_large"
+                        android:layout_marginStart="@dimen/margin_large"
+                        android:paddingStart="@dimen/padding_medium"
+                        android:paddingLeft="@dimen/padding_medium">
 
 
-                        <android.support.v7.widget.AppCompatTextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/movie_title"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:ellipsize="end"
-                            android:paddingEnd="@dimen/padding"
-                            android:paddingRight="@dimen/padding"
+                            android:padding="@dimen/padding"
                             android:fontFamily="@font/gt_medium"
                             android:maxLines="1"
                             android:paddingTop="@dimen/margin_large"
@@ -98,7 +103,8 @@
                             android:paddingRight="@dimen/padding_small"
                             android:paddingBottom="2dp"
                             app:layout_constraintLeft_toLeftOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/movie_title">
+                            app:layout_constraintTop_toBottomOf="@+id/movie_title"
+                            android:layout_marginEnd="@dimen/margin_xxxxxxlarge">
 
                             <ImageView
                                 android:layout_width="wrap_content"
@@ -107,7 +113,7 @@
                                 android:adjustViewBounds="true"
                                 android:src="@drawable/ic_imdb" />
 
-                            <android.support.v7.widget.AppCompatTextView
+                            <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/imdbRating"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -118,7 +124,8 @@
                                 android:paddingTop="2dp"
                                 android:textColor="@android:color/white"
                                 android:textSize="@dimen/font_xsmall"
-                                android:fontFamily="@font/gt_medium" />
+                                android:fontFamily="@font/gt_medium"
+                                android:drawableStart="@drawable/ic_star" />
 
 
                         </LinearLayout>
@@ -142,10 +149,13 @@
                             app:cp_textPaddingRight="@dimen/padding_medium"
                             app:cp_textPaddingTop="@dimen/padding_small"
                             app:layout_constraintLeft_toRightOf="@+id/layout_imdb"
-                            app:layout_constraintTop_toBottomOf="@+id/movie_title" />
+                            app:layout_constraintTop_toBottomOf="@+id/movie_title"
+                            android:layout_marginStart="@dimen/margin_xxxxxxlarge"
+                            android:layout_marginEnd="@dimen/margin"
+                            android:paddingStart="@dimen/margin_xlarge" />
 
 
-                        <android.support.v7.widget.AppCompatTextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/movie_desc"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -179,7 +189,7 @@
                             app:layout_constraintTop_toBottomOf="@+id/movie_desc" />
 
 
-                        <android.support.v7.widget.AppCompatTextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/txt_runtime"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -193,10 +203,11 @@
                             android:textColor="@color/text_runtime_activity_detail"
                             android:textSize="@dimen/font_small"
                             app:layout_constraintLeft_toRightOf="@+id/movie_status"
-                            app:layout_constraintTop_toBottomOf="@+id/movie_desc" />
+                            app:layout_constraintTop_toBottomOf="@+id/movie_desc"
+                            android:layout_marginStart="@dimen/margin_large" />
 
 
-                        <android.support.v7.widget.AppCompatTextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/expand_button"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -226,10 +237,8 @@
                             app:layout_constraintTop_toBottomOf="@+id/expand_button" />
 
 
-                    </android.support.constraint.ConstraintLayout>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-                </android.support.v7.widget.CardView>
 
                 <include
                     android:id="@+id/included_similar_layout"
@@ -240,7 +249,7 @@
                     android:layout_marginBottom="@dimen/margin_xxlarge"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/movie_detail_card" />
+                    app:layout_constraintTop_toBottomOf="@+id/cl_details" />
 
 
 
@@ -256,12 +265,12 @@
                     app:layout_constraintTop_toBottomOf="@+id/included_similar_layout" />
 
 
-            </android.support.constraint.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-        </android.support.v4.widget.NestedScrollView>
+        </androidx.core.widget.NestedScrollView>
 
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

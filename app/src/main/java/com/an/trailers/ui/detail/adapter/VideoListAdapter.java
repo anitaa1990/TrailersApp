@@ -2,10 +2,11 @@ package com.an.trailers.ui.detail.adapter;
 
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.an.trailers.AppConstants;
 import com.an.trailers.R;
@@ -36,8 +37,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Cust
     public CustomViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         VideoListItemBinding itemBinding = VideoListItemBinding.inflate(layoutInflater, parent, false);
-        CustomViewHolder viewHolder = new CustomViewHolder(itemBinding);
-        return viewHolder;
+        return new CustomViewHolder(itemBinding);
     }
 
     @Override

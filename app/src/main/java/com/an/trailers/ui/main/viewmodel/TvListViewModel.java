@@ -1,6 +1,7 @@
 package com.an.trailers.ui.main.viewmodel;
 
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.MutableLiveData;
+
 import com.an.trailers.data.Resource;
 import com.an.trailers.data.local.dao.TvDao;
 import com.an.trailers.data.local.entity.TvEntity;
@@ -33,9 +34,7 @@ public class TvListViewModel extends BaseViewModel {
 
     public boolean isLastPage() {
         return tvsLiveData.getValue() != null &&
-                !tvsLiveData.getValue().data.isEmpty() ?
-                tvsLiveData.getValue().data.get(0).isLastPage() :
-                false;
+                !tvsLiveData.getValue().data.isEmpty() && tvsLiveData.getValue().data.get(0).isLastPage();
     }
 
     public MutableLiveData<Resource<List<TvEntity>>> getTvsLiveData() {

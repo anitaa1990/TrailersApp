@@ -7,7 +7,6 @@ import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.Interpolator;
@@ -20,6 +19,8 @@ import static com.an.trailers.ui.base.custom.expandableLayout.ExpandableLayout.S
 import static com.an.trailers.ui.base.custom.expandableLayout.ExpandableLayout.State.COLLAPSING;
 import static com.an.trailers.ui.base.custom.expandableLayout.ExpandableLayout.State.EXPANDED;
 import static com.an.trailers.ui.base.custom.expandableLayout.ExpandableLayout.State.EXPANDING;
+
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 
 
 public class ExpandableLayout extends FrameLayout {

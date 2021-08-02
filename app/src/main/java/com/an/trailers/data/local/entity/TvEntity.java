@@ -1,9 +1,10 @@
 package com.an.trailers.data.local.entity;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.TypeConverters;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import androidx.room.Entity;
+import androidx.room.TypeConverters;
 
 import com.an.trailers.AppConstants;
 import com.an.trailers.data.local.converter.CastListTypeConverter;
