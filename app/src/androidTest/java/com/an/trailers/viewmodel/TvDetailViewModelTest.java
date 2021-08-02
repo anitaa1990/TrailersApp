@@ -1,11 +1,6 @@
 package com.an.trailers.viewmodel;
 
 import android.app.Application;
-import android.arch.core.executor.testing.InstantTaskExecutorRule;
-import android.arch.lifecycle.Observer;
-import android.support.test.InstrumentationRegistry;
-
-import com.an.trailers.data.local.entity.MovieEntity;
 import com.an.trailers.data.local.entity.TvEntity;
 import com.an.trailers.ui.detail.viewmodel.MovieDetailViewModel;
 import com.an.trailers.ui.detail.viewmodel.TvDetailViewModel;
@@ -19,6 +14,10 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static com.an.trailers.AppConstants.MOVIES_POPULAR;
+
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
+import androidx.lifecycle.Observer;
+import androidx.test.core.app.ApplicationProvider;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TvDetailViewModelTest {
@@ -34,8 +33,7 @@ public class TvDetailViewModelTest {
     @Before
     public void init() {
         Application app =
-                (Application) InstrumentationRegistry
-                        .getTargetContext()
+                (Application) ApplicationProvider
                         .getApplicationContext();
         tvDetailViewModel = new TvDetailViewModel(app);
     }

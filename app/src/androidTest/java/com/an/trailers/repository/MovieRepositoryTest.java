@@ -1,6 +1,5 @@
 package com.an.trailers.repository;
 
-import android.arch.core.executor.testing.InstantTaskExecutorRule;
 import com.an.trailers.data.Resource;
 import com.an.trailers.data.local.dao.MovieDao;
 import com.an.trailers.data.local.entity.MovieEntity;
@@ -24,6 +23,8 @@ import static com.an.trailers.AppConstants.MOVIES_POPULAR;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MovieRepositoryTest {
