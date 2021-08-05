@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="../../../../layout/custom_preview.xml" value="0.2833333333333333" />
+        <entry key="app/src/main/res/layout/activity_detail.xml" value="0.18" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.11907164480322906" />
+        <entry key="app/src/main/res/layout/activity_search.xml" value="0.27717391304347827" />
+        <entry key="app/src/main/res/layout/activity_video.xml" value="0.27717391304347827" />
+        <entry key="app/src/main/res/layout/fragment_movie_list.xml" value="0.27717391304347827" />
+        <entry key="app/src/main/res/layout/list_item_credits.xml" value="0.27717391304347827" />
+        <entry key="app/src/main/res/layout/list_item_detail.xml" value="0.27717391304347827" />
+        <entry key="app/src/main/res/layout/list_item_genre.xml" value="0.21316851664984865" />
+        <entry key="app/src/main/res/layout/list_item_menu.xml" value="0.27717391304347827" />
+        <entry key="app/src/main/res/layout/list_item_movie.xml" value="0.27717391304347827" />
+        <entry key="app/src/main/res/layout/list_item_reviews.xml" value="0.27717391304347827" />
+        <entry key="app/src/main/res/layout/list_item_similar_movies.xml" value="0.27717391304347827" />
+        <entry key="app/src/main/res/layout/list_item_video.xml" value="0.27717391304347827" />
+        <entry key="app/src/main/res/layout/newton_cradle_loading.xml" value="0.27717391304347827" />
+        <entry key="app/src/main/res/layout/view_empty.xml" value="0.27717391304347827" />
+        <entry key="app/src/main/res/layout/view_loader.xml" value="0.27717391304347827" />
+        <entry key="app/src/main/res/layout/view_reviews_list.xml" value="0.27717391304347827" />
+        <entry key="app/src/main/res/layout/view_similiar_movies_list.xml" value="0.27717391304347827" />
+        <entry key="app/src/main/res/layout/view_toolbar.xml" value="0.27717391304347827" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

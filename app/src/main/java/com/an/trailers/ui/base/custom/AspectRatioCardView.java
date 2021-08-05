@@ -1,9 +1,10 @@
 package com.an.trailers.ui.base.custom;
 
 import android.content.Context;
-import android.support.design.card.MaterialCardView;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
+
+import com.google.android.material.card.MaterialCardView;
 
 public class AspectRatioCardView extends MaterialCardView {
 

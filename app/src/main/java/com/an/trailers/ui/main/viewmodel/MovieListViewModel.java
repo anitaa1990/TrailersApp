@@ -1,6 +1,7 @@
 package com.an.trailers.ui.main.viewmodel;
 
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.MutableLiveData;
+
 import com.an.trailers.data.Resource;
 import com.an.trailers.data.local.dao.MovieDao;
 import com.an.trailers.data.local.entity.MovieEntity;
@@ -33,9 +34,7 @@ public class MovieListViewModel extends BaseViewModel {
 
     public boolean isLastPage() {
         return moviesLiveData.getValue() != null &&
-                !moviesLiveData.getValue().data.isEmpty() ?
-                moviesLiveData.getValue().data.get(0).isLastPage() :
-                false;
+                !moviesLiveData.getValue().data.isEmpty() && moviesLiveData.getValue().data.get(0).isLastPage();
     }
 
     public MutableLiveData<Resource<List<MovieEntity>>> getMoviesLiveData() {

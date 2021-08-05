@@ -1,9 +1,9 @@
 package com.an.trailers.data.local.converter;
 
-import android.arch.persistence.room.TypeConverter;
+
+import androidx.room.TypeConverter;
 
 import com.an.trailers.data.remote.model.Cast;
-import com.an.trailers.data.remote.model.CreditResponse;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 

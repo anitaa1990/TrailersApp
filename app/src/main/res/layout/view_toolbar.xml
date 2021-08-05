@@ -1,6 +1,6 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <android.support.v7.widget.Toolbar
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -12,7 +12,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/bg_activity_detail"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginStart="70dp">
 
             <RadioGroup
                 android:id="@+id/radio_group"
@@ -21,7 +22,7 @@
                 android:orientation="horizontal"
                 android:padding="@dimen/padding">
 
-                <android.support.v7.widget.AppCompatRadioButton
+                <androidx.appcompat.widget.AppCompatRadioButton
                     android:id="@+id/btn_movie"
                     android:checked="true"
                     android:layout_width="wrap_content"
@@ -29,7 +30,8 @@
                     android:layout_marginRight="@dimen/margin"
                     android:background="@drawable/ic_movie_selector"
                     android:button="@null"
-                    android:text="@null" />
+                    android:text="@null"
+                    android:layout_marginEnd="@dimen/margin" />
 
 
                 <View
@@ -39,14 +41,15 @@
                     android:background="@android:color/white" />
 
 
-                <android.support.v7.widget.AppCompatRadioButton
+                <androidx.appcompat.widget.AppCompatRadioButton
                     android:id="@+id/btn_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/margin"
                     android:background="@drawable/ic_tv_selector"
                     android:button="@null"
-                    android:text="@null" />
+                    android:text="@null"
+                    android:layout_marginStart="@dimen/margin" />
 
 
             </RadioGroup>
@@ -60,11 +63,13 @@
                 android:layout_centerVertical="true"
                 android:layout_marginRight="@dimen/margin_large"
                 android:background="@drawable/ic_search"
-                android:onClick="handleSearchIconClick" />
+                android:onClick="handleSearchIconClick"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="@dimen/margin_large" />
 
 
         </RelativeLayout>
 
-    </android.support.v7.widget.Toolbar>
+    </androidx.appcompat.widget.Toolbar>
 
 </layout>

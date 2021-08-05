@@ -1,8 +1,6 @@
 package com.an.trailers.db;
 
 
-import android.support.test.runner.AndroidJUnit4;
-
 import com.an.trailers.data.local.entity.TvEntity;
 import com.an.trailers.util.MockTestUtil;
 
@@ -16,7 +14,9 @@ import java.util.List;
 
 import static com.an.trailers.AppConstants.MOVIES_POPULAR;
 
-@RunWith(AndroidJUnit4.class)
+import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
+
+@RunWith(AndroidJUnit4ClassRunner.class)
 public class TvDaoTest extends DbTest {
 
     @Test

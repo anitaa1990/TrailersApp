@@ -1,11 +1,11 @@
 package com.an.trailers.data;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
 import static com.an.trailers.data.Status.ERROR;
 import static com.an.trailers.data.Status.LOADING;
 import static com.an.trailers.data.Status.SUCCESS;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 
 public class Resource<T> {

@@ -2,7 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/review_view"
         android:visibility="gone"
         android:layout_width="match_parent"
@@ -12,7 +12,7 @@
         android:paddingBottom="@dimen/padding_large">
 
 
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/movie_reviews_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -24,10 +24,11 @@
             android:textColor="@android:color/white"
             android:textSize="@dimen/font_medium"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginStart="@dimen/margin_large" />
 
 
-        <android.support.design.card.MaterialCardView
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_large"
@@ -43,13 +44,13 @@
             app:layout_constraintHeight_default="wrap"
             app:layout_constraintTop_toBottomOf="@+id/movie_reviews_title">
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/reviews_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
 
-        </android.support.design.card.MaterialCardView>
+        </com.google.android.material.card.MaterialCardView>
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

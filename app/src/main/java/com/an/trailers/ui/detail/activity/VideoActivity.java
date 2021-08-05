@@ -1,8 +1,6 @@
 package com.an.trailers.ui.detail.activity;
 
-import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.widget.Toast;
 
 import com.an.trailers.AppConstants;
@@ -13,6 +11,9 @@ import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
 
 import static com.an.trailers.AppConstants.INTENT_VIDEO_KEY;
+
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
 
 public class VideoActivity extends YouTubeBaseActivity implements YouTubePlayer.OnInitializedListener {
 

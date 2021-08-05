@@ -1,22 +1,23 @@
 package com.an.trailers.ui.search.activity;
 
 import android.app.SearchManager;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.databinding.DataBindingUtil;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.content.res.ResourcesCompat;
-import android.support.v4.util.Pair;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.SnapHelper;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
+import androidx.core.app.ActivityOptionsCompat;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.core.util.Pair;
+import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.SnapHelper;
 
 import com.an.trailers.R;
 import com.an.trailers.data.local.entity.TvEntity;
@@ -61,7 +62,9 @@ public class TvSearchActivity extends BaseActivity implements SearchView.OnQuery
         binding.search.setIconifiedByDefault(false);
         binding.search.setOnQueryTextListener(this);
 
-        EditText searchEditText = binding.search.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        //android.support.v7.appcompat.R.id.search_src_text
+
+        EditText searchEditText = binding.search.findViewById(androidx.appcompat.R.id.search_src_text);
         searchEditText.setTextColor(getResources().getColor(android.R.color.white));
         searchEditText.setHintTextColor(getResources().getColor(android.R.color.white));
         Typeface myCustomFont = ResourcesCompat.getFont(getApplicationContext(), R.font.gt_medium);

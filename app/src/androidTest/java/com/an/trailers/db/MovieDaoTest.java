@@ -1,6 +1,5 @@
 package com.an.trailers.db;
 
-import android.support.test.runner.AndroidJUnit4;
 
 import com.an.trailers.data.local.entity.MovieEntity;
 import com.an.trailers.util.MockTestUtil;
@@ -9,12 +8,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static com.an.trailers.AppConstants.MOVIES_POPULAR;
 
-@RunWith(AndroidJUnit4.class)
+import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
+
+@RunWith(AndroidJUnit4ClassRunner.class)
 public class MovieDaoTest extends DbTest {
 
     @Test
