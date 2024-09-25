@@ -1,189 +1,176 @@
-package com.an.trailers.data.repository;
+package com.an.trailers.data.repository
 
 
-import android.support.annotation.NonNull;
-import com.an.trailers.data.NetworkBoundResource;
-
-import com.an.trailers.data.Resource;
-import com.an.trailers.data.local.dao.MovieDao;
-import com.an.trailers.data.local.entity.MovieEntity;
-import com.an.trailers.data.remote.api.MovieApiService;
-import com.an.trailers.data.remote.model.MovieApiResponse;
-import com.an.trailers.utils.AppUtils;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import javax.inject.Singleton;
-import io.reactivex.Flowable;
-import io.reactivex.Observable;
+import com.an.trailers.data.NetworkBoundResource
+import com.an.trailers.data.Resource
+import com.an.trailers.data.local.dao.MovieDao
+import com.an.trailers.data.local.entity.MovieEntity
+import com.an.trailers.data.remote.api.MovieApiService
+import com.an.trailers.data.remote.model.CreditResponse
+import com.an.trailers.data.remote.model.MovieApiResponse
+import com.an.trailers.data.remote.model.VideoResponse
+import com.an.trailers.utils.AppUtils
+import io.reactivex.Flowable
+import io.reactivex.Observable
+import javax.inject.Singleton
 
 @Singleton
-public class MovieRepository {
+class MovieRepository(
+    private val movieDao: MovieDao,
+    private val movieApiService: MovieApiService
+) {
+   fun loadMoviesByType(page: Long,
+                        type: String
+   ): Observable<Resource<List<MovieEntity>>> {
+        return object : NetworkBoundResource<List<MovieEntity>, MovieApiResponse>() {
 
-    private MovieDao movieDao;
-    private MovieApiService movieApiService;
-    public MovieRepository(MovieDao movieDao,
-                           MovieApiService movieApiService) {
-        this.movieDao = movieDao;
-        this.movieApiService = movieApiService;
-    }
-
-    public Observable<Resource<List<MovieEntity>>> loadMoviesByType(Long page,
-                                                                    String type) {
-        return new NetworkBoundResource<List<MovieEntity>, MovieApiResponse>() {
-
-            @Override
-            protected void saveCallResult(@NonNull MovieApiResponse item) {
-                List<MovieEntity> movieEntities = new ArrayList<>();
-                for(MovieEntity movieEntity : item.getResults()) {
-
-                    MovieEntity storedMovieEntity = movieDao.getMovieById(movieEntity.getId());
-                    if(storedMovieEntity == null) movieEntity.setCategoryTypes(Arrays.asList(type));
-                    else {
-                        List<String> categories = storedMovieEntity.getCategoryTypes();
-                        categories.add(type);
-                        movieEntity.setCategoryTypes(categories);
+            override fun saveCallResult(item: MovieApiResponse) {
+                val movieEntities = ArrayList<MovieEntity>()
+                for (movieEntity in item.results) {
+                    val storedEntity = movieDao.getMovieById(movieEntity.id)
+                    if(storedEntity == null) {
+                        movieEntity.categoryTypes = listOf(type)
+                    } else {
+                        val categories: MutableList<String> = mutableListOf()
+                        if(storedEntity.categoryTypes != null) categories.addAll(storedEntity.categoryTypes!!)
+                        categories.add(type)
+                        movieEntity.categoryTypes = categories
                     }
 
-                    movieEntity.setPage(item.getPage());
-                    movieEntity.setTotalPages(item.getTotalPages());
-                    movieEntities.add(movieEntity);
+                    movieEntity.page = item.page
+                    movieEntity.totalPages = item.totalPages
+                    movieEntities.add(movieEntity)
                 }
-                movieDao.insertMovies(movieEntities);
+                movieDao.insertMovies(movieEntities)
             }
 
-            @Override
-            protected boolean shouldFetch() {
-                return true;
+            override fun shouldFetch(): Boolean {
+                return true
             }
 
-            @NonNull
-            @Override
-            protected Flowable<List<MovieEntity>> loadFromDb() {
-                List<MovieEntity> movieEntities = movieDao.getMoviesByPage(page);
-                if(movieEntities == null || movieEntities.isEmpty()) {
-                    return Flowable.empty();
-                }
-                return Flowable.just(AppUtils.getMoviesByType(type, movieEntities));
+            override fun loadFromDb(): Flowable<List<MovieEntity>> {
+                val movieEntities = movieDao.getMoviesByPage(page)
+                return if (movieEntities.isEmpty()) {
+                    Flowable.empty()
+                } else Flowable.just(AppUtils.getMoviesByType(type, movieEntities))
             }
 
-            @NonNull
-            @Override
-            protected Observable<Resource<MovieApiResponse>> createCall() {
+            override fun createCall(): Observable<Resource<MovieApiResponse>> {
                 return movieApiService.fetchMoviesByType(type, page)
-                        .flatMap(movieApiResponse -> Observable.just(movieApiResponse == null
-                                ? Resource.error("", new MovieApiResponse())
-                                : Resource.success(movieApiResponse)));
+                    .flatMap { movieApiResponse ->
+                        Observable.just(
+                            if (movieApiResponse.results.isEmpty())
+                                Resource.error("", MovieApiResponse(1, emptyList(), 0, 1))
+                            else Resource.success(movieApiResponse)
+                        )
+                    }
             }
-        }.getAsObservable();
+        }.getAsObservable()
     }
 
 
-    public Observable<Resource<MovieEntity>> fetchMovieDetails(Long movieId) {
-        return new NetworkBoundResource<MovieEntity, MovieEntity>() {
-            @Override
-            protected void saveCallResult(@NonNull MovieEntity item) {
-                MovieEntity movieEntity = movieDao.getMovieById(item.getId());
-                if(movieEntity == null) movieDao.insertMovie(item);
-                else movieDao.updateMovie(item);
+    fun fetchMovieDetails(movieId: Long): Observable<Resource<MovieEntity>> {
+        return object : NetworkBoundResource<MovieEntity, MovieEntity>() {
+            override fun saveCallResult(item: MovieEntity) {
+                val movieEntity = movieDao.getMovieById(movieId)
+                if(null == movieEntity) movieDao.insertMovie(item)
+                else {
+                    item.page = movieEntity.page
+                    item.totalPages = movieEntity.totalPages
+                    item.categoryTypes = movieEntity.categoryTypes
+                    movieDao.updateMovie(item)
+                }
             }
 
-            @Override
-            protected boolean shouldFetch() {
-                return true;
+            override fun shouldFetch(): Boolean {
+                return true
             }
 
-            @NonNull
-            @Override
-            protected Flowable<MovieEntity> loadFromDb() {
-                MovieEntity movieEntity = movieDao.getMovieById(movieId);
-                if(movieEntity == null) return Flowable.empty();
-                return Flowable.just(movieEntity);
+            override fun loadFromDb(): Flowable<MovieEntity> {
+                val movieEntity = movieDao.getMovieById(movieId) ?: return Flowable.empty()
+                return Flowable.just(movieEntity)
             }
 
-            @NonNull
-            @Override
-            protected Observable<Resource<MovieEntity>> createCall() {
-                String id = String.valueOf(movieId);
-                return Observable.combineLatest(movieApiService.fetchMovieDetail(id),
-                        movieApiService.fetchMovieVideo(id),
-                        movieApiService.fetchCastDetail(id),
-                        movieApiService.fetchSimilarMovie(id, 1),
-                        movieApiService.fetchMovieReviews(id),
-                        (movieEntity, videoResponse, creditResponse, movieApiResponse, reviewApiResponse) -> {
+            override fun createCall(): Observable<Resource<MovieEntity>> {
+                val id = movieId.toString()
+                return Observable.combineLatest(
+                    movieApiService.fetchMovieDetail(id),
+                    movieApiService.fetchMovieVideo(id),
+                    movieApiService.fetchCastDetail(id),
+                    movieApiService.fetchSimilarMovie(id, 1)
+                ) { movieEntity: MovieEntity,
+                    videoResponse: VideoResponse,
+                    creditResponse: CreditResponse,
+                    movieApiResponse: MovieApiResponse ->
 
-                            if(videoResponse != null) {
-                                movieEntity.setVideos(videoResponse.getResults());
-                            }
-
-                            if(creditResponse != null) {
-                                movieEntity.setCrews(creditResponse.getCrew());
-                                movieEntity.setCasts(creditResponse.getCast());
-                            }
-
-                            if(movieApiResponse != null) {
-                                movieEntity.setSimilarMovies(movieApiResponse.getResults());
-                            }
-
-                            if(reviewApiResponse != null) {
-                                movieEntity.setReviews(reviewApiResponse.getResults());
-                            }
-                            return Resource.success(movieEntity);
-                        });
+                    if (videoResponse.results.isNotEmpty()) {
+                        movieEntity.videos = videoResponse.results
+                    }
+                    if (creditResponse.crew.isNotEmpty()) {
+                        movieEntity.crews = creditResponse.crew
+                    }
+                    if (creditResponse.cast.isNotEmpty()) {
+                        movieEntity.casts = creditResponse.cast
+                    }
+                    if (movieApiResponse.results.isNotEmpty()) {
+                        movieEntity.similarMovies = movieApiResponse.results
+                    }
+                    Resource.success(movieEntity)
+                }
             }
-        }.getAsObservable();
+        }.getAsObservable()
     }
 
 
-    public Observable<Resource<List<MovieEntity>>> searchMovies(Long page,
-                                                                String query) {
-        return new NetworkBoundResource<List<MovieEntity>, MovieApiResponse>() {
+    fun searchMovies(
+        page: Long,
+        query: String
+    ): Observable<Resource<List<MovieEntity>>> {
+        return object : NetworkBoundResource<List<MovieEntity>, MovieApiResponse>() {
 
-            @Override
-            protected void saveCallResult(@NonNull MovieApiResponse item) {
-                List<MovieEntity> movieEntities = new ArrayList<>();
-                for(MovieEntity movieEntity : item.getResults()) {
-
-                    MovieEntity storedMovieEntity = movieDao.getMovieById(movieEntity.getId());
-                    if(storedMovieEntity == null) movieEntity.setCategoryTypes(Arrays.asList(query));
-                    else {
-                        List<String> categories = storedMovieEntity.getCategoryTypes();
-                        categories.add(query);
-                        movieEntity.setCategoryTypes(categories);
+            override fun saveCallResult(item: MovieApiResponse) {
+                val movieEntities = ArrayList<MovieEntity>()
+                for (movieEntity in item.results) {
+                    val storedEntity = movieDao.getMovieById(movieEntity.id)
+                    if(storedEntity == null) {
+                        movieEntity.categoryTypes = listOf(query)
+                    } else {
+                        val categories: MutableList<String> = mutableListOf()
+                        if(!storedEntity.categoryTypes.isNullOrEmpty()) categories.addAll(storedEntity.categoryTypes!!)
+                        categories.add(query)
+                        movieEntity.categoryTypes = categories
                     }
 
-                    movieEntity.setPage(item.getPage());
-                    movieEntity.setTotalPages(item.getTotalPages());
-                    movieEntities.add(movieEntity);
+                    movieEntity.page = item.page
+                    movieEntity.totalPages = item.totalPages
+                    movieEntities.add(movieEntity)
                 }
-                movieDao.insertMovies(movieEntities);
+                movieDao.insertMovies(movieEntities)
             }
 
-            @Override
-            protected boolean shouldFetch() {
-                return true;
+            override fun shouldFetch(): Boolean {
+                return true
             }
 
-            @NonNull
-            @Override
-            protected Flowable<List<MovieEntity>> loadFromDb() {
-                List<MovieEntity> movieEntities = movieDao.getMoviesByPage(page);
-                if(movieEntities == null || movieEntities.isEmpty()) {
-                    return Flowable.empty();
-                }
-                return Flowable.just(AppUtils.getMoviesByType(query, movieEntities));
+            override fun loadFromDb(): Flowable<List<MovieEntity>> {
+                val movieEntities = movieDao.getMoviesByPage(page)
+                return if (movieEntities.isEmpty()) {
+                    Flowable.empty()
+                } else Flowable.just(AppUtils.getMoviesByType(query, movieEntities))
             }
 
-            @NonNull
-            @Override
-            protected Observable<Resource<MovieApiResponse>> createCall() {
+            override fun createCall(): Observable<Resource<MovieApiResponse>> {
                 return movieApiService.searchMoviesByQuery(query, "1")
-                        .flatMap(movieApiResponse -> Observable.just(movieApiResponse == null
-                                ? Resource.error("", new MovieApiResponse())
-                                : Resource.success(movieApiResponse)));
+                    .flatMap { movieApiResponse ->
+                        Observable.just(
+                            if (movieApiResponse.results.isEmpty()) {
+                                Resource.error("", MovieApiResponse(1, emptyList(), 0, 1))
+                            } else Resource.success(movieApiResponse)
+                        )
+
+                    }
             }
-        }.getAsObservable();
+        }.getAsObservable()
     }
 
 }

@@ -1,152 +1,142 @@
-package com.an.trailers.ui.main.fragment;
+package com.an.trailers.ui.main.fragment
 
-import android.arch.lifecycle.ViewModelProviders;
-import android.databinding.DataBindingUtil;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.util.Pair;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.SnapHelper;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import androidx.databinding.DataBindingUtil
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.core.app.ActivityOptionsCompat
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.an.trailers.AppConstants.Companion.INTENT_CATEGORY
+import com.an.trailers.AppConstants.Companion.MENU_MOVIE_ITEM
+import com.an.trailers.AppConstants.Companion.TRANSITION_IMAGE_NAME
+import com.an.trailers.R
+import com.an.trailers.data.local.entity.MovieEntity
+import com.an.trailers.databinding.MoviesListFragmentBinding
+import com.an.trailers.ui.base.BaseFragment
+import com.an.trailers.ui.base.custom.recyclerview.PagerSnapHelper
+import com.an.trailers.ui.base.custom.recyclerview.RecyclerItemClickListener
+import com.an.trailers.ui.base.custom.recyclerview.RecyclerSnapItemListener
+import com.an.trailers.ui.main.activity.MainActivity
+import com.an.trailers.ui.main.adapter.MoviesListAdapter
+import com.an.trailers.ui.main.viewmodel.MovieListViewModel
+import com.an.trailers.utils.NavigationUtils
+import dagger.android.support.AndroidSupportInjection
 
-import com.an.trailers.R;
-import com.an.trailers.data.local.entity.MovieEntity;
-import com.an.trailers.databinding.MoviesListFragmentBinding;
-import com.an.trailers.factory.ViewModelFactory;
-import com.an.trailers.ui.base.BaseFragment;
-import com.an.trailers.ui.base.custom.recyclerview.PagerSnapHelper;
-import com.an.trailers.ui.base.custom.recyclerview.RecyclerItemClickListener;
-import com.an.trailers.ui.base.custom.recyclerview.RecyclerViewPaginator;
-import com.an.trailers.ui.main.activity.MainActivity;
-import com.an.trailers.ui.main.adapter.MoviesListAdapter;
-import com.an.trailers.ui.main.viewmodel.MovieListViewModel;
-import com.an.trailers.utils.NavigationUtils;
+import javax.inject.Inject
+import com.an.trailers.ui.base.custom.recyclerview.RecyclerViewPaginator
 
-import java.util.List;
 
-import javax.inject.Inject;
 
-import dagger.android.support.AndroidSupportInjection;
-
-public class MovieListFragment extends BaseFragment implements RecyclerItemClickListener.OnRecyclerViewItemClickListener {
+class MovieListFragment : BaseFragment(), RecyclerItemClickListener.OnRecyclerViewItemClickListener {
 
     @Inject
-    ViewModelFactory viewModelFactory;
+    internal lateinit var viewModelFactory: ViewModelProvider.Factory
 
-    MovieListViewModel moviesListViewModel;
-    private MoviesListFragmentBinding binding;
-    private MoviesListAdapter moviesListAdapter;
+    private lateinit var binding: MoviesListFragmentBinding
+    private lateinit var moviesListAdapter: MoviesListAdapter
+    lateinit var moviesListViewModel: MovieListViewModel
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        AndroidSupportInjection.inject(this);
-        initialiseViewModel();
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        AndroidSupportInjection.inject(this)
+        initialiseViewModel()
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_movie_list, container, false);
-        return binding.getRoot();
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_movie_list, container, false)
+        return binding.root
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        initialiseView();
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initialiseView()
     }
 
-    private void initialiseView() {
-        moviesListAdapter = new MoviesListAdapter(activity);
-        binding.moviesList.setLayoutManager(new LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false));
-        binding.moviesList.setAdapter(moviesListAdapter);
-        binding.moviesList.addOnItemTouchListener(new RecyclerItemClickListener(getContext(), this));
+    private fun initialiseView() {
+        moviesListAdapter = MoviesListAdapter(activity)
+        binding.moviesList.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
+        binding.moviesList.adapter = moviesListAdapter
+        val startSnapHelper = PagerSnapHelper(
+            object : RecyclerSnapItemListener {
+                override fun onItemSnap(position: Int) {
+                    val movie = moviesListAdapter.getItem(position)
+                    (activity as MainActivity).updateBackground(movie.getFormattedPosterPath())
+                }
+            }
+        )
+        startSnapHelper.attachToRecyclerView(binding.moviesList)
+        binding.moviesList.addOnItemTouchListener(RecyclerItemClickListener(requireContext(), this))
 
-        /* SnapHelper to change the background of the activity based on the list item
-         * currently visible */
-        SnapHelper startSnapHelper = new PagerSnapHelper(position -> {
-            MovieEntity movie = moviesListAdapter.getItem(position);
-            ((MainActivity)activity).updateBackground(movie.getPosterPath());
-        });
-        startSnapHelper.attachToRecyclerView(binding.moviesList);
+        binding.moviesList.addOnScrollListener(object : RecyclerViewPaginator(binding.moviesList) {
+            override val isLastPage: Boolean
+                get() = moviesListViewModel.isLastPage()
 
-        /* RecyclerViewPaginator to handle pagination */
-        binding.moviesList.addOnScrollListener(new RecyclerViewPaginator(binding.moviesList) {
-            @Override
-            public boolean isLastPage() {
-                return moviesListViewModel.isLastPage();
+            override fun loadMore(page: Long) {
+                moviesListViewModel.loadMoreMovies(page)
             }
 
-            @Override
-            public void loadMore(Long page) {
-                moviesListViewModel.loadMoreMovies(page);
+            override fun loadFirstData(page: Long) {
+                displayLoader()
+                moviesListViewModel.loadMoreMovies(page)
             }
-
-            @Override
-            public void loadFirstData(Long page) {
-                displayLoader();
-                moviesListViewModel.loadMoreMovies(page);
-            }
-        });
+        })
     }
 
 
-    private void initialiseViewModel() {
-        moviesListViewModel = ViewModelProviders.of(this, viewModelFactory).get(MovieListViewModel.class);
-        moviesListViewModel.setType(MENU_MOVIE_ITEM.get(getArguments() == null ? 0: getArguments().getInt(INTENT_CATEGORY)));
+    private fun initialiseViewModel() {
+        moviesListViewModel = ViewModelProviders.of(this, viewModelFactory)[MovieListViewModel::class.java]
+        moviesListViewModel.setType(MENU_MOVIE_ITEM[if (arguments == null) 0 else requireArguments().getInt(INTENT_CATEGORY)]!!)
+        moviesListViewModel.getMoviesLiveData().observe(this) { resource ->
+            if (resource!!.isLoading) {
 
-        moviesListViewModel.getMoviesLiveData().observe(this, resource -> {
-            if(resource.isLoading()) {
+            } else if (!resource.data.isNullOrEmpty()) {
+                updateMoviesList(resource.data)
 
-            } else if(!resource.data.isEmpty()) {
-                updateMoviesList(resource.data);
-
-            } else handleErrorResponse();
-        });
+            } else
+                handleErrorResponse()
+        }
     }
 
-    private void updateMoviesList(List<MovieEntity> movies) {
-        hideLoader();
-        binding.emptyLayout.emptyContainer.setVisibility(View.GONE);
-        binding.moviesList.setVisibility(View.VISIBLE);
-        moviesListAdapter.setItems(movies);
+    private fun updateMoviesList(movies: List<MovieEntity>) {
+        hideLoader()
+        binding.emptyLayout.emptyContainer.visibility = View.GONE
+        binding.moviesList.visibility = View.VISIBLE
+        moviesListAdapter.setItems(movies)
+    }
+
+    private fun handleErrorResponse() {
+        hideLoader()
+        binding.moviesList.visibility = View.GONE
+        binding.emptyLayout.emptyContainer.visibility = View.VISIBLE
+        (activity as MainActivity).clearBackground()
     }
 
 
-    private void handleErrorResponse() {
-        hideLoader();
-        binding.moviesList.setVisibility(View.GONE);
-        binding.emptyLayout.emptyContainer.setVisibility(View.VISIBLE);
-        ((MainActivity) activity).clearBackground();
+    private fun displayLoader() {
+        binding.moviesList.visibility = View.GONE
+        binding.loaderLayout.rootView.visibility = View.VISIBLE
+        binding.loaderLayout.loader.start()
+        (activity as MainActivity).hideToolbar()
     }
 
-
-    private void displayLoader() {
-        binding.moviesList.setVisibility(View.GONE);
-        binding.loaderLayout.rootView.setVisibility(View.VISIBLE);
-        binding.loaderLayout.loader.start();
-        ((MainActivity)activity).hideToolbar();
+    private fun hideLoader() {
+        binding.moviesList.visibility = View.VISIBLE
+        binding.loaderLayout.rootView.visibility = View.GONE
+        binding.loaderLayout.loader.stop()
+        (activity as MainActivity).displayToolbar()
     }
 
-    private void hideLoader() {
-        binding.moviesList.setVisibility(View.VISIBLE);
-        binding.loaderLayout.rootView.setVisibility(View.GONE);
-        binding.loaderLayout.loader.stop();
-        ((MainActivity)activity).displayToolbar();
-    }
+    override fun onItemClick(parentView: View, childView: View, position: Int) {
+        moviesListViewModel.onStop()
+        val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+            requireActivity(), androidx.core.util.Pair(childView.findViewById(R.id.image), TRANSITION_IMAGE_NAME))
 
-    @Override
-    public void onItemClick(View parentView, View childView, int position) {
-        moviesListViewModel.onStop();
-        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity,
-                new Pair(childView.findViewById(R.id.image), TRANSITION_IMAGE_NAME));
-        NavigationUtils.redirectToDetailScreen(requireActivity(),
-                moviesListAdapter.getItem(position),
-                options);
+        NavigationUtils.redirectToDetailScreen(
+            requireActivity(), moviesListAdapter.getItem(position), options
+        )
     }
 }

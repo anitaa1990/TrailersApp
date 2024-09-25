@@ -1,162 +1,160 @@
-package com.an.trailers.ui.detail.activity;
+package com.an.trailers.ui.detail.activity
 
-import android.arch.lifecycle.ViewModelProviders;
-import android.databinding.DataBindingUtil;
-import android.graphics.Paint;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.util.Pair;
-import android.support.v4.view.ViewCompat;
-import android.support.v7.widget.LinearLayoutManager;
-import android.view.View;
+import android.graphics.Paint
+import android.os.Bundle
+import android.view.View
+import androidx.core.app.ActivityOptionsCompat
+import androidx.core.view.ViewCompat
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.an.trailers.AppConstants.Companion.CREDIT_CREW
+import com.an.trailers.AppConstants.Companion.INTENT_MOVIE
+import com.an.trailers.AppConstants.Companion.TRANSITION_IMAGE_NAME
+import com.an.trailers.R
+import com.an.trailers.data.local.entity.MovieEntity
+import com.an.trailers.data.remote.model.Cast
+import com.an.trailers.data.remote.model.Crew
+import com.an.trailers.data.remote.model.Video
+import com.an.trailers.databinding.DetailActivityBinding
+import com.an.trailers.factory.ViewModelFactory
+import com.an.trailers.ui.base.BaseActivity
+import com.an.trailers.ui.base.custom.recyclerview.RecyclerItemClickListener
+import com.an.trailers.ui.detail.adapter.CreditListAdapter
+import com.an.trailers.ui.detail.adapter.SimilarMoviesListAdapter
+import com.an.trailers.ui.detail.adapter.VideoListAdapter
+import com.an.trailers.ui.detail.viewmodel.MovieDetailViewModel
+import com.an.trailers.utils.AppUtils
+import com.an.trailers.utils.NavigationUtils
+import com.an.trailers.utils.getParcelable
+import com.squareup.picasso.Picasso
+import dagger.android.AndroidInjection
+import javax.inject.Inject
 
-import com.an.trailers.R;
-import com.an.trailers.data.local.entity.MovieEntity;
-import com.an.trailers.data.remote.model.Cast;
-import com.an.trailers.data.remote.model.Crew;
-import com.an.trailers.data.remote.model.Review;
-import com.an.trailers.data.remote.model.Video;
-import com.an.trailers.databinding.DetailActivityBinding;
-import com.an.trailers.factory.ViewModelFactory;
-import com.an.trailers.ui.base.BaseActivity;
-import com.an.trailers.ui.base.custom.recyclerview.RecyclerItemClickListener;
-import com.an.trailers.ui.detail.adapter.CreditListAdapter;
-import com.an.trailers.ui.detail.adapter.ReviewListAdapter;
-import com.an.trailers.ui.detail.adapter.SimilarMoviesListAdapter;
-import com.an.trailers.ui.detail.adapter.VideoListAdapter;
-import com.an.trailers.ui.detail.viewmodel.MovieDetailViewModel;
-import com.an.trailers.utils.AppUtils;
-import com.an.trailers.utils.NavigationUtils;
-import com.squareup.picasso.Picasso;
-
-import java.util.Arrays;
-import java.util.List;
-
-import javax.inject.Inject;
-
-import dagger.android.AndroidInjection;
-
-public class MovieDetailActivity extends BaseActivity {
+class MovieDetailActivity : BaseActivity() {
 
     @Inject
-    ViewModelFactory viewModelFactory;
+    internal lateinit var viewModelFactory: ViewModelFactory
 
-    private DetailActivityBinding binding;
-    MovieDetailViewModel movieDetailViewModel;
+    private lateinit var binding: DetailActivityBinding
+    private lateinit var movieDetailViewModel: MovieDetailViewModel
 
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        AndroidInjection.inject(this);
-        initialiseView();
-        initialiseViewModel();
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        AndroidInjection.inject(this)
+        initialiseView()
+        initialiseViewModel()
     }
 
-    private void initialiseView() {
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
+    private fun initialiseView() {
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_detail)
 
-        MovieEntity movie = getIntent().getParcelableExtra(INTENT_MOVIE);
-        Picasso.get().load(movie.getPosterPath()).into(binding.image);
-        ViewCompat.setTransitionName(binding.image, TRANSITION_IMAGE_NAME);
-        binding.expandButton.setPaintFlags(binding.expandButton.getPaintFlags() |  Paint.UNDERLINE_TEXT_FLAG);
+        val movie = intent.getParcelable(INTENT_MOVIE, MovieEntity::class.java)
+        Picasso.get().load(movie.getFormattedPosterPath()).into(binding.image)
+        ViewCompat.setTransitionName(binding.image, TRANSITION_IMAGE_NAME)
+        binding.expandButton.paintFlags = binding.expandButton.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+
+
     }
 
-
-    private void initialiseViewModel() {
-        movieDetailViewModel = ViewModelProviders.of(this, viewModelFactory).get(MovieDetailViewModel.class);
-        movieDetailViewModel.fetchMovieDetail(getIntent().getParcelableExtra(INTENT_MOVIE));
-        movieDetailViewModel.getMovieDetailsLiveData().observe(this, movieEntity -> {
-            updateMovieDetailView(movieEntity);
-            if(movieEntity.getVideos() != null && !movieEntity.getVideos().isEmpty()) {
-                updateMovieVideos(movieEntity.getVideos());
+    private fun initialiseViewModel() {
+        movieDetailViewModel = ViewModelProviders.of(this, viewModelFactory).get(MovieDetailViewModel::class.java)
+        val movie = intent.getParcelable(INTENT_MOVIE, MovieEntity::class.java)
+        movieDetailViewModel.fetchMovieDetail(movie)
+        movieDetailViewModel.getMovieDetailsLiveData().observe(this) { movieEntity ->
+            updateMovieDetailView(movieEntity!!)
+            if (movieEntity.videos != null && movieEntity.videos!!.isNotEmpty()) {
+                updateMovieVideos(movieEntity.videos!!)
             }
-            if(movieEntity.getCrews() != null && !movieEntity.getCrews().isEmpty()) {
-                updateMovieCrewDetails(movieEntity.getCrews());
+            if (!movieEntity.crews.isNullOrEmpty()) {
+                updateMovieCrewDetails(movieEntity.crews!!)
             }
 
-            if(movieEntity.getCasts() != null && !movieEntity.getCasts().isEmpty()) {
-                binding.expandButton.setVisibility(View.VISIBLE);
-                updateMovieCastDetails(movieEntity.getCasts());
+            if (!movieEntity.casts.isNullOrEmpty()) {
+                binding.expandButton.visibility = View.VISIBLE
+                updateMovieCastDetails(movieEntity.casts!!)
             }
-            if(movieEntity.getSimilarMovies() != null && !movieEntity.getSimilarMovies().isEmpty()) {
-                updateSimilarMoviesView(movieEntity.getSimilarMovies());
+            if (!movieEntity.similarMovies.isNullOrEmpty()) {
+                updateSimilarMoviesView(movieEntity.similarMovies!!)
             }
-            if(movieEntity.getReviews() != null && !movieEntity.getReviews().isEmpty()) {
-                updateMovieReviews(movieEntity.getReviews());
-            } else binding.includedReviewsLayout.reviewView.setVisibility(View.GONE);
-        });
+        }
     }
 
 
-    private void updateMovieDetailView(MovieEntity movie) {
-        binding.movieTitle.setText(movie.getHeader());
-        binding.movieDesc.setText(movie.getDescription());
-        if(movie.getStatus() != null) binding.movieStatus.setItems(Arrays.asList(new String[]{ movie.getStatus() }));
-        binding.collectionItemPicker.setUseRandomColor(true);
-        if(movie.getGenres() != null) binding.collectionItemPicker.setItems(AppUtils.getGenres(movie.getGenres()));
-        binding.txtRuntime.setText(AppUtils.getRunTimeInMins(movie.getStatus(), movie.getRuntime(), movie.getReleaseDate()));
+    private fun updateMovieDetailView(movie: MovieEntity) {
+        binding.movieTitle.text = movie.header
+        binding.movieDesc.text = movie.description
+        if (movie.status != null) binding.movieStatus.items = mutableListOf(movie.status!!)
+        binding.collectionItemPicker.isUseRandomColor = true
+        if (movie.genres != null) binding.collectionItemPicker.items = AppUtils.getGenres(movie.genres!!)
+        binding.txtRuntime.text = AppUtils.getRunTimeInMins(movie.status, movie.runTime, movie.releaseDate)
     }
 
-    private void updateMovieVideos(List<Video> videos) {
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        binding.recyclerView.setLayoutManager(linearLayoutManager);
-        binding.recyclerView.smoothScrollToPosition(1);
+    private fun updateMovieVideos(videos: List<Video>) {
+        val linearLayoutManager = LinearLayoutManager(this)
+        linearLayoutManager.orientation = LinearLayoutManager.HORIZONTAL
+        binding.recyclerView.layoutManager = linearLayoutManager
+        binding.recyclerView.smoothScrollToPosition(1)
 
-        VideoListAdapter videoListAdapter = new VideoListAdapter(getApplicationContext(), videos);
-        binding.recyclerView.setAdapter(videoListAdapter);
-        binding.recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, (parentView, childView, position) -> {
-            NavigationUtils.redirectToVideoScreen(this, videoListAdapter.getItem(position).getKey());
-        }));
+        val videoListAdapter = VideoListAdapter(applicationContext, videos)
+        binding.recyclerView.adapter = videoListAdapter
+        binding.recyclerView.addOnItemTouchListener(
+            RecyclerItemClickListener(
+                this, object : RecyclerItemClickListener.OnRecyclerViewItemClickListener {
+                    override fun onItemClick(parentView: View, childView: View, position: Int) {
+                        NavigationUtils.redirectToVideoScreen(
+                            applicationContext, videoListAdapter.getItem(position).key
+                        )
+                    }
+                })
+        )
     }
 
-    private void updateMovieCastDetails(List<Cast> casts) {
-        binding.includedLayout.castList.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false));
-        binding.includedLayout.castList.setVisibility(View.VISIBLE);
-        CreditListAdapter creditListAdapter = new CreditListAdapter(getApplicationContext(), casts);
-        binding.includedLayout.castList.setAdapter(creditListAdapter);
+    private fun updateMovieCastDetails(casts: List<Cast>) {
+        binding.includedLayout.castList.layoutManager =
+                LinearLayoutManager(applicationContext, LinearLayoutManager.HORIZONTAL, false)
+        binding.includedLayout.castList.visibility = View.VISIBLE
+        val creditListAdapter = CreditListAdapter(applicationContext, casts)
+        binding.includedLayout.castList.adapter = creditListAdapter
     }
 
-    private void updateMovieCrewDetails(List<Crew> crews) {
-        binding.includedLayout.crewList.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false));
-        binding.includedLayout.castList.setVisibility(View.VISIBLE);
-        CreditListAdapter creditListAdapter = new CreditListAdapter(getApplicationContext(), CREDIT_CREW, crews);
-        binding.includedLayout.crewList.setAdapter(creditListAdapter);
+    private fun updateMovieCrewDetails(crews: List<Crew>) {
+        binding.includedLayout.crewList.layoutManager =
+                LinearLayoutManager(applicationContext, LinearLayoutManager.HORIZONTAL, false)
+        binding.includedLayout.castList.visibility = View.VISIBLE
+        val creditListAdapter = CreditListAdapter(applicationContext, CREDIT_CREW, crews)
+        binding.includedLayout.crewList.adapter = creditListAdapter
+    }
+
+    private fun updateSimilarMoviesView(movies: List<MovieEntity>) {
+        binding.includedSimilarLayout.moviesList.layoutManager =
+                LinearLayoutManager(applicationContext, LinearLayoutManager.HORIZONTAL, false)
+        binding.includedSimilarLayout.moviesList.visibility = View.VISIBLE
+        val similarMoviesListAdapter = SimilarMoviesListAdapter(movies)
+        binding.includedSimilarLayout.moviesList.adapter = similarMoviesListAdapter
+
+        binding.includedSimilarLayout.moviesList.addOnItemTouchListener(
+                RecyclerItemClickListener(applicationContext,
+                        object : RecyclerItemClickListener.OnRecyclerViewItemClickListener {
+                            override fun onItemClick(parentView: View, childView: View, position: Int) {
+                                val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                                        this@MovieDetailActivity, childView, TRANSITION_IMAGE_NAME)
+
+                                NavigationUtils.redirectToDetailScreen(
+                                        this@MovieDetailActivity, similarMoviesListAdapter.getItem(position), options)
+                            }
+                        }))
+        binding.includedSimilarLayout.movieSimilarTitle.visibility = View.VISIBLE
     }
 
 
-    private void updateMovieReviews(List<Review> reviews) {
-        binding.includedReviewsLayout.reviewsList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        binding.includedReviewsLayout.reviewsList.setVisibility(View.VISIBLE);
-        ReviewListAdapter reviewListAdapter = new ReviewListAdapter(reviews);
-        binding.includedReviewsLayout.reviewsList.setAdapter(reviewListAdapter);
-        binding.includedReviewsLayout.reviewView.setVisibility(View.VISIBLE);
-    }
-
-    private void updateSimilarMoviesView(List<MovieEntity> movies) {
-        binding.includedSimilarLayout.moviesList.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false));
-        binding.includedSimilarLayout.moviesList.setVisibility(View.VISIBLE);
-        SimilarMoviesListAdapter similarMoviesListAdapter = new SimilarMoviesListAdapter(this, movies);
-        binding.includedSimilarLayout.moviesList.setAdapter(similarMoviesListAdapter);
-
-        binding.includedSimilarLayout.moviesList.addOnItemTouchListener(new RecyclerItemClickListener(this, (parentView, childView, position) -> {
-            MovieEntity movie = similarMoviesListAdapter.getItem(position);
-            ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this,
-                    new Pair(childView, TRANSITION_IMAGE_NAME));
-            NavigationUtils.redirectToDetailScreen(this, movie, options);
-        }));
-        binding.includedSimilarLayout.movieSimilarTitle.setVisibility(View.VISIBLE);
-    }
-
-
-    public void handleExpandAction(View view) {
-        if (binding.includedLayout.expandableLayout.isExpanded()) {
-            binding.expandButton.setText(getString(R.string.read_more));
-            binding.includedLayout.expandableLayout.collapse();
+    fun handleExpandAction(view: View) {
+        if (binding.includedLayout.expandableLayout.isExpanded) {
+            binding.expandButton.text = getString(R.string.read_more)
+            binding.includedLayout.expandableLayout.collapse()
         } else {
-            binding.expandButton.setText(getString(R.string.read_less));
-            binding.includedLayout.expandableLayout.expand();
+            binding.expandButton.text = getString(R.string.read_less)
+            binding.includedLayout.expandableLayout.expand()
         }
     }
 }

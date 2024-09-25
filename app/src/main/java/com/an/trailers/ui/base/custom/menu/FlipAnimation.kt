@@ -1,52 +1,40 @@
-package com.an.trailers.ui.base.custom.menu;
+package com.an.trailers.ui.base.custom.menu
 
-import android.graphics.Camera;
-import android.graphics.Matrix;
-import android.view.animation.Animation;
-import android.view.animation.Transformation;
+import android.graphics.Camera
+import android.view.animation.Animation
+import android.view.animation.Transformation
 
 
-public class FlipAnimation extends Animation {
-    private final float mFromDegrees;
-    private final float mToDegrees;
-    private final float mCenterX;
-    private final float mCenterY;
-    private Camera mCamera;
+class FlipAnimation(
+    private val mFromDegrees: Float, private val mToDegrees: Float,
+    private val mCenterX: Float, private val mCenterY: Float
+) : Animation() {
+    private var mCamera: Camera? = null
 
-    public FlipAnimation(float fromDegrees, float toDegrees,
-                         float centerX, float centerY) {
-        mFromDegrees = fromDegrees;
-        mToDegrees = toDegrees;
-        mCenterX = centerX;
-        mCenterY = centerY;
+    override fun initialize(width: Int, height: Int, parentWidth: Int, parentHeight: Int) {
+        super.initialize(width, height, parentWidth, parentHeight)
+        mCamera = Camera()
     }
 
-    @Override
-    public void initialize(int width, int height, int parentWidth, int parentHeight) {
-        super.initialize(width, height, parentWidth, parentHeight);
-        mCamera = new Camera();
-    }
+    override fun applyTransformation(interpolatedTime: Float, t: Transformation) {
+        val fromDegrees = mFromDegrees
+        val degrees = fromDegrees + (mToDegrees - fromDegrees) * interpolatedTime
 
-    @Override
-    protected void applyTransformation(float interpolatedTime, Transformation t) {
-        final float fromDegrees = mFromDegrees;
-        float degrees = fromDegrees + ((mToDegrees - fromDegrees) * interpolatedTime);
+        val centerX = mCenterX
+        val centerY = mCenterY
+        val camera = mCamera
 
-        final float centerX = mCenterX;
-        final float centerY = mCenterY;
-        final Camera camera = mCamera;
+        val matrix = t.matrix
 
-        final Matrix matrix = t.getMatrix();
+        camera!!.save()
 
-        camera.save();
+        camera.rotateY(degrees)
 
-        camera.rotateY(degrees);
+        camera.getMatrix(matrix)
+        camera.restore()
 
-        camera.getMatrix(matrix);
-        camera.restore();
-
-        matrix.preTranslate(-centerX, -centerY);
-        matrix.postTranslate(centerX, centerY);
+        matrix.preTranslate(-centerX, -centerY)
+        matrix.postTranslate(centerX, centerY)
 
     }
 

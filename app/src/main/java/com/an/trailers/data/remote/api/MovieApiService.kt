@@ -1,45 +1,45 @@
-package com.an.trailers.data.remote.api;
+package com.an.trailers.data.remote.api
 
 
-import com.an.trailers.data.local.entity.MovieEntity;
-import com.an.trailers.data.remote.model.CreditResponse;
-import com.an.trailers.data.remote.model.MovieApiResponse;
-import com.an.trailers.data.remote.model.ReviewApiResponse;
-import com.an.trailers.data.remote.model.VideoResponse;
+import com.an.trailers.data.local.entity.MovieEntity
+import com.an.trailers.data.remote.model.CreditResponse
+import com.an.trailers.data.remote.model.MovieApiResponse
+import com.an.trailers.data.remote.model.VideoResponse
+import io.reactivex.Observable
+import retrofit2.http.GET
+import retrofit2.http.Path
+import retrofit2.http.Query
 
-import io.reactivex.Observable;
-import retrofit2.http.GET;
-import retrofit2.http.Path;
-import retrofit2.http.Query;
-
-public interface MovieApiService {
+interface MovieApiService {
 
     @GET("movie/{type}?language=en-US&region=US")
-    Observable<MovieApiResponse> fetchMoviesByType(@Path("type") String type,
-                                                   @Query("page") long page);
+    fun fetchMoviesByType(
+        @Path("type") type: String,
+        @Query("page") page: Long
+    ): Observable<MovieApiResponse>
 
 
     @GET("/3/movie/{movieId}")
-    Observable<MovieEntity> fetchMovieDetail(@Path("movieId") String movieId);
+    fun fetchMovieDetail(@Path("movieId") movieId: String): Observable<MovieEntity>
 
 
     @GET("/3/movie/{movieId}/videos")
-    Observable<VideoResponse> fetchMovieVideo(@Path("movieId") String movieId);
+    fun fetchMovieVideo(@Path("movieId") movieId: String): Observable<VideoResponse>
 
     @GET("/3/movie/{movieId}/credits")
-    Observable<CreditResponse> fetchCastDetail(@Path("movieId") String movieId);
+    fun fetchCastDetail(@Path("movieId") movieId: String): Observable<CreditResponse>
 
 
     @GET("/3/movie/{movieId}/similar")
-    Observable<MovieApiResponse> fetchSimilarMovie(@Path("movieId") String movieId,
-                                                   @Query("page") long page);
-
-
-    @GET("/3/movie/{movieId}/reviews")
-    Observable<ReviewApiResponse> fetchMovieReviews(@Path("movieId") String movieId);
+    fun fetchSimilarMovie(
+        @Path("movieId") movieId: String,
+        @Query("page") page: Long
+    ): Observable<MovieApiResponse>
 
 
     @GET("/3/search/movie")
-    Observable<MovieApiResponse> searchMoviesByQuery(@Query("query") String query,
-                                                     @Query("page") String page);
+    fun searchMoviesByQuery(
+        @Query("query") query: String,
+        @Query("page") page: String
+    ): Observable<MovieApiResponse>
 }

@@ -1,44 +1,30 @@
-package com.an.trailers.ui.search.viewmodel;
+package com.an.trailers.ui.search.viewmodel
 
-import android.app.Application;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.ViewModel;
-import android.support.annotation.NonNull;
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import com.an.trailers.data.Resource
+import com.an.trailers.data.local.dao.TvDao
+import com.an.trailers.data.local.entity.TvEntity
+import com.an.trailers.data.remote.api.TvApiService
+import com.an.trailers.data.repository.TvRepository
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 
-import com.an.trailers.AppController;
-import com.an.trailers.data.Resource;
-import com.an.trailers.data.local.dao.TvDao;
-import com.an.trailers.data.local.entity.TvEntity;
-import com.an.trailers.data.remote.api.TvApiService;
-import com.an.trailers.data.repository.TvRepository;
-import com.an.trailers.ui.base.BaseViewModel;
+import javax.inject.Inject
 
-import java.util.List;
+class TvSearchViewModel @Inject constructor(
+    tvDao: TvDao,
+    tvApiService: TvApiService) : ViewModel() {
 
-import javax.inject.Inject;
+    private val tvRepository: TvRepository = TvRepository(tvDao, tvApiService)
+    private val tvsLiveData = MutableLiveData<Resource<List<TvEntity>>>()
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
-
-public class TvSearchViewModel extends ViewModel {
-
-    @Inject
-    public TvSearchViewModel(TvDao tvDao, TvApiService tvApiService) {
-        tvRepository = new TvRepository(tvDao, tvApiService);
+    fun searchTv(text: String) {
+        tvRepository.searchTvs(1, text)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { resource -> tvsLiveData.postValue(resource) }
     }
 
-    private TvRepository tvRepository;
-
-    private MutableLiveData<Resource<List<TvEntity>>> tvsLiveData = new MutableLiveData<>();
-
-    public void searchTv(String text) {
-        tvRepository.searchTvs(1l, text)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(resource -> getTvsLiveData().postValue(resource));
-    }
-
-    public MutableLiveData<Resource<List<TvEntity>>> getTvsLiveData() {
-        return tvsLiveData;
-    }
+    fun getTvListLiveData() = tvsLiveData
 }

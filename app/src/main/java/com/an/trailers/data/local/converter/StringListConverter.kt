@@ -1,25 +1,19 @@
-package com.an.trailers.data.local.converter;
+package com.an.trailers.data.local.converter
 
-import android.arch.persistence.room.TypeConverter;
+import androidx.room.TypeConverter
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
-
-public class StringListConverter {
-
+class StringListConverter {
     @TypeConverter
-    public List<String> fromString(String value) {
-        Type listType = new TypeToken<List<String>>() {}.getType();
-        List<String> videos = new Gson().fromJson(value, listType);
-        return videos;
+    fun fromString(value: String): List<String>? {
+        val listType = object : TypeToken<List<String>>() {}.type
+        return Gson().fromJson<List<String>>(value, listType)
     }
 
     @TypeConverter
-    public String fromList(List<String> videos) {
-        return new Gson().toJson(videos);
+    fun fromList(list: List<String>?): String {
+        val gson = Gson()
+        return gson.toJson(list)
     }
 }

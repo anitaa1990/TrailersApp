@@ -1,58 +1,30 @@
-package com.an.trailers.data.remote.model;
+package com.an.trailers.data.remote.model
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import android.os.Parcel
+import android.os.Parcelable
 
 
-public class Video implements Parcelable {
+data class Video(
+    val id: String,
+    val key: String
+) : Parcelable {
+    constructor(source: Parcel) : this(
+        source.readString().toString(),
+        source.readString().toString()
+    )
 
-    private String id;
-    private String key;
+    override fun describeContents() = 0
 
-    public String getId() {
-        return id;
+    override fun writeToParcel(dest: Parcel, flags: Int) = with(dest) {
+        writeString(id)
+        writeString(key)
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.id);
-        dest.writeString(this.key);
-    }
-
-    public Video() {
-    }
-
-    protected Video(Parcel in) {
-        this.id = in.readString();
-        this.key = in.readString();
-    }
-
-    public static final Creator<Video> CREATOR = new Creator<Video>() {
-        @Override
-        public Video createFromParcel(Parcel source) {
-            return new Video(source);
+    companion object {
+        @JvmField
+        val CREATOR: Parcelable.Creator<Video> = object : Parcelable.Creator<Video> {
+            override fun createFromParcel(source: Parcel): Video = Video(source)
+            override fun newArray(size: Int): Array<Video?> = arrayOfNulls(size)
         }
-
-        @Override
-        public Video[] newArray(int size) {
-            return new Video[size];
-        }
-    };
+    }
 }

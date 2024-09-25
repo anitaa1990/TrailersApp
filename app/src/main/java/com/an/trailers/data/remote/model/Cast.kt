@@ -1,121 +1,48 @@
-package com.an.trailers.data.remote.model;
+package com.an.trailers.data.remote.model
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import android.os.Parcel
+import android.os.Parcelable
+import com.google.gson.annotations.SerializedName
 
-import com.google.gson.annotations.SerializedName;
-
-public class Cast implements Parcelable {
-
+data class Cast(
+    val id: Long,
     @SerializedName("cast_id")
-    private long castId;
-
-    private String character;
-
+    val castId: Long,
+    var character: String,
     @SerializedName("credit_id")
-    private String creditId;
-
-    private long id;
-    private String name;
-    private int order;
-
+    val creditId: String,
+    val name: String,
     @SerializedName("profile_path")
-    private String profilePath;
+    var profilePath: String,
+    val order: Int
+) : Parcelable {
+    constructor(source: Parcel) : this(
+        source.readLong(),
+        source.readLong(),
+        source.readString().toString(),
+        source.readString().toString(),
+        source.readString().toString(),
+        source.readString().toString(),
+        source.readInt()
+    )
 
-    public long getCastId() {
-        return castId;
+    override fun describeContents() = 0
+
+    override fun writeToParcel(dest: Parcel, flags: Int) = with(dest) {
+        writeLong(id)
+        writeLong(castId)
+        writeString(character)
+        writeString(creditId)
+        writeString(name)
+        writeString(profilePath)
+        writeInt(order)
     }
 
-    public void setCastId(long castId) {
-        this.castId = castId;
-    }
-
-    public String getCharacter() {
-        return character;
-    }
-
-    public void setCharacter(String character) {
-        this.character = character;
-    }
-
-    public String getCreditId() {
-        return creditId;
-    }
-
-    public void setCreditId(String creditId) {
-        this.creditId = creditId;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getOrder() {
-        return order;
-    }
-
-    public void setOrder(int order) {
-        this.order = order;
-    }
-
-    public String getProfilePath() {
-        return profilePath;
-    }
-
-    public void setProfilePath(String profilePath) {
-        this.profilePath = profilePath;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(this.castId);
-        dest.writeString(this.character);
-        dest.writeString(this.creditId);
-        dest.writeLong(this.id);
-        dest.writeString(this.name);
-        dest.writeInt(this.order);
-        dest.writeString(this.profilePath);
-    }
-
-    public Cast() {
-    }
-
-    protected Cast(Parcel in) {
-        this.castId = in.readLong();
-        this.character = in.readString();
-        this.creditId = in.readString();
-        this.id = in.readLong();
-        this.name = in.readString();
-        this.order = in.readInt();
-        this.profilePath = in.readString();
-    }
-
-    public static final Creator<Cast> CREATOR = new Creator<Cast>() {
-        @Override
-        public Cast createFromParcel(Parcel source) {
-            return new Cast(source);
+    companion object {
+        @JvmField
+        val CREATOR: Parcelable.Creator<Cast> = object : Parcelable.Creator<Cast> {
+            override fun createFromParcel(source: Parcel): Cast = Cast(source)
+            override fun newArray(size: Int): Array<Cast?> = arrayOfNulls(size)
         }
-
-        @Override
-        public Cast[] newArray(int size) {
-            return new Cast[size];
-        }
-    };
+    }
 }

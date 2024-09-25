@@ -1,33 +1,31 @@
-package com.an.trailers.data.local.dao;
+package com.an.trailers.data.local.dao
 
-import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.OnConflictStrategy;
-import android.arch.persistence.room.Query;
-import android.arch.persistence.room.Update;
-import com.an.trailers.data.local.entity.MovieEntity;
-import java.util.List;
-
-import io.reactivex.Flowable;
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
+import com.an.trailers.data.local.entity.MovieEntity
+import io.reactivex.Flowable
 
 @Dao
-public interface MovieDao {
+interface MovieDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    long[] insertMovies(List<MovieEntity> movies);
+    fun insertMovies(movies: List<MovieEntity>): LongArray
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    long insertMovie(MovieEntity movie);
+    fun insertMovie(movie: MovieEntity): Long
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    int updateMovie(MovieEntity movie);
+    fun updateMovie(movie: MovieEntity): Int
 
     @Query("SELECT * FROM `MovieEntity` where id = :id")
-    MovieEntity getMovieById(Long id);
+    fun getMovieById(id: Long?): MovieEntity?
 
     @Query("SELECT * FROM `MovieEntity` where id = :id")
-    Flowable<MovieEntity> getMovieDetailById(Long id);
+    fun getMovieDetailById(id: Long?): Flowable<MovieEntity>
 
     @Query("SELECT * FROM `MovieEntity` where page = :page")
-    List<MovieEntity> getMoviesByPage(Long page);
+    fun getMoviesByPage(page: Long): List<MovieEntity>
 }

@@ -1,189 +1,175 @@
-package com.an.trailers.data.repository;
+package com.an.trailers.data.repository
 
 
-import android.support.annotation.NonNull;
-
-import com.an.trailers.data.NetworkBoundResource;
-import com.an.trailers.data.Resource;
-import com.an.trailers.data.local.converter.VideoListTypeConverter;
-import com.an.trailers.data.local.dao.TvDao;
-import com.an.trailers.data.local.entity.TvEntity;
-import com.an.trailers.data.remote.api.TvApiService;
-import com.an.trailers.data.remote.model.TvApiResponse;
-import com.an.trailers.utils.AppUtils;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import javax.inject.Singleton;
-import io.reactivex.Flowable;
-import io.reactivex.Observable;
+import com.an.trailers.data.NetworkBoundResource
+import com.an.trailers.data.Resource
+import com.an.trailers.data.local.dao.TvDao
+import com.an.trailers.data.local.entity.TvEntity
+import com.an.trailers.data.remote.api.TvApiService
+import com.an.trailers.data.remote.model.CreditResponse
+import com.an.trailers.data.remote.model.TvApiResponse
+import com.an.trailers.data.remote.model.VideoResponse
+import com.an.trailers.utils.AppUtils
+import io.reactivex.Flowable
+import io.reactivex.Observable
+import javax.inject.Singleton
 
 @Singleton
-public class TvRepository {
+class TvRepository(
+    private val tvDao: TvDao,
+    private val tvApiService: TvApiService
+) {
 
-    private TvDao tvDao;
-    private TvApiService tvApiService;
-    public TvRepository(TvDao tvDao,
-                        TvApiService tvApiService) {
-        this.tvDao = tvDao;
-        this.tvApiService = tvApiService;
-    }
+    fun loadTvsByType(
+        page: Long,
+        type: String
+    ): Observable<Resource<List<TvEntity>>> {
+        return object : NetworkBoundResource<List<TvEntity>, TvApiResponse>() {
 
-    public Observable<Resource<List<TvEntity>>> loadTvsByType(Long page,
-                                                              String type) {
-        return new NetworkBoundResource<List<TvEntity>, TvApiResponse>() {
-
-            @Override
-            protected void saveCallResult(@NonNull TvApiResponse item) {
-                List<TvEntity> tvEntities = new ArrayList<>();
-                for(TvEntity tvEntity : item.getResults()) {
-                    TvEntity storedTvEntity = tvDao.getTvEntityById(tvEntity.getId());
-                    if(storedTvEntity == null) tvEntity.setCategoryTypes(Arrays.asList(type));
-                    else {
-                        List<String> categories = storedTvEntity.getCategoryTypes();
-                        categories.add(type);
-                        tvEntity.setCategoryTypes(categories);
+            override fun saveCallResult(item: TvApiResponse) {
+                val tvEntities = ArrayList<TvEntity>()
+                for (tvEntity in item.results) {
+                    val storedEntity = tvDao.getTvById(tvEntity.id)
+                    if(storedEntity == null) {
+                        tvEntity.categoryTypes = listOf(type)
+                    } else {
+                        val categories: MutableList<String> = mutableListOf()
+                        if(storedEntity.categoryTypes != null) categories.addAll(storedEntity.categoryTypes!!)
+                        categories.add(type)
+                        tvEntity.categoryTypes = categories
                     }
-
-                    tvEntity.setPage(item.getPage());
-                    tvEntity.setTotalPages(item.getTotalPages());
-                    tvEntities.add(tvEntity);
+                    tvEntity.page = item.page
+                    tvEntity.totalPages = item.totalPages
+                    tvEntities.add(tvEntity)
                 }
-                tvDao.insertTvList(tvEntities);
+                tvDao.insertTvList(tvEntities)
             }
 
-            @Override
-            protected boolean shouldFetch() {
-                return true;
+            override fun shouldFetch(): Boolean {
+                return true
             }
 
-            @NonNull
-            @Override
-            protected Flowable<List<TvEntity>> loadFromDb() {
-
-                List<TvEntity> tvEntities = tvDao.getTvListByPage(page);
-                if(tvEntities == null || tvEntities.isEmpty()) {
-                    return Flowable.empty();
-                }
-                return Flowable.just(AppUtils.getTvListByType(type, tvEntities));
+            override fun loadFromDb(): Flowable<List<TvEntity>> {
+                val movieEntities = tvDao.getTvsByPage(page)
+                return if (movieEntities.isEmpty()) {
+                    Flowable.empty()
+                } else Flowable.just(AppUtils.getTvsByType(type, movieEntities))
             }
 
-            @NonNull
-            @Override
-            protected Observable<Resource<TvApiResponse>> createCall() {
+            override fun createCall(): Observable<Resource<TvApiResponse>> {
                 return tvApiService.fetchTvListByType(type, page)
-                        .flatMap(tvApiResponse -> Observable.just(tvApiResponse == null
-                                ? Resource.error("", new TvApiResponse())
-                                : Resource.success(tvApiResponse)));
+                    .flatMap { tvApiResponse ->
+                        Observable.just(
+                            if (tvApiResponse.results.isEmpty())
+                                Resource.error("", TvApiResponse(1, emptyList(), 0, 1))
+                            else
+                                Resource.success(tvApiResponse)
+                        )
+                    }
             }
-        }.getAsObservable();
+        }.getAsObservable()
     }
 
 
-    public Observable<Resource<TvEntity>> fetchTvDetails(Long tvId) {
-        return new NetworkBoundResource<TvEntity, TvEntity>() {
-            @Override
-            protected void saveCallResult(@NonNull TvEntity item) {
-                TvEntity tvEntity = tvDao.getTvEntityById(item.getId());
-                if(tvEntity == null) tvDao.insertTv(item);
-                else tvDao.updateTv(item);
+    fun fetchTvDetails(tvId: Long): Observable<Resource<TvEntity>> {
+        return object : NetworkBoundResource<TvEntity, TvEntity>() {
+            override fun saveCallResult(item: TvEntity) {
+                val tvEntity = tvDao.getTvById(tvId)
+                if(null == tvEntity) tvDao.insertTv(item)
+                else {
+                    item.page = tvEntity.page
+                    item.totalPages = tvEntity.totalPages
+                    item.categoryTypes = tvEntity.categoryTypes
+                    tvDao.updateTv(item)
+                }
             }
 
-            @Override
-            protected boolean shouldFetch() {
-                return true;
+            override fun shouldFetch(): Boolean {
+                return true
             }
 
-            @NonNull
-            @Override
-            protected Flowable<TvEntity> loadFromDb() {
-                TvEntity tvEntity = tvDao.getTvEntityById(tvId);
-                if(tvEntity == null) return Flowable.empty();
-                return Flowable.just(tvEntity);
+            override fun loadFromDb(): Flowable<TvEntity> {
+                val tvEntity = tvDao.getTvById(tvId) ?: return Flowable.empty()
+                return Flowable.just(tvEntity)
             }
 
-            @NonNull
-            @Override
-            protected Observable<Resource<TvEntity>> createCall() {
-                String id = String.valueOf(tvId);
-                return Observable.combineLatest(tvApiService.fetchTvDetail(id),
-                        tvApiService.fetchTvVideo(id),
-                        tvApiService.fetchCastDetail(id),
-                        tvApiService.fetchSimilarTvList(id, 1),
-                        tvApiService.fetchTvReviews(id),
-                        (tvEntity, videoResponse, creditResponse, tvApiResponse, reviewApiResponse) -> {
+            override fun createCall(): Observable<Resource<TvEntity>> {
+                val id = tvId.toString()
+                return Observable.combineLatest(
+                    tvApiService.fetchTvDetail(id),
+                    tvApiService.fetchTvVideo(id),
+                    tvApiService.fetchCastDetail(id),
+                    tvApiService.fetchSimilarTvList(id, 1)
+                ) { tvEntity: TvEntity,
+                    videoResponse: VideoResponse,
+                    creditResponse: CreditResponse,
+                    tvApiResponse: TvApiResponse ->
 
-                            if(videoResponse != null) {
-                                tvEntity.setVideos(videoResponse.getResults());
-                            }
-
-                            if(creditResponse != null) {
-                                tvEntity.setCrews(creditResponse.getCrew());
-                                tvEntity.setCasts(creditResponse.getCast());
-                            }
-
-                            if(tvApiResponse != null) {
-                                tvEntity.setSimilarTvEntities(tvApiResponse.getResults());
-                            }
-
-                            if(reviewApiResponse != null) {
-                                tvEntity.setReviews(reviewApiResponse.getResults());
-                            }
-                            return Resource.success(tvEntity);
-                        });
+                    if (videoResponse.results.isNotEmpty()) {
+                        tvEntity.videos = videoResponse.results
+                    }
+                    if (creditResponse.cast.isNotEmpty()) {
+                        tvEntity.casts = creditResponse.cast
+                    }
+                    if (creditResponse.crew.isNotEmpty()) {
+                        tvEntity.crews = creditResponse.crew
+                    }
+                    if (tvApiResponse.results.isNotEmpty()) {
+                        tvEntity.similarTvEntities = tvApiResponse.results
+                    }
+                    Resource.success(tvEntity)
+                }
             }
-        }.getAsObservable();
+        }.getAsObservable()
     }
 
 
-    public Observable<Resource<List<TvEntity>>> searchTvs(Long page,
-                                                          String query) {
-        return new NetworkBoundResource<List<TvEntity>, TvApiResponse>() {
+    fun searchTvs(page: Long,
+                  query: String): Observable<Resource<List<TvEntity>>> {
+        return object : NetworkBoundResource<List<TvEntity>, TvApiResponse>() {
 
-            @Override
-            protected void saveCallResult(@NonNull TvApiResponse item) {
-                List<TvEntity> tvEntities = new ArrayList<>();
-                for(TvEntity tvEntity : item.getResults()) {
-                    TvEntity storedTvEntity = tvDao.getTvEntityById(tvEntity.getId());
-                    if(storedTvEntity == null) tvEntity.setCategoryTypes(Arrays.asList(query));
-                    else {
-                        List<String> categories = storedTvEntity.getCategoryTypes();
-                        categories.add(query);
-                        tvEntity.setCategoryTypes(categories);
+            override fun saveCallResult(item: TvApiResponse) {
+                val tvEntities = ArrayList<TvEntity>()
+                for (tvEntity in item.results) {
+                    val storedEntity = tvDao.getTvById(tvEntity.id)
+                    if(storedEntity == null) {
+                        tvEntity.categoryTypes = listOf(query)
+                    } else {
+                        val categories: MutableList<String> = mutableListOf()
+                        if(storedEntity.categoryTypes != null) categories.addAll(storedEntity.categoryTypes!!)
+                        categories.add(query)
+                        tvEntity.categoryTypes = categories
                     }
 
-                    tvEntity.setPage(item.getPage());
-                    tvEntity.setTotalPages(item.getTotalPages());
-                    tvEntities.add(tvEntity);
+                    tvEntity.page = item.page
+                    tvEntity.totalPages = item.totalPages
+                    tvEntities.add(tvEntity)
                 }
-                tvDao.insertTvList(tvEntities);
+                tvDao.insertTvList(tvEntities)
             }
 
-            @Override
-            protected boolean shouldFetch() {
-                return true;
+            override fun shouldFetch(): Boolean {
+                return true
             }
 
-            @NonNull
-            @Override
-            protected Flowable<List<TvEntity>> loadFromDb() {
-                List<TvEntity> tvEntities = tvDao.getTvListByPage(page);
-                if(tvEntities == null || tvEntities.isEmpty()) {
-                    return Flowable.empty();
-                }
-                return Flowable.just(AppUtils.getTvListByType(query, tvEntities));
+            override fun loadFromDb(): Flowable<List<TvEntity>> {
+                val movieEntities = tvDao.getTvsByPage(page)
+                return if (movieEntities.isEmpty()) {
+                    Flowable.empty()
+                } else Flowable.just(AppUtils.getTvsByType(query, movieEntities))
             }
 
-            @NonNull
-            @Override
-            protected Observable<Resource<TvApiResponse>> createCall() {
+            override fun createCall(): Observable<Resource<TvApiResponse>> {
                 return tvApiService.searchTvsByQuery(query, "1")
-                        .flatMap(tvApiResponse -> Observable.just(tvApiResponse == null
-                                ? Resource.error("", new TvApiResponse())
-                                : Resource.success(tvApiResponse)));
+                    .flatMap { tvApiResponse ->
+                        Observable.just(
+                            if (tvApiResponse.results.isEmpty())
+                                Resource.error("", TvApiResponse(1, emptyList(), 0, 1))
+                            else
+                                Resource.success(tvApiResponse)
+                        )
+                    }
             }
-        }.getAsObservable();
+        }.getAsObservable()
     }
-
 }

@@ -1,84 +1,60 @@
-package com.an.trailers.ui.base.custom.menu;
+package com.an.trailers.ui.base.custom.menu
 
-import android.content.res.Configuration;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.LinearLayout;
-
-import java.util.List;
+import android.view.MenuItem
+import android.view.View
+import android.widget.LinearLayout
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.drawerlayout.widget.DrawerLayout
 
 
-public abstract class MenuDrawerToggle extends ActionBarDrawerToggle implements ViewAnimator.ViewAnimatorListener {
+abstract class MenuDrawerToggle(
+    private var activity: AppCompatActivity?,
+    drawerLayout: DrawerLayout,
+    toolbar: Toolbar,
+    private val layoutView: LinearLayout,
+    openDrawerContentDescRes: Int,
+    closeDrawerContentDescRes: Int,
+    slideMenuItems: List<SlideMenuItem>
 
-    private AppCompatActivity activity;
-    private ViewAnimator viewAnimator;
-    private LinearLayout layoutView;
-    public MenuDrawerToggle(AppCompatActivity activity,
-                            DrawerLayout drawerLayout,
-                            Toolbar toolbar,
-                            LinearLayout layoutView,
-                            int openDrawerContentDescRes,
-                            int closeDrawerContentDescRes,
-                            List<SlideMenuItem> slideMenuItems) {
+) : ActionBarDrawerToggle(activity, drawerLayout, toolbar, openDrawerContentDescRes, closeDrawerContentDescRes),
+    ViewAnimator.ViewAnimatorListener {
 
-        super(activity, drawerLayout, toolbar, openDrawerContentDescRes, closeDrawerContentDescRes);
-        this.activity = activity;
-        this.layoutView = layoutView;
-        viewAnimator =new ViewAnimator(activity, slideMenuItems, drawerLayout, this);
-    }
+    private var viewAnimator: ViewAnimator = ViewAnimator(
+        activity!!, slideMenuItems, drawerLayout, this)
 
-    @Override
-    public void onDrawerSlide(View drawerView, float slideOffset) {
-        super.onDrawerSlide(drawerView, slideOffset);
-        if (slideOffset > 0.6 && layoutView.getChildCount() == 0) {
-            viewAnimator.displayMenuContent();
+    val selectedPosition: Int
+        get() = viewAnimator.selectedPosition
+
+    override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+        super.onDrawerSlide(drawerView, slideOffset)
+        if (slideOffset > 0.6 && layoutView.childCount == 0) {
+            viewAnimator.displayMenuContent()
         }
     }
 
-    @Override
-    public void onDrawerOpened(View drawerView) {
-        super.onDrawerOpened(drawerView);
+    override fun onDrawerClosed(drawerView: View) {
+        super.onDrawerClosed(drawerView)
+        layoutView.removeAllViews()
+        layoutView.invalidate()
     }
 
-    @Override
-    public void onDrawerClosed(View drawerView) {
-        super.onDrawerClosed(drawerView);
-        layoutView.removeAllViews();
-        layoutView.invalidate();
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return if (onOptionsItemSelected(item)) {
+            true
+        } else super.onOptionsItemSelected(item)
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (onOptionsItemSelected(item)) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+    override fun updateHomeButton(enabled: Boolean) {
+        activity!!.supportActionBar!!.setHomeButtonEnabled(enabled)
     }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
+    override fun addViewToContainer(view: View) {
+        layoutView.addView(view)
     }
 
-    @Override
-    public void updateHomeButton(boolean enabled) {
-        activity.getSupportActionBar().setHomeButtonEnabled(enabled);
-    }
-
-    @Override
-    public void addViewToContainer(View view) {
-        layoutView.addView(view);
-    }
-
-    public void onDestroy() {
-        activity = null;
-    }
-
-    public int getSelectedPosition() {
-        return viewAnimator.getSelectedPosition();
+    fun onDestroy() {
+        activity = null
     }
 }

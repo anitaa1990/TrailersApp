@@ -1,231 +1,219 @@
-package com.an.trailers.ui.base.custom.menu;
+package com.an.trailers.ui.base.custom.menu
 
-import android.os.Handler;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.Animation;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.os.Handler
+import android.view.View
+import android.view.ViewGroup
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.Animation
+import android.widget.ImageView
+import android.widget.LinearLayout
+import androidx.appcompat.app.AppCompatActivity
+import androidx.drawerlayout.widget.DrawerLayout
+import com.an.trailers.R
+import com.an.trailers.utils.AppUtils
 
-import com.an.trailers.R;
-import com.an.trailers.utils.AppUtils;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.ArrayList
 
 
-public class ViewAnimator<T> {
+class ViewAnimator(
+    private val appCompatActivity: AppCompatActivity,
+    private val slideMenuItems: List<SlideMenuItem>,
+    private val drawerLayout: DrawerLayout,
+    private val animatorListener: ViewAnimatorListener
+) {
 
-    private final int ANIMATION_DURATION = 175;
-    private final double ASPECT_RATIO_WIDTH = 11.1;
-    private final double ASPECT_RATIO_HEIGHT = 6.756;
-    private final double ASPECT_RATIO_CONTAINER_HEIGHT = 15.9;
+    private val ANIMATION_DURATION = 175
+    private val ASPECT_RATIO_WIDTH = 11.1
+    private val ASPECT_RATIO_HEIGHT = 6.756
+    private val ASPECT_RATIO_CONTAINER_HEIGHT = 15.9
 
-    private int screenWidth;
-    private int screenHeight;
-    private int selectedPosition = 0;
-    private DrawerLayout drawerLayout;
-    private List<SlideMenuItem> slideMenuItems;
-    private AppCompatActivity appCompatActivity;
-    private ViewAnimatorListener animatorListener;
+    private val screenWidth: Int = AppUtils.getScreenWidth(appCompatActivity)
+    private val screenHeight: Int = AppUtils.getScreenHeight(appCompatActivity)
+    var selectedPosition = 0
+        private set
 
-    private List<View> viewList = new ArrayList<>();
+    private val viewList = ArrayList<View>()
 
-    public ViewAnimator(AppCompatActivity activity,
-                        List<SlideMenuItem> items,
-                        DrawerLayout drawerLayout,
-                        ViewAnimatorListener animatorListener) {
-        this.appCompatActivity = activity;
-
-        this.slideMenuItems = items;
-        this.drawerLayout = drawerLayout;
-        this.animatorListener = animatorListener;
-        this.screenWidth = AppUtils.getScreenWidth(activity);
-        this.screenHeight = AppUtils.getScreenHeight(activity);
-    }
-
-    private void setViewsClickable(boolean clickable) {
-        animatorListener.updateHomeButton(false);
-        for (View view : viewList) {
-            view.setEnabled(clickable);
+    private fun setViewsClickable(clickable: Boolean) {
+        animatorListener.updateHomeButton(false)
+        for (view in viewList) {
+            view.isEnabled = clickable
         }
     }
 
-    public void displayMenuContent() {
-        setViewsClickable(false);
-        viewList.clear();
+    fun displayMenuContent() {
+        setViewsClickable(false)
+        viewList.clear()
 
-        double size = slideMenuItems.size();
-        for (int i = 0; i < size; i++) {
-            final View viewMenu = appCompatActivity.getLayoutInflater().inflate(R.layout.list_item_menu, null);
+        val size = slideMenuItems.size.toDouble()
+        var i = 0
+        while (i < size) {
+            val viewMenu = appCompatActivity.layoutInflater.inflate(R.layout.list_item_menu, null)
 
-            updateMenuItemImageView(i, viewMenu);
-            updateMenuItemContainerView(i, viewMenu);
+            updateMenuItemImageView(i, viewMenu)
+            updateMenuItemContainerView(i, viewMenu)
 
-            viewList.add(viewMenu);
-            animatorListener.addViewToContainer(viewMenu);
-            if(i == selectedPosition) {
-                viewList.get(i).setSelected(true);
+            viewList.add(viewMenu)
+            animatorListener.addViewToContainer(viewMenu)
+            if (i == selectedPosition) {
+                viewList[i].isSelected = true
             }
 
-            animateMenuItem((double)i, size);
+            animateMenuItem(i.toDouble(), size)
+            i++
 
         }
     }
 
 
-    private void updateMenuItemImageView(int position,
-                                         View viewMenu) {
-        ImageView iv = viewMenu.findViewById(R.id.menu_item_image);
+    private fun updateMenuItemImageView(
+        position: Int,
+        viewMenu: View
+    ) {
+        val iv = viewMenu.findViewById<ImageView>(R.id.menu_item_image)
 
-        ViewGroup.LayoutParams lp = iv.getLayoutParams();
-        Double width = Math.ceil((ASPECT_RATIO_WIDTH * screenWidth)/100);
-        Double height = Math.ceil((ASPECT_RATIO_HEIGHT * screenHeight)/100);
-        lp.width = width.intValue();
-        lp.height = height.intValue();
-        iv.setLayoutParams(lp);
+        val lp = iv.layoutParams
+        val width = Math.ceil(ASPECT_RATIO_WIDTH * screenWidth / 100)
+        val height = Math.ceil(ASPECT_RATIO_HEIGHT * screenHeight / 100)
+        lp.width = width.toInt()
+        lp.height = height.toInt()
+        iv.layoutParams = lp
 
-        iv.setImageResource(slideMenuItems.get(position).getImageRes());
+        iv.setImageResource(slideMenuItems[position].imageRes)
     }
 
-    private void updateMenuItemContainerView(int position,
-                                             View viewMenu) {
-        View container = viewMenu.findViewById(R.id.menu_item_container);
-        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-        container.setLayoutParams(layoutParams);
-        Double containerHeight = Math.ceil((ASPECT_RATIO_CONTAINER_HEIGHT * screenHeight)/100);
-        layoutParams.height = containerHeight.intValue();
-        container.setLayoutParams(layoutParams);
+    private fun updateMenuItemContainerView(
+        position: Int,
+        viewMenu: View
+    ) {
+        val container = viewMenu.findViewById<View>(R.id.menu_item_container)
+        val layoutParams = ViewGroup.LayoutParams(
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        )
+        container.layoutParams = layoutParams
+        val containerHeight = Math.ceil(ASPECT_RATIO_CONTAINER_HEIGHT * screenHeight / 100)
+        layoutParams.height = containerHeight.toInt()
+        container.layoutParams = layoutParams
 
-        viewMenu.setVisibility(View.GONE);
-        viewMenu.setEnabled(true);
+        viewMenu.visibility = View.GONE
+        viewMenu.isEnabled = true
 
-        viewMenu.setOnClickListener(v -> {
-            int[] location = {0, 0};
-            v.getLocationOnScreen(location);
-            switchItem(v, position, location[1] + v.getHeight() / 2);
-        });
+        viewMenu.setOnClickListener { v ->
+            val location = intArrayOf(0, 0)
+            v.getLocationOnScreen(location)
+            switchItem(v, position, location[1] + v.height / 2)
+        }
     }
 
 
-    private void animateMenuItem(double position,
-                                 double totalSize) {
-        final double delay = 3 * ANIMATION_DURATION * (position / totalSize);
-        new Handler().postDelayed(() -> {
-            if (position < viewList.size()) {
-                animateView((int) position);
+    private fun animateMenuItem(
+        position: Double,
+        totalSize: Double
+    ) {
+        val delay = 3.0 * ANIMATION_DURATION.toDouble() * (position / totalSize)
+        Handler().postDelayed({
+            if (position < viewList.size) {
+                animateView(position.toInt())
             }
-        }, (long) delay);
+        }, delay.toLong())
     }
 
-    private void hideMenuContent() {
-        setViewsClickable(false);
-        double size = slideMenuItems.size();
+    private fun hideMenuContent() {
+        setViewsClickable(false)
+        val size = slideMenuItems.size.toDouble()
 
-        for (int i = slideMenuItems.size(); i >= 0; i--) {
+        for (i in slideMenuItems.size downTo 0) {
 
-            final double position = i;
-            final double delay = 3 * ANIMATION_DURATION * (position / size);
+            val position = i.toDouble()
+            val delay = 3.0 * ANIMATION_DURATION.toDouble() * (position / size)
 
-            new Handler().postDelayed(() -> {
-                if (position < viewList.size()) {
-                    animateHideView((int) position);
+            Handler().postDelayed({
+                if (position < viewList.size) {
+                    animateHideView(position.toInt())
                 }
-            }, (long) delay);
+            }, delay.toLong())
         }
 
     }
 
-    private void animateView(int position) {
-        final View view = viewList.get(position);
-        view.setVisibility(View.VISIBLE);
-        FlipAnimation rotation =
-                new FlipAnimation(90, 0, 0.0f, view.getHeight() / 2.0f);
-        rotation.setDuration(ANIMATION_DURATION);
-        rotation.setFillAfter(true);
-        rotation.setInterpolator(new AccelerateInterpolator());
-        rotation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
+    private fun animateView(position: Int) {
+        val view = viewList[position]
+        view.visibility = View.VISIBLE
+        val rotation = FlipAnimation(90f, 0f, 0.0f, view.height / 2.0f)
+        rotation.duration = ANIMATION_DURATION.toLong()
+        rotation.fillAfter = true
+        rotation.interpolator = AccelerateInterpolator()
+        rotation.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation) {
 
             }
 
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                view.clearAnimation();
+            override fun onAnimationEnd(animation: Animation) {
+                view.clearAnimation()
             }
 
-            @Override
-            public void onAnimationRepeat(Animation animation) {
+            override fun onAnimationRepeat(animation: Animation) {
 
             }
-        });
+        })
 
-        view.startAnimation(rotation);
+        view.startAnimation(rotation)
     }
 
 
-    private void animateHideView(final int position) {
-        final View view = viewList.get(position);
-        FlipAnimation rotation =
-                new FlipAnimation(0, 90, 0.0f, view.getHeight() / 2.0f);
-        rotation.setDuration(ANIMATION_DURATION);
-        rotation.setFillAfter(true);
-        rotation.setInterpolator(new AccelerateInterpolator());
-        rotation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
+    private fun animateHideView(position: Int) {
+        val view = viewList[position]
+        val rotation = FlipAnimation(0f, 90f, 0.0f, view.height / 2.0f)
+        rotation.duration = ANIMATION_DURATION.toLong()
+        rotation.fillAfter = true
+        rotation.interpolator = AccelerateInterpolator()
+        rotation.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation) {
 
             }
 
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                view.clearAnimation();
-                view.setVisibility(View.INVISIBLE);
-                if (position == viewList.size() - 1) {
-                    animatorListener.updateHomeButton(true);
-                    drawerLayout.closeDrawers();
+            override fun onAnimationEnd(animation: Animation) {
+                view.clearAnimation()
+                view.visibility = View.INVISIBLE
+                if (position == viewList.size - 1) {
+                    animatorListener.updateHomeButton(true)
+                    drawerLayout.closeDrawers()
                 }
             }
 
-            @Override
-            public void onAnimationRepeat(Animation animation) {
+            override fun onAnimationRepeat(animation: Animation) {
 
             }
-        });
+        })
 
-        view.startAnimation(rotation);
+        view.startAnimation(rotation)
     }
 
 
-    private void switchItem(View view, int selectedPosition, int topPosition) {
-        if(getSelectedPosition() != selectedPosition && selectedPosition != viewList.size() - 1) {
-            view.setSelected(true);
-            updateSelectedView(view);
-            this.selectedPosition = selectedPosition;
-             animatorListener.onSwitch(selectedPosition, topPosition);
+    private fun switchItem(view: View, selectedPosition: Int, topPosition: Int) {
+        if (this.selectedPosition != selectedPosition && selectedPosition != viewList.size - 1) {
+            view.isSelected = true
+            updateSelectedView(view)
+            this.selectedPosition = selectedPosition
+            animatorListener.onSwitch(selectedPosition, topPosition)
         }
-        hideMenuContent();
+        hideMenuContent()
     }
 
-    private void updateSelectedView(View view) {
-        for(int i =0; i<viewList.size(); i++) {
-            if(view.getId() != viewList.get(0).getId()) {
-                viewList.get(i).setSelected(false);
+    private fun updateSelectedView(view: View) {
+        for (i in viewList.indices) {
+            if (view.id != viewList[0].id) {
+                viewList[i].isSelected = false
             }
         }
     }
 
-    public int getSelectedPosition() {
-        return selectedPosition;
-    }
-
-    public interface ViewAnimatorListener {
-        void onSwitch(int selectedPosition, int topPosition);
-        void updateHomeButton(boolean enabled);
-        void addViewToContainer(View view);
+    interface ViewAnimatorListener {
+        fun onSwitch(selectedPosition: Int, topPosition: Int)
+        fun updateHomeButton(enabled: Boolean)
+        fun addViewToContainer(view: View)
     }
 }

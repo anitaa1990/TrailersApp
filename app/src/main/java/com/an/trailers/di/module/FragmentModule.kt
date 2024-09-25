@@ -1,17 +1,16 @@
-package com.an.trailers.di.module;
+package com.an.trailers.di.module
 
-import com.an.trailers.ui.main.fragment.MovieListFragment;
-import com.an.trailers.ui.main.fragment.TvListFragment;
-
-import dagger.Module;
-import dagger.android.ContributesAndroidInjector;
+import com.an.trailers.ui.main.fragment.MovieListFragment
+import com.an.trailers.ui.main.fragment.TvListFragment
+import dagger.Module
+import dagger.android.ContributesAndroidInjector
 
 @Module
-public abstract class FragmentModule {
+abstract class FragmentModule {
 
     @ContributesAndroidInjector
-    abstract MovieListFragment contributeMovieListFragment();
+    abstract fun contributeMovieListFragment(): MovieListFragment
 
     @ContributesAndroidInjector
-    abstract TvListFragment contributeTvListFragment();
+    abstract fun contributeTvListFragment(): TvListFragment
 }

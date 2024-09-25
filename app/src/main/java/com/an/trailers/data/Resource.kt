@@ -1,46 +1,34 @@
-package com.an.trailers.data;
-
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
-import static com.an.trailers.data.Status.ERROR;
-import static com.an.trailers.data.Status.LOADING;
-import static com.an.trailers.data.Status.SUCCESS;
+package com.an.trailers.data
 
 
-public class Resource<T> {
-    @NonNull
-    public final Status status;
-    @Nullable
-    public final T data;
-    @Nullable public final String message;
-    private Resource(@NonNull Status status, @Nullable T data, @Nullable String message) {
-        this.status = status;
-        this.data = data;
-        this.message = message;
-    }
+import com.an.trailers.data.Status.ERROR
+import com.an.trailers.data.Status.LOADING
+import com.an.trailers.data.Status.SUCCESS
 
-    public static <T> Resource<T> success(@NonNull T data) {
-        return new Resource<>(SUCCESS, data, null);
-    }
 
-    public static <T> Resource<T> error(String msg, @Nullable T data) {
-        return new Resource<>(ERROR, data, msg);
-    }
+class Resource<T> private constructor(val status: Status, val data: T?, val message: String?) {
 
-    public static <T> Resource<T> loading(@Nullable T data) {
-        return new Resource<>(LOADING, data, null);
-    }
+    val isSuccess: Boolean
+        get() = status === SUCCESS && data != null
 
-    public boolean isSuccess() {
-        return status == Status.SUCCESS && data != null;
-    }
+    val isLoading: Boolean
+        get() = status === LOADING
 
-    public boolean isLoading() {
-        return status == Status.LOADING;
-    }
+    val isLoaded: Boolean
+        get() = status !== LOADING
 
-    public boolean isLoaded() {
-        return status != Status.LOADING;
+    companion object {
+
+        fun <T> success(data: T): Resource<T> {
+            return Resource(SUCCESS, data, null)
+        }
+
+        fun <T> error(msg: String, data: T): Resource<T> {
+            return Resource(ERROR, data, msg)
+        }
+
+        fun <T> loading(data: T): Resource<T> {
+            return Resource(LOADING, data, null)
+        }
     }
 }

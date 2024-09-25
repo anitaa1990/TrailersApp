@@ -1,168 +1,155 @@
-package com.an.trailers.utils;
+package com.an.trailers.utils
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.res.TypedArray;
-import android.graphics.Movie;
-import android.graphics.Point;
-import android.os.Build;
-import android.view.Display;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
+import android.app.Activity
+import android.content.Context
+import android.graphics.Point
+import android.os.Build
+import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
+import com.an.trailers.AppConstants.Companion.MOVIE_STATUS_RELEASED
+import com.an.trailers.R
+import com.an.trailers.data.remote.model.Genre
+import com.an.trailers.ui.base.custom.menu.SlideMenuItem
 
-import com.an.trailers.R;
-import com.an.trailers.data.local.entity.MovieEntity;
-import com.an.trailers.data.local.entity.TvEntity;
-import com.an.trailers.data.remote.model.Genre;
-import com.an.trailers.ui.base.custom.menu.SlideMenuItem;
-import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.text.ParsePosition
+import java.text.SimpleDateFormat
+import java.util.*
+import com.an.trailers.data.local.entity.MovieEntity
+import com.an.trailers.data.local.entity.TvEntity
 
-import static com.an.trailers.AppConstants.MOVIE_STATUS_RELEASED;
 
-public class AppUtils {
+object AppUtils {
 
-    private static Date getDate(String aDate) {
-        ParsePosition pos = new ParsePosition(0);
-        SimpleDateFormat simpledateformat = new SimpleDateFormat("yyyy-MM-dd");
-        Date stringDate = simpledateformat.parse(aDate, pos);
-        return stringDate;
+    private fun getDate(aDate: String?): Date {
+        val pos = ParsePosition(0)
+        val simpledateformat = SimpleDateFormat("yyyy-MM-dd")
+        val stringDate = simpledateformat.parse(aDate, pos)
+        return stringDate
 
     }
 
-    public static String getFormattedDate(String dateString) {
-        Date date = getDate(dateString);
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
+    fun getFormattedDate(dateString: String?): String? {
+        val date = getDate(dateString)
+        val cal = Calendar.getInstance()
+        cal.time = date
 
-        int day = cal.get(Calendar.DATE);
-        switch (day % 10) {
-            case 1:
-                return new SimpleDateFormat("MMMM d'st', yyyy").format(date);
-            case 2:
-                return new SimpleDateFormat("MMMM d'nd', yyyy").format(date);
-            case 3:
-                return new SimpleDateFormat("MMMM d'rd', yyyy").format(date);
-            default:
-                return new SimpleDateFormat("MMMM d'th', yyyy").format(date);
+        val day = cal.get(Calendar.DATE)
+        return when (day % 10) {
+            1 -> SimpleDateFormat("MMMM d'st', yyyy").format(date)
+            2 -> SimpleDateFormat("MMMM d'nd', yyyy").format(date)
+            3 -> SimpleDateFormat("MMMM d'rd', yyyy").format(date)
+            else -> SimpleDateFormat("MMMM d'th', yyyy").format(date)
         }
     }
 
-    public static List<String> getGenres(List<Genre> genres) {
-        List<String> genreNames = new ArrayList<>(genres.size());
-        for(Object obj : genres) {
-            if(obj instanceof String)
-                genreNames.add(Objects.toString(obj, null));
-            else genreNames.add(String.valueOf(((Genre)obj).getName()));
+    fun getGenres(genres: List<Genre>): MutableList<String> {
+        val genreNames = ArrayList<String>(genres.size)
+        for (obj in genres) {
+            genreNames.add(obj.name.toString())
         }
-        return genreNames;
+        return genreNames
     }
 
 
-
-    public static int getScreenWidth(Context mContext) {
-        boolean width = false;
-        WindowManager wm = (WindowManager)mContext.getSystemService("window");
-        Display display = wm.getDefaultDisplay();
-        int width1;
-        if(Build.VERSION.SDK_INT > 12) {
-            Point size = new Point();
-            display.getSize(size);
-            width1 = size.x;
+    fun getScreenWidth(mContext: Context): Int {
+        val wm = mContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        val display = wm.defaultDisplay
+        val width1: Int = if (Build.VERSION.SDK_INT > 12) {
+            val size = Point()
+            display.getSize(size)
+            size.x
         } else {
-            width1 = display.getWidth();
+            display.width
         }
 
-        return width1;
+        return width1
     }
 
-    public static int getScreenHeight(Context mContext) {
-        boolean height = false;
-        WindowManager wm = (WindowManager)mContext.getSystemService("window");
-        Display display = wm.getDefaultDisplay();
-        int height1;
-        if(Build.VERSION.SDK_INT > 12) {
-            Point size = new Point();
-            display.getSize(size);
-            height1 = size.y;
+    fun getScreenHeight(mContext: Context): Int {
+        val wm = mContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        val display = wm.defaultDisplay
+        val height1: Int
+        height1 = if (Build.VERSION.SDK_INT > 12) {
+            val size = Point()
+            display.getSize(size)
+            size.y
         } else {
-            height1 = display.getHeight();
+            display.height
         }
 
-        return height1;
+        return height1
     }
 
 
-    public static List<SlideMenuItem> getMenuList(Context context) {
-        List<SlideMenuItem> slideMenuItems = new ArrayList<>();
-        List<String> menuTitles = Arrays.asList(context.getResources().getStringArray(R.array.menu_names));
-        TypedArray menuIcons = context.getResources().obtainTypedArray(R.array.menu_icons);
+    fun getMenuList(context: Context): List<SlideMenuItem> {
+        val slideMenuItems = ArrayList<SlideMenuItem>()
+        val menuTitles = Arrays.asList(*context.resources.getStringArray(R.array.menu_names))
+        val menuIcons = context.resources.obtainTypedArray(R.array.menu_icons)
 
-        for(int i = 0; i< menuTitles.size(); i++) {
-            SlideMenuItem slideMenuItem = new SlideMenuItem(menuTitles.get(i), menuIcons.getResourceId(i, -1));
-            slideMenuItems.add(slideMenuItem);
+        for (i in menuTitles.indices) {
+            val slideMenuItem = SlideMenuItem(menuTitles[i], menuIcons.getResourceId(i, -1))
+            slideMenuItems.add(slideMenuItem)
         }
 
-        menuIcons.recycle();
-        return slideMenuItems;
+        menuIcons.recycle()
+        return slideMenuItems
     }
 
-    public static List<MovieEntity> getMoviesByType(String type,
-                                                    List<MovieEntity> movieEntities) {
-        List<MovieEntity> finalList = new ArrayList<>();
-        for(MovieEntity movieEntity: movieEntities) {
-            boolean add = false;
-            for(String categoryType : movieEntity.getCategoryTypes()) {
-                if(type.equalsIgnoreCase(categoryType)) {
-                    add = true;
+    fun getMoviesByType(type: String,
+                        movieEntities: List<MovieEntity>): List<MovieEntity> {
+        val finalList: MutableList<MovieEntity> = ArrayList()
+        for (movieEntity in movieEntities) {
+            var add = false
+            if(movieEntity.categoryTypes != null) {
+                for (categoryType in movieEntity.categoryTypes!!) {
+                    if (type.equals(categoryType, ignoreCase = true)) {
+                        add = true
+                    }
                 }
             }
-            if(add) finalList.add(movieEntity);
+            if (add) finalList.add(movieEntity)
         }
-        return finalList;
+        return finalList
     }
 
-    public static List<TvEntity> getTvListByType(String type,
-                                                 List<TvEntity> tvEntities) {
-        List<TvEntity> finalList = new ArrayList<>();
-        for(TvEntity tvEntity: tvEntities) {
-            boolean add = false;
-            for(String categoryType : tvEntity.getCategoryTypes()) {
-                if(type.equalsIgnoreCase(categoryType)) {
-                    add = true;
+
+    fun getTvsByType(type: String,
+                     tvEntities: List<TvEntity>): List<TvEntity> {
+        val finalList: MutableList<TvEntity> = ArrayList()
+        for (tvEntity in tvEntities) {
+            var add = false
+            if(tvEntity.categoryTypes != null) {
+                for (categoryType in tvEntity.categoryTypes!!) {
+                    if (type.equals(categoryType, ignoreCase = true)) {
+                        add = true
+                    }
                 }
             }
-            if(add) finalList.add(tvEntity);
+            if (add) finalList.add(tvEntity)
         }
-        return finalList;
+        return finalList
     }
 
+    fun getRunTimeInMins(
+        status: String?,
+        runtime: Long?,
+        releaseDate: String?
+    ): String? {
 
-    public static String getRunTimeInMins(String status,
-                                          Long runtime,
-                                          String releaseDate) {
-
-        return (MOVIE_STATUS_RELEASED.equalsIgnoreCase(status)
-                && runtime != null)
-                ? String.format("%s mins", String.valueOf(runtime)) :
-                getFormattedDate(releaseDate);
+        return if (MOVIE_STATUS_RELEASED.equals(status) && runtime != null)
+            String.format("%s mins", runtime.toString())
+        else getFormattedDate(releaseDate)
     }
 
-    public static String getSeasonNumber(Long seasonNumber) {
-        return String.format("Season %s", seasonNumber);
+    fun getSeasonNumber(seasonNumber: Long?): String {
+        return String.format("Season %s", seasonNumber)
     }
 
-    public static void closeKeyboard(Activity activity) {
-        final InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        if (inputMethodManager.isActive()) {
-            if (activity.getCurrentFocus() != null) {
-                inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
+    fun closeKeyboard(activity: Activity) {
+        val inputMethodManager = activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        if (inputMethodManager.isActive) {
+            if (activity.currentFocus != null) {
+                inputMethodManager.hideSoftInputFromWindow(activity.currentFocus!!.windowToken, 0)
             }
         }
     }

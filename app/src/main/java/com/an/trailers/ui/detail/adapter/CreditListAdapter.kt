@@ -1,107 +1,87 @@
-package com.an.trailers.ui.detail.adapter;
+package com.an.trailers.ui.detail.adapter
 
-import android.content.Context;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
+import android.content.Context
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import com.an.trailers.AppConstants
+import com.an.trailers.R
+import com.an.trailers.data.remote.model.Cast
+import com.an.trailers.data.remote.model.Crew
+import com.an.trailers.databinding.CreditListWithItemBinding
+import com.squareup.picasso.Picasso
+import com.an.trailers.AppConstants.Companion.CREDIT_CAST
 
-import com.an.trailers.AppConstants;
-import com.an.trailers.R;
-import com.an.trailers.data.remote.model.Cast;
-import com.an.trailers.data.remote.model.Crew;
-import com.an.trailers.databinding.CreditListWithItemBinding;
-import com.squareup.picasso.Picasso;
+class CreditListAdapter : RecyclerView.Adapter<CreditListAdapter.CustomViewHolder> {
 
-import java.util.Collections;
-import java.util.List;
+    private var type: String
+    private var context: Context
+    private var casts: List<Cast>
+    private var crews: List<Crew>
 
-import static com.an.trailers.AppConstants.CREDIT_CAST;
+    private val isCast: Boolean
+        get() =  (type.equals(CREDIT_CAST, ignoreCase = true))
 
-public class CreditListAdapter extends RecyclerView.Adapter<CreditListAdapter.CustomViewHolder> {
-
-    private String type;
-    private Context context;
-    private List<Cast> casts;
-    private List<Crew> crews;
-
-    public CreditListAdapter(Context context, String type) {
-        this.type = type;
-        this.context = context;
-        this.casts = Collections.emptyList();
-        this.crews = Collections.emptyList();
+    constructor(context: Context, type: String) {
+        this.type = type
+        this.context = context
+        this.casts = emptyList()
+        this.crews = emptyList()
     }
 
-    public CreditListAdapter(Context context, List<Cast> casts) {
-        this.type = CREDIT_CAST;
-        this.context = context;
-        this.casts = casts;
-        this.crews = Collections.emptyList();
-    }
-
-
-    public CreditListAdapter(Context context, String type, List<Crew> crews) {
-        this.type = type;
-        this.context = context;
-        this.casts = Collections.emptyList();
-        this.crews = crews;
+    constructor(context: Context, casts: List<Cast>) {
+        this.type = CREDIT_CAST
+        this.context = context
+        this.casts = casts
+        this.crews = emptyList()
     }
 
 
-    @Override
-    public CustomViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
-        CreditListWithItemBinding itemBinding = CreditListWithItemBinding.inflate(layoutInflater, parent, false);
-        CustomViewHolder viewHolder = new CustomViewHolder(itemBinding);
-        return viewHolder;
+    constructor(context: Context, type: String, crews: List<Crew>) {
+        this.type = type
+        this.context = context
+        this.casts = emptyList()
+        this.crews = crews
     }
 
-    @Override
-    public void onBindViewHolder(CustomViewHolder holder, int position) {
-        if(isCast()) {
-            Cast cast = getCastItem(position);
-            Picasso.get().load(String.format(AppConstants.IMAGE_URL, cast.getProfilePath()))
-                    .error(R.drawable.ic_placeholder_profile)
-                    .into(holder.binding.profileImage);
-            holder.binding.txtName.setText(cast.getName());
-            holder.binding.txtInfo.setText(cast.getCharacter());
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CustomViewHolder {
+        val layoutInflater = LayoutInflater.from(parent.context)
+        val itemBinding = CreditListWithItemBinding.inflate(layoutInflater, parent, false)
+        return CustomViewHolder(itemBinding)
+    }
+
+    override fun onBindViewHolder(holder: CustomViewHolder, position: Int) {
+        if (isCast) {
+            val cast = getCastItem(position)
+            Picasso.get().load(String.format(AppConstants.IMAGE_URL, cast.profilePath))
+                .error(R.drawable.ic_placeholder_profile)
+                .into(holder.binding.profileImage)
+            holder.binding.txtName.text = cast.name
+            holder.binding.txtInfo.text = cast.character
 
         } else {
-            Crew crew = getCrewItem(position);
-            Picasso.get().load(String.format(AppConstants.IMAGE_URL, crew.getProfilePath()))
-                    .error(R.drawable.ic_placeholder_profile)
-                    .into(holder.binding.profileImage);
-            holder.binding.txtName.setText(crew.getName());
-            holder.binding.txtInfo.setText(crew.getJob());
+            val crew = getCrewItem(position)
+            Picasso.get().load(String.format(AppConstants.IMAGE_URL, crew.profilePath))
+                .error(R.drawable.ic_placeholder_profile)
+                .into(holder.binding.profileImage)
+            holder.binding.txtName.text = crew.name
+            holder.binding.txtInfo.text = crew.job
         }
     }
 
-    @Override
-    public int getItemCount() {
-        if(isCast()) return casts.size();
-        return crews.size();
+    override fun getItemCount(): Int {
+        return if (isCast) casts.size else crews.size
     }
 
-    public Boolean isCast() {
-        if(type.equalsIgnoreCase(CREDIT_CAST))
-            return Boolean.TRUE;
-        return Boolean.FALSE;
+    private fun getCastItem(position: Int): Cast {
+        return casts[position]
     }
 
-    public Cast getCastItem(int position) {
-        return casts.get(position);
-    }
-
-    public Crew getCrewItem(int position) {
-        return crews.get(position);
+    private fun getCrewItem(position: Int): Crew {
+        return crews[position]
     }
 
 
-    public class CustomViewHolder extends RecyclerView.ViewHolder {
-        private CreditListWithItemBinding binding;
-
-        public CustomViewHolder(CreditListWithItemBinding binding) {
-            super(binding.getRoot());
-            this.binding = binding;
-        }
-    }
+    inner class CustomViewHolder(internal val binding: CreditListWithItemBinding) : RecyclerView.ViewHolder(binding.root)
 }

@@ -1,164 +1,161 @@
-package com.an.trailers.ui.detail.activity;
+package com.an.trailers.ui.detail.activity
 
-import android.arch.lifecycle.ViewModelProviders;
-import android.databinding.DataBindingUtil;
-import android.graphics.Paint;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.util.Pair;
-import android.support.v4.view.ViewCompat;
-import android.support.v7.widget.LinearLayoutManager;
-import android.view.View;
+import android.graphics.Paint
+import android.os.Bundle
+import android.view.View
+import androidx.core.app.ActivityOptionsCompat
+import androidx.core.view.ViewCompat
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.an.trailers.AppConstants.Companion.CREDIT_CREW
+import com.an.trailers.AppConstants.Companion.INTENT_MOVIE
+import com.an.trailers.AppConstants.Companion.TRANSITION_IMAGE_NAME
+import com.an.trailers.R
+import com.an.trailers.data.local.entity.TvEntity
+import com.an.trailers.data.remote.model.Cast
+import com.an.trailers.data.remote.model.Crew
+import com.an.trailers.data.remote.model.Video
+import com.an.trailers.databinding.DetailActivityBinding
+import com.an.trailers.factory.ViewModelFactory
+import com.an.trailers.ui.base.BaseActivity
+import com.an.trailers.ui.base.custom.recyclerview.RecyclerItemClickListener
+import com.an.trailers.ui.detail.adapter.CreditListAdapter
+import com.an.trailers.ui.detail.adapter.SimilarTvListAdapter
+import com.an.trailers.ui.detail.adapter.VideoListAdapter
+import com.an.trailers.ui.detail.viewmodel.TvDetailViewModel
+import com.an.trailers.utils.AppUtils
+import com.an.trailers.utils.NavigationUtils
+import com.an.trailers.utils.getParcelable
+import com.squareup.picasso.Picasso
+import dagger.android.AndroidInjection
+import java.util.*
+import javax.inject.Inject
 
-import com.an.trailers.R;
-import com.an.trailers.data.local.entity.TvEntity;
-import com.an.trailers.data.remote.model.Cast;
-import com.an.trailers.data.remote.model.Crew;
-import com.an.trailers.data.remote.model.Review;
-import com.an.trailers.data.remote.model.Video;
-import com.an.trailers.databinding.DetailActivityBinding;
-import com.an.trailers.factory.ViewModelFactory;
-import com.an.trailers.ui.base.BaseActivity;
-import com.an.trailers.ui.base.custom.recyclerview.RecyclerItemClickListener;
-import com.an.trailers.ui.detail.adapter.CreditListAdapter;
-import com.an.trailers.ui.detail.adapter.ReviewListAdapter;
-import com.an.trailers.ui.detail.adapter.SimilarTvListAdapter;
-import com.an.trailers.ui.detail.adapter.VideoListAdapter;
-import com.an.trailers.ui.detail.viewmodel.TvDetailViewModel;
-import com.an.trailers.utils.AppUtils;
-import com.an.trailers.utils.NavigationUtils;
-import com.squareup.picasso.Picasso;
-
-import java.util.Arrays;
-import java.util.List;
-
-import javax.inject.Inject;
-
-import dagger.android.AndroidInjection;
-
-public class TvDetailActivity extends BaseActivity {
+class TvDetailActivity : BaseActivity() {
 
     @Inject
-    ViewModelFactory viewModelFactory;
+    internal lateinit var viewModelFactory: ViewModelFactory
 
-    private DetailActivityBinding binding;
-    TvDetailViewModel tvDetailViewModel;
+    private lateinit var binding: DetailActivityBinding
+    private lateinit var tvDetailViewModel: TvDetailViewModel
 
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        AndroidInjection.inject(this);
-        initialiseView();
-        initialiseViewModel();
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        AndroidInjection.inject(this)
+        initialiseView()
+        initialiseViewModel()
     }
 
-    private void initialiseView() {
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
+    private fun initialiseView() {
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_detail)
 
-        TvEntity tvEntity = getIntent().getParcelableExtra(INTENT_MOVIE);
-        Picasso.get().load(tvEntity.getPosterPath()).into(binding.image);
-        ViewCompat.setTransitionName(binding.image, TRANSITION_IMAGE_NAME);
-        binding.expandButton.setPaintFlags(binding.expandButton.getPaintFlags() |  Paint.UNDERLINE_TEXT_FLAG);
-
-
+        val tvEntity = intent.getParcelable(INTENT_MOVIE, TvEntity::class.java)
+        Picasso.get().load(tvEntity.getFormattedPosterPath()).into(binding.image)
+        ViewCompat.setTransitionName(binding.image, TRANSITION_IMAGE_NAME)
+        binding.expandButton.paintFlags = binding.expandButton.paintFlags or Paint.UNDERLINE_TEXT_FLAG
     }
 
-    private void initialiseViewModel() {
-        tvDetailViewModel = ViewModelProviders.of(this, viewModelFactory).get(TvDetailViewModel.class);
-        tvDetailViewModel.fetchMovieDetail(getIntent().getParcelableExtra(INTENT_MOVIE));
-        tvDetailViewModel.getTvDetailsLiveData().observe(this, tvEntity -> {
-            if(tvEntity != null) {
-                updateMovieDetailView(tvEntity);
-                if(tvEntity.getVideos() != null && !tvEntity.getVideos().isEmpty()) {
-                    updateMovieVideos(tvEntity.getVideos());
+    private fun initialiseViewModel() {
+        tvDetailViewModel = ViewModelProviders.of(this, viewModelFactory).get(TvDetailViewModel::class.java)
+        tvDetailViewModel.fetchMovieDetail(intent.getParcelable(INTENT_MOVIE, TvEntity::class.java))
+        tvDetailViewModel.getTvDetailsLiveData().observe(this) { tvEntity ->
+            if (tvEntity != null) {
+                updateMovieDetailView(tvEntity)
+                if (tvEntity.videos != null && tvEntity.videos!!.isNotEmpty()) {
+                    updateMovieVideos(tvEntity.videos!!)
                 }
-                if(tvEntity.getCrews() != null && !tvEntity.getCrews().isEmpty()) {
-                    updateMovieCrewDetails(tvEntity.getCrews());
+                if (tvEntity.crews != null && tvEntity.crews!!.isNotEmpty()) {
+                    updateMovieCrewDetails(tvEntity.crews!!)
                 }
 
-                if(tvEntity.getCasts() != null && !tvEntity.getCasts().isEmpty()) {
-                    binding.expandButton.setVisibility(View.VISIBLE);
-                    updateMovieCastDetails(tvEntity.getCasts());
+                if (tvEntity.casts != null && tvEntity.casts!!.isNotEmpty()) {
+                    binding.expandButton.visibility = View.VISIBLE
+                    updateMovieCastDetails(tvEntity.casts!!)
                 }
-                if(tvEntity.getSimilarTvEntities() != null && !tvEntity.getSimilarTvEntities().isEmpty()) {
-                    updateSimilarMoviesView(tvEntity.getSimilarTvEntities());
+                if (tvEntity.similarTvEntities != null && tvEntity.similarTvEntities!!.isNotEmpty()) {
+                    updateSimilarMoviesView(tvEntity.similarTvEntities!!)
                 }
-                if(tvEntity.getReviews() != null && !tvEntity.getReviews().isEmpty()) {
-                    updateTvReviews(tvEntity.getReviews());
-                } else binding.includedReviewsLayout.reviewView.setVisibility(View.GONE);
             }
-        });
+        }
     }
 
 
-    private void updateMovieDetailView(TvEntity tvEntity) {
-        binding.movieTitle.setText(tvEntity.getHeader());
-        binding.movieDesc.setText(tvEntity.getDescription());
-        if(tvEntity.getStatus() != null) binding.movieStatus.setItems(Arrays.asList(new String[]{ tvEntity.getStatus() }));
-        binding.collectionItemPicker.setUseRandomColor(true);
-        if(tvEntity.getGenres() != null) binding.collectionItemPicker.setItems(AppUtils.getGenres(tvEntity.getGenres()));
-        if(tvEntity.getNumberOfSeasons() != null) binding.txtRuntime.setText(AppUtils.getSeasonNumber(tvEntity.getNumberOfSeasons()));
+    private fun updateMovieDetailView(tvEntity: TvEntity) {
+        binding.movieTitle.text = tvEntity.header
+        binding.movieDesc.text = tvEntity.description
+        if (tvEntity.status != null) binding.movieStatus.items = Arrays.asList(tvEntity.status)
+        binding.collectionItemPicker.isUseRandomColor = true
+        if (tvEntity.genres != null) binding.collectionItemPicker.items = AppUtils.getGenres(tvEntity.genres!!)
+        if (tvEntity.numberOfSeasons != null) binding.txtRuntime.text =
+                AppUtils.getSeasonNumber(tvEntity.numberOfSeasons)
     }
 
-    private void updateMovieVideos(List<Video> videos) {
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        binding.recyclerView.setLayoutManager(linearLayoutManager);
-        binding.recyclerView.smoothScrollToPosition(1);
+    private fun updateMovieVideos(videos: List<Video>) {
+        val linearLayoutManager = LinearLayoutManager(this)
+        linearLayoutManager.orientation = LinearLayoutManager.HORIZONTAL
+        binding.recyclerView.layoutManager = linearLayoutManager
+        binding.recyclerView.smoothScrollToPosition(1)
 
-        VideoListAdapter videoListAdapter = new VideoListAdapter(getApplicationContext(), videos);
-        binding.recyclerView.setAdapter(videoListAdapter);
-        binding.recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, (parentView, childView, position) -> {
-            NavigationUtils.redirectToVideoScreen(this, videoListAdapter.getItem(position).getKey());
-        }));
+        val videoListAdapter = VideoListAdapter(applicationContext, videos)
+        binding.recyclerView.adapter = videoListAdapter
+        binding.recyclerView.addOnItemTouchListener(
+            RecyclerItemClickListener(
+                this, object : RecyclerItemClickListener.OnRecyclerViewItemClickListener {
+                    override fun onItemClick(parentView: View, childView: View, position: Int) {
+
+                        NavigationUtils.redirectToVideoScreen(
+                             applicationContext, videoListAdapter.getItem(position).key
+                        )
+                    }
+                })
+        )
     }
 
-    private void updateMovieCastDetails(List<Cast> casts) {
-        binding.includedLayout.castList.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false));
-        binding.includedLayout.castList.setVisibility(View.VISIBLE);
-        CreditListAdapter creditListAdapter = new CreditListAdapter(getApplicationContext(), casts);
-        binding.includedLayout.castList.setAdapter(creditListAdapter);
+    private fun updateMovieCastDetails(casts: List<Cast>) {
+        binding.includedLayout.castList.layoutManager =
+                LinearLayoutManager(applicationContext, LinearLayoutManager.HORIZONTAL, false)
+        binding.includedLayout.castList.visibility = View.VISIBLE
+        val creditListAdapter = CreditListAdapter(applicationContext, casts)
+        binding.includedLayout.castList.adapter = creditListAdapter
     }
 
-    private void updateMovieCrewDetails(List<Crew> crews) {
-        binding.includedLayout.crewList.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false));
-        binding.includedLayout.castList.setVisibility(View.VISIBLE);
-        CreditListAdapter creditListAdapter = new CreditListAdapter(getApplicationContext(), CREDIT_CREW, crews);
-        binding.includedLayout.crewList.setAdapter(creditListAdapter);
+    private fun updateMovieCrewDetails(crews: List<Crew>) {
+        binding.includedLayout.crewList.layoutManager =
+                LinearLayoutManager(applicationContext, LinearLayoutManager.HORIZONTAL, false)
+        binding.includedLayout.castList.visibility = View.VISIBLE
+        val creditListAdapter = CreditListAdapter(applicationContext, CREDIT_CREW, crews)
+        binding.includedLayout.crewList.adapter = creditListAdapter
     }
 
-    private void updateTvReviews(List<Review> reviews) {
-        binding.includedReviewsLayout.reviewsList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        binding.includedReviewsLayout.reviewsList.setVisibility(View.VISIBLE);
-        ReviewListAdapter reviewListAdapter = new ReviewListAdapter(reviews);
-        binding.includedReviewsLayout.reviewsList.setAdapter(reviewListAdapter);
-        binding.includedReviewsLayout.reviewView.setVisibility(View.VISIBLE);
-    }
+    private fun updateSimilarMoviesView(tvEntities: List<TvEntity>) {
+        binding.includedSimilarLayout.moviesList.layoutManager =
+                LinearLayoutManager(applicationContext, LinearLayoutManager.HORIZONTAL, false)
+        binding.includedSimilarLayout.moviesList.visibility = View.VISIBLE
+        val similarTvListAdapter = SimilarTvListAdapter(tvEntities)
+        binding.includedSimilarLayout.moviesList.adapter = similarTvListAdapter
+        binding.includedSimilarLayout.moviesList.addOnItemTouchListener(
+                RecyclerItemClickListener(applicationContext,
+                        object : RecyclerItemClickListener.OnRecyclerViewItemClickListener {
+                            override fun onItemClick(parentView: View, childView: View, position: Int) {
+                                val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                                        this@TvDetailActivity, childView, TRANSITION_IMAGE_NAME)
 
-    private void updateSimilarMoviesView(List<TvEntity> tvEntities) {
-        binding.includedSimilarLayout.moviesList.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false));
-        binding.includedSimilarLayout.moviesList.setVisibility(View.VISIBLE);
-        SimilarTvListAdapter similarTvListAdapter = new SimilarTvListAdapter(this, tvEntities);
-        binding.includedSimilarLayout.moviesList.setAdapter(similarTvListAdapter);
-
-        binding.includedSimilarLayout.moviesList.addOnItemTouchListener(new RecyclerItemClickListener(this, (parentView, childView, position) -> {
-            TvEntity tvEntity = similarTvListAdapter.getItem(position);
-            ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this,
-                    new Pair(childView, TRANSITION_IMAGE_NAME));
-            NavigationUtils.redirectToTvDetailScreen(this, tvEntity, options);
-        }));
-        binding.includedSimilarLayout.movieSimilarTitle.setVisibility(View.VISIBLE);
+                                NavigationUtils.redirectToTvDetailScreen(
+                                        this@TvDetailActivity, similarTvListAdapter.getItem(position), options)
+                            }
+                        }))
+        binding.includedSimilarLayout.movieSimilarTitle.visibility = View.VISIBLE
     }
 
 
-    public void handleExpandAction(View view) {
-        if (binding.includedLayout.expandableLayout.isExpanded()) {
-            binding.expandButton.setText(getString(R.string.read_more));
-            binding.includedLayout.expandableLayout.collapse();
+    fun handleExpandAction(view: View) {
+        if (binding.includedLayout.expandableLayout.isExpanded) {
+            binding.expandButton.text = getString(R.string.read_more)
+            binding.includedLayout.expandableLayout.collapse()
         } else {
-            binding.expandButton.setText(getString(R.string.read_less));
-            binding.includedLayout.expandableLayout.expand();
+            binding.expandButton.text = getString(R.string.read_less)
+            binding.includedLayout.expandableLayout.expand()
         }
     }
 }

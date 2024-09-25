@@ -1,67 +1,72 @@
-package com.an.trailers.data;
+package com.an.trailers.data
 
-import android.support.annotation.MainThread;
-import android.support.annotation.NonNull;
-import android.support.annotation.WorkerThread;
+import androidx.annotation.MainThread
+import androidx.annotation.WorkerThread
+import io.reactivex.Flowable
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 
-import io.reactivex.Flowable;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
+abstract class NetworkBoundResource<ResultType, RequestType> @MainThread
+protected constructor() {
 
-public abstract class NetworkBoundResource<ResultType, RequestType> {
+    private val asObservable: Observable<Resource<ResultType>>
 
-    private Observable<Resource<ResultType>> result;
+    init {
+        val source: Observable<Resource<ResultType>>
+        if (this.shouldFetch()) {
 
-    @MainThread
-    protected NetworkBoundResource() {
-        Observable<Resource<ResultType>> source;
-        if (shouldFetch()) {
-            source = createCall()
-                    .subscribeOn(Schedulers.io())
-                    .doOnNext(apiResponse -> saveCallResult(processResponse(apiResponse)))
-                    .flatMap(apiResponse -> loadFromDb().toObservable().map(Resource::success))
-                    .doOnError(t -> onFetchFailed())
-                    .onErrorResumeNext(t -> {
-                        return loadFromDb()
-                                .toObservable()
-                                .map(data -> Resource.error(t.getMessage(), data));
+            source = this.createCall()
+                .subscribeOn(Schedulers.io())
+                .doOnNext {
+                    saveCallResult(processResponse(it)!!) }
+                .doOnError { onFetchFailed() }
+                .observeOn(AndroidSchedulers.mainThread())
+                .flatMap {
+                    loadFromDb().toObservable()
+                        .map { Resource.success(it) }
+                }
+//                .onErrorResumeNext { t : Throwable ->
+//                    loadFromDb().toObservable().map {
+//                        Resource.error(t.message!!, it)
+//                    }
+//                }
 
-                    })
-                    .observeOn(AndroidSchedulers.mainThread());
         } else {
-            source = loadFromDb()
-                    .toObservable()
-                    .map(Resource::success);
+            source = this.loadFromDb()
+                .toObservable()
+                .map { Resource.success(it) }
         }
 
-        result = Observable.concat(
-                loadFromDb()
-                        .toObservable()
-                        .map(Resource::loading)
-                        .take(1),
-                source
-        );
+        asObservable = Observable.concat(
+            this.loadFromDb()
+                .toObservable()
+                .take(1)
+                .map { Resource.loading(it) },
+            source
+        )
     }
 
-    public Observable<Resource<ResultType>> getAsObservable() {return result;}
+    fun getAsObservable(): Observable<Resource<ResultType>> {
+        return asObservable
+    }
 
-    protected void onFetchFailed() {}
+    private fun onFetchFailed() {}
 
     @WorkerThread
-    protected RequestType processResponse(Resource<RequestType> response) {return response.data;}
+    protected fun processResponse(response: Resource<RequestType>): RequestType? {
+        return response.data
+    }
 
     @WorkerThread
-    protected abstract void saveCallResult(@NonNull RequestType item);
+    protected abstract fun saveCallResult(item: RequestType)
 
     @MainThread
-    protected abstract boolean shouldFetch();
+    protected abstract fun shouldFetch(): Boolean
 
-    @NonNull
     @MainThread
-    protected abstract Flowable<ResultType> loadFromDb();
+    protected abstract fun loadFromDb(): Flowable<ResultType>
 
-    @NonNull
     @MainThread
-    protected abstract Observable<Resource<RequestType>> createCall();
+    protected abstract fun createCall(): Observable<Resource<RequestType>>
 }

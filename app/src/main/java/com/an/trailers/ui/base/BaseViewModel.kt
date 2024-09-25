@@ -1,20 +1,19 @@
-package com.an.trailers.ui.base;
+package com.an.trailers.ui.base
 
-import android.arch.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModel
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
+open class BaseViewModel : ViewModel() {
 
-public class BaseViewModel extends ViewModel {
+    private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
-
-    protected void addToDisposable(Disposable disposable) {
-        compositeDisposable.remove(disposable);
-        compositeDisposable.add(disposable);
+    protected fun addToDisposable(disposable: Disposable) {
+        compositeDisposable.remove(disposable)
+        compositeDisposable.add(disposable)
     }
 
-    public void onStop() {
-        compositeDisposable.clear();
+    fun onStop() {
+        compositeDisposable.clear()
     }
 }

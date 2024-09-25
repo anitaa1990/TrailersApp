@@ -1,23 +1,25 @@
-package com.an.trailers.data.remote.interceptor;
+package com.an.trailers.data.remote.interceptor
 
-import android.content.Context;
-import android.content.ContextWrapper;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.content.Context
+import android.content.ContextWrapper
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.RemoteException
 
-public class ConnectivityStatus extends ContextWrapper {
-
-    public ConnectivityStatus(Context base) {
-        super(base);
-    }
-
-    public static boolean isConnected(Context context){
-
-        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo connection = manager.getActiveNetworkInfo();
-        if (connection != null && connection.isConnectedOrConnecting()){
-            return true;
+class ConnectivityStatus(base: Context) : ContextWrapper(base) {
+    companion object {
+        fun isConnected(context: Context): Boolean {
+            val manager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            return try {
+                manager.getNetworkCapabilities(manager.activeNetwork)
+                    ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                    .let { connected ->
+                        connected == true
+                    }
+            } catch (e: RemoteException) {
+                e.printStackTrace()
+                false
+            }
         }
-        return false;
     }
 }

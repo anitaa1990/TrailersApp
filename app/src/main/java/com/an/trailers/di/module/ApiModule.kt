@@ -1,93 +1,89 @@
-package com.an.trailers.di.module;
+package com.an.trailers.di.module
 
-import android.app.Application;
+import android.app.Application
+import com.an.trailers.AppConstants
+import com.an.trailers.data.remote.api.MovieApiService
+import com.an.trailers.data.remote.api.TvApiService
+import com.an.trailers.data.remote.interceptor.NetworkInterceptor
+import com.an.trailers.data.remote.interceptor.RequestInterceptor
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import dagger.Module
+import dagger.Provides
+import okhttp3.Cache
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
+import retrofit2.converter.gson.GsonConverterFactory
 
-import com.an.trailers.data.remote.api.MovieApiService;
-import com.an.trailers.data.remote.api.TvApiService;
-import com.an.trailers.data.remote.interceptor.NetworkInterceptor;
-import com.an.trailers.data.remote.interceptor.RequestInterceptor;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import java.io.File;
-import java.util.concurrent.TimeUnit;
-
-import javax.inject.Singleton;
-
-import dagger.Module;
-import dagger.Provides;
-import okhttp3.Cache;
-import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
-
-import static com.an.trailers.AppConstants.BASE_URL;
+import javax.inject.Singleton
+import java.io.File
+import java.util.concurrent.TimeUnit
 
 
 @Module
-public class ApiModule {
+class ApiModule {
 
     @Provides
     @Singleton
-    Gson provideGson() {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-//        gsonBuilder.registerTypeAdapter(MOVIE_ARRAY_LIST_CLASS_TYPE, new MoviesJsonDeserializer());
-        return gsonBuilder.create();
+    internal fun provideGson(): Gson {
+        val gsonBuilder = GsonBuilder()
+        return gsonBuilder.create()
     }
 
     @Provides
     @Singleton
-    Cache provideCache(Application application) {
-        long cacheSize = 10 * 1024 * 1024; // 10 MB
-         File httpCacheDirectory = new File(application.getCacheDir(), "http-cache");
-        return new Cache(httpCacheDirectory, cacheSize);
-    }
-
-
-    @Provides
-    @Singleton
-    NetworkInterceptor provideNetworkInterceptor(Application application) {
-        return new NetworkInterceptor(application.getApplicationContext());
-    }
-
-    @Provides
-    @Singleton
-    OkHttpClient provideOkhttpClient(Cache cache, NetworkInterceptor networkInterceptor) {
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-
-        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        httpClient.cache(cache);
-        httpClient.addInterceptor(networkInterceptor);
-        httpClient.addInterceptor(logging);
-        httpClient.addNetworkInterceptor(new RequestInterceptor());
-        httpClient.connectTimeout(30, TimeUnit.SECONDS);
-        httpClient.readTimeout(30, TimeUnit.SECONDS);
-        return httpClient.build();
-    }
-
-    @Provides
-    @Singleton
-    Retrofit provideRetrofit(Gson gson, OkHttpClient okHttpClient) {
-        return new Retrofit.Builder()
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .baseUrl(BASE_URL)
-                .client(okHttpClient)
-                .build();
-    }
-
-    @Provides
-    @Singleton
-    MovieApiService provideMovieApiService(Retrofit retrofit) {
-        return retrofit.create(MovieApiService.class);
+    internal fun provideCache(application: Application): Cache {
+        val cacheSize = (10 * 1024 * 1024).toLong() // 10 MB
+        val httpCacheDirectory = File(application.cacheDir, "http-cache")
+        return Cache(httpCacheDirectory, cacheSize)
     }
 
 
     @Provides
     @Singleton
-    TvApiService provideTvApiService(Retrofit retrofit) {
-        return retrofit.create(TvApiService.class);
+    internal fun provideNetworkInterceptor(application: Application): NetworkInterceptor {
+        return NetworkInterceptor(application.applicationContext)
+    }
+
+    @Provides
+    @Singleton
+    internal fun provideOkhttpClient(cache: Cache, networkInterceptor: NetworkInterceptor): OkHttpClient {
+        val logging = HttpLoggingInterceptor()
+        logging.level = HttpLoggingInterceptor.Level.BODY
+
+        val httpClient = OkHttpClient.Builder()
+        httpClient.cache(cache)
+        httpClient.addInterceptor(networkInterceptor)
+        httpClient.addInterceptor(logging)
+        httpClient.addNetworkInterceptor(RequestInterceptor())
+        httpClient.connectTimeout(30, TimeUnit.SECONDS)
+        httpClient.readTimeout(30, TimeUnit.SECONDS)
+        return httpClient.build()
+    }
+
+    @Provides
+    @Singleton
+    internal fun provideRetrofit(gson: Gson, okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .baseUrl(AppConstants.BASE_URL)
+            .client(okHttpClient)
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    internal fun provideMovieApiService(retrofit: Retrofit): MovieApiService {
+        return retrofit.create(MovieApiService::class.java)
+    }
+
+
+    @Provides
+    @Singleton
+    internal fun provideTvApiService(retrofit: Retrofit): TvApiService {
+        return retrofit.create(TvApiService::class.java)
     }
 }

@@ -1,147 +1,136 @@
-package com.an.trailers.ui.base.custom;
+package com.an.trailers.ui.base.custom
 
-import android.animation.Animator;
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-import android.os.Handler;
-import android.util.AttributeSet;
-import android.util.DisplayMetrics;
-import android.view.animation.Animation;
-import android.widget.ImageSwitcher;
-import android.widget.ImageView;
+import android.animation.Animator
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
+import android.os.Handler
+import android.os.Looper
+import android.util.AttributeSet
+import android.view.animation.Animation
+import android.widget.ImageSwitcher
+import android.widget.ImageView
+import com.an.trailers.utils.AnimUtils
+import com.squareup.picasso.Picasso
+import com.squareup.picasso.Target
 
-import com.an.trailers.utils.AnimUtils;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
+class BackgroundSwitcherView : ImageSwitcher {
+    private val normalOrder = intArrayOf(0, 1)
 
-public class BackgroundSwitcherView extends ImageSwitcher {
-    private final int[] NORMAL_ORDER = new int[]{0, 1};
+    private var bgImageGap: Int = 0
+    private var bgImageWidth: Int = 0
 
-    private int bgImageGap;
-    private int bgImageWidth;
+    private var bgImageInLeftAnimation: Animation? = null
+    private var bgImageOutLeftAnimation: Animation? = null
 
-    private Animation bgImageInLeftAnimation;
-    private Animation bgImageOutLeftAnimation;
+    private var bgImageInRightAnimation: Animation? = null
+    private var bgImageOutRightAnimation: Animation? = null
 
-    private Animation bgImageInRightAnimation;
-    private Animation bgImageOutRightAnimation;
+    private val movementDuration = 500
+    private val widthBackgroundImageGapPercent = 12
 
-    private int movementDuration = 500;
-    private int widthBackgroundImageGapPercent = 12;
+    private var currentAnimationDirection: AnimationDirection? = null
 
-    private AnimationDirection currentAnimationDirection;
-
-    public BackgroundSwitcherView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        inflateAndInit(context);
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
+        inflateAndInit(context)
     }
 
-    public BackgroundSwitcherView(Context context) {
-        super(context);
-        inflateAndInit(context);
+    constructor(context: Context) : super(context) {
+        inflateAndInit(context)
     }
 
-    private void inflateAndInit(final Context context) {
-        setChildrenDrawingOrderEnabled(true);
-        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
-        bgImageGap = (displayMetrics.widthPixels / 100) * widthBackgroundImageGapPercent;
-        bgImageWidth = displayMetrics.widthPixels + bgImageGap * 2;
+    private fun inflateAndInit(context: Context) {
+        isChildrenDrawingOrderEnabled = true
+        val displayMetrics = context.resources.displayMetrics
+        bgImageGap = displayMetrics.widthPixels / 100 * widthBackgroundImageGapPercent
+        bgImageWidth = displayMetrics.widthPixels + bgImageGap * 2
 
-        this.setFactory(() -> {
-            ImageView myView = new ImageView(context);
-            myView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            myView.setLayoutParams(new LayoutParams(bgImageWidth, LayoutParams.MATCH_PARENT));
-            myView.setTranslationX(-bgImageGap);
-            return myView;
-        });
+        this.setFactory {
+            val myView = ImageView(context)
+            myView.scaleType = ImageView.ScaleType.CENTER_CROP
+            myView.layoutParams = LayoutParams(bgImageWidth, LayoutParams.MATCH_PARENT)
+            myView.translationX = (-bgImageGap).toFloat()
+            myView
+        }
 
-        bgImageInLeftAnimation = AnimUtils.createBgImageInAnimation(bgImageGap, 0, movementDuration);
-        bgImageOutLeftAnimation = AnimUtils.createBgImageOutAnimation(0, -bgImageGap, movementDuration);
-        bgImageInRightAnimation = AnimUtils.createBgImageInAnimation(-bgImageGap, 0, movementDuration);
-        bgImageOutRightAnimation = AnimUtils.createBgImageOutAnimation(0, bgImageGap, movementDuration);
+        bgImageInLeftAnimation = AnimUtils.createBgImageInAnimation(bgImageGap, 0, movementDuration)
+        bgImageOutLeftAnimation = AnimUtils.createBgImageOutAnimation(0, -bgImageGap, movementDuration)
+        bgImageInRightAnimation = AnimUtils.createBgImageInAnimation(-bgImageGap, 0, movementDuration)
+        bgImageOutRightAnimation = AnimUtils.createBgImageOutAnimation(0, bgImageGap, movementDuration)
     }
 
 
-    @Override
-    protected int getChildDrawingOrder(int childCount, int i) {
-        return NORMAL_ORDER[i];
+    override fun getChildDrawingOrder(childCount: Int, i: Int): Int {
+        return normalOrder[i]
     }
 
-    private synchronized void setImageBitmapWithAnimation(Bitmap newBitmap, AnimationDirection animationDirection) {
+    @Synchronized
+    private fun setImageBitmapWithAnimation(newBitmap: Bitmap, animationDirection: AnimationDirection?) {
         if (animationDirection == AnimationDirection.LEFT) {
-            this.setInAnimation(bgImageInLeftAnimation);
-            this.setOutAnimation(bgImageOutLeftAnimation);
-            this.setImageBitmap(newBitmap);
+            this.inAnimation = bgImageInLeftAnimation
+            this.outAnimation = bgImageOutLeftAnimation
+            this.setImageBitmap(newBitmap)
 
         } else if (animationDirection == AnimationDirection.RIGHT) {
-            this.setInAnimation(bgImageInRightAnimation);
-            this.setOutAnimation(bgImageOutRightAnimation);
-            this.setImageBitmap(newBitmap);
+            this.inAnimation = bgImageInRightAnimation
+            this.outAnimation = bgImageOutRightAnimation
+            this.setImageBitmap(newBitmap)
         }
     }
 
 
+    fun updateCurrentBackground(imageUrl: String?) {
 
-    public void updateCurrentBackground(String imageUrl) {
-
-        this.currentAnimationDirection = AnimationDirection.RIGHT;
-        ImageView image = (ImageView) this.getNextView();
-        image.setImageDrawable(null);
-        showNext();
-
-        if(imageUrl == null) return;
+        this.currentAnimationDirection = AnimationDirection.RIGHT
+        val image = this.nextView as ImageView
+        image.setImageDrawable(null)
+        showNext()
 
         Picasso.get().load(imageUrl)
-                .noFade().noPlaceholder()
-                .into(new Target() {
-                    @Override
-                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                        setImageBitmapWithAnimation(bitmap, currentAnimationDirection);
-                    }
-                    @Override
-                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-                        System.out.println("@#@#@#@#@" + e.getMessage());
-                    }
-                    @Override
-                    public void onPrepareLoad(Drawable placeHolderDrawable) { }
-                });
+            .into(object :
+                Target {
+                override fun onBitmapLoaded(bitmap: Bitmap, from: Picasso.LoadedFrom) {
+                    setImageBitmapWithAnimation(bitmap, currentAnimationDirection)
+                }
+
+                override fun onBitmapFailed(e: Exception, errorDrawable: Drawable?) {
+                    println("@#@#@#@#@" + e.message)
+                }
+
+                override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+            })
     }
 
 
-    private void setImageBitmap(Bitmap bitmap) {
-        ImageView image = (ImageView) this.getNextView();
-        image.setImageDrawable(null);
+    private fun setImageBitmap(bitmap: Bitmap) {
+        val image = this.nextView as ImageView
+        image.setImageDrawable(null)
 
-        int duration = 0;
-        animate().alpha(0.0f).setDuration(duration).setListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
+        val duration = 0
+        animate().alpha(0.0f).setDuration(duration.toLong()).setListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(animation: Animator) {
 
             }
 
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                image.setImageBitmap(bitmap);
-                new Handler().postDelayed(() -> animate().alpha(0.4f).setDuration(duration), 200);
+            override fun onAnimationEnd(animation: Animator) {
+                image.setImageBitmap(bitmap)
+                Handler(Looper.getMainLooper()).postDelayed({ animate().alpha(0.4f).duration = duration.toLong() }, 200)
             }
 
-            @Override
-            public void onAnimationCancel(Animator animation) { }
+            override fun onAnimationCancel(animation: Animator) {}
 
-            @Override
-            public void onAnimationRepeat(Animator animation) { }
-        });
-        showNext();
+            override fun onAnimationRepeat(animation: Animator) {}
+        })
+        showNext()
     }
 
-    public void clearImage() {
-        ImageView image = (ImageView) this.getNextView();
-        image.setImageDrawable(null);
-        showNext();
+    fun clearImage() {
+        val image = this.nextView as ImageView
+        image.setImageDrawable(null)
+        showNext()
     }
 
-    public enum AnimationDirection {
+    enum class AnimationDirection {
         LEFT, RIGHT
     }
 }

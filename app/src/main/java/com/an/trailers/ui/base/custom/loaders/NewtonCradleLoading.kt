@@ -1,183 +1,177 @@
-package com.an.trailers.ui.base.custom.loaders;
+package com.an.trailers.ui.base.custom.loaders
 
-import android.content.Context;
-import android.util.AttributeSet;
-import android.view.LayoutInflater;
-import android.view.animation.Animation;
-import android.view.animation.CycleInterpolator;
-import android.view.animation.LinearInterpolator;
-import android.view.animation.RotateAnimation;
-import android.view.animation.TranslateAnimation;
-import android.widget.LinearLayout;
+import android.content.Context
+import android.util.AttributeSet
+import android.view.LayoutInflater
+import android.view.animation.*
+import android.widget.LinearLayout
+import com.an.trailers.R
 
-import com.an.trailers.R;
+class NewtonCradleLoading : LinearLayout {
 
-public class NewtonCradleLoading extends LinearLayout {
-
-    private CradleBall cradleBallOne;
-    private CradleBall cradleBallTwo;
-    private CradleBall cradleBallThree;
-    private CradleBall cradleBallFour;
-    private CradleBall cradleBallFive;
-
-    private static final int DURATION = 400;
-    private static final int SHAKE_DISTANCE = 2;
-    private static final float PIVOT_X = 0.5f;
-    private static final float PIVOT_Y = -3f;
-    private static final int DEGREE = 30;
+    private var cradleBallOne: CradleBall? = null
+    private var cradleBallTwo: CradleBall? = null
+    private var cradleBallThree: CradleBall? = null
+    private var cradleBallFour: CradleBall? = null
+    private var cradleBallFive: CradleBall? = null
 
 
-    private boolean isStart = false;
+    var isStart = false
+        private set
 
-    public NewtonCradleLoading(Context context) {
-        super(context);
-        initView(context);
+    private lateinit var rotateLeftAnimation: RotateAnimation//cradleBallOne left to right
+    private lateinit var rotateRightAnimation: RotateAnimation//cradleBallFive right to left
+    private lateinit var shakeLeftAnimation: TranslateAnimation
+    private lateinit var shakeRightAnimation: TranslateAnimation
+
+    constructor(context: Context) : super(context) {
+        initView(context)
     }
 
-    public NewtonCradleLoading(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        initView(context);
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
+        initView(context)
     }
 
-    public NewtonCradleLoading(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        initView(context);
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+        initView(context)
     }
 
-    private void initView(Context context) {
-        LayoutInflater.from(context).inflate(R.layout.newton_cradle_loading, this, true);
+    private fun initView(context: Context) {
+        LayoutInflater.from(context).inflate(R.layout.newton_cradle_loading, this, true)
     }
 
-    @Override
-    protected void onFinishInflate() {
-        super.onFinishInflate();
-        cradleBallOne = findViewById(R.id.ball_one);
-        cradleBallTwo = findViewById(R.id.ball_two);
-        cradleBallThree = findViewById(R.id.ball_three);
-        cradleBallFour = findViewById(R.id.ball_four);
-        cradleBallFive = findViewById(R.id.ball_five);
+    override fun onFinishInflate() {
+        super.onFinishInflate()
+        cradleBallOne = findViewById(R.id.ball_one)
+        cradleBallTwo = findViewById(R.id.ball_two)
+        cradleBallThree = findViewById(R.id.ball_three)
+        cradleBallFour = findViewById(R.id.ball_four)
+        cradleBallFive = findViewById(R.id.ball_five)
 
-        initAnim();
+        initAnim()
     }
 
-    RotateAnimation rotateLeftAnimation;//cradleBallOne left to right
-    RotateAnimation rotateRightAnimation;//cradleBallFive right to left
-    TranslateAnimation shakeLeftAnimation;
-    TranslateAnimation shakeRightAnimation;
 
+    private fun initAnim() {
+        rotateRightAnimation = RotateAnimation(
+            0f,
+            (-DEGREE).toFloat(),
+            RotateAnimation.RELATIVE_TO_SELF,
+            PIVOT_X,
+            RotateAnimation.RELATIVE_TO_SELF,
+            PIVOT_Y
+        )
+        rotateRightAnimation.repeatCount = 1
+        rotateRightAnimation.repeatMode = Animation.REVERSE
+        rotateRightAnimation.duration = DURATION.toLong()
+        rotateRightAnimation.interpolator = LinearInterpolator()
+        rotateRightAnimation.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation) {}
 
-    private void initAnim() {
-        rotateRightAnimation = new RotateAnimation(0, -DEGREE, RotateAnimation.RELATIVE_TO_SELF, PIVOT_X, RotateAnimation.RELATIVE_TO_SELF, PIVOT_Y);
-        rotateRightAnimation.setRepeatCount(1);
-        rotateRightAnimation.setRepeatMode(Animation.REVERSE);
-        rotateRightAnimation.setDuration(DURATION);
-        rotateRightAnimation.setInterpolator(new LinearInterpolator());
-        rotateRightAnimation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
+            override fun onAnimationEnd(animation: Animation) {
                 if (isStart)
-                    startRightAnim();
+                    startRightAnim()
             }
 
-            @Override
-            public void onAnimationRepeat(Animation animation) {
+            override fun onAnimationRepeat(animation: Animation) {}
+        })
+
+        shakeLeftAnimation = TranslateAnimation(0f, SHAKE_DISTANCE.toFloat(), 0f, 0f)
+        shakeLeftAnimation.duration = DURATION.toLong()
+        shakeLeftAnimation.interpolator = CycleInterpolator(2f)
+
+        rotateLeftAnimation = RotateAnimation(
+            0f,
+            DEGREE.toFloat(),
+            RotateAnimation.RELATIVE_TO_SELF,
+            PIVOT_X,
+            RotateAnimation.RELATIVE_TO_SELF,
+            PIVOT_Y
+        )
+        rotateLeftAnimation.repeatCount = 1
+        rotateLeftAnimation.repeatMode = Animation.REVERSE
+        rotateLeftAnimation.duration = DURATION.toLong()
+        rotateLeftAnimation.interpolator = LinearInterpolator()
+        rotateLeftAnimation.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation) {
+
             }
-        });
 
-        shakeLeftAnimation = new TranslateAnimation(0, SHAKE_DISTANCE, 0, 0);
-        shakeLeftAnimation.setDuration(DURATION);
-        shakeLeftAnimation.setInterpolator(new CycleInterpolator(2));
-
-        rotateLeftAnimation = new RotateAnimation(0, DEGREE, RotateAnimation.RELATIVE_TO_SELF, PIVOT_X, RotateAnimation.RELATIVE_TO_SELF, PIVOT_Y);
-        rotateLeftAnimation.setRepeatCount(1);
-        rotateLeftAnimation.setRepeatMode(Animation.REVERSE);
-        rotateLeftAnimation.setDuration(DURATION);
-        rotateLeftAnimation.setInterpolator(new LinearInterpolator());
-        rotateLeftAnimation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
+            override fun onAnimationEnd(animation: Animation) {
                 if (isStart) {
-                    cradleBallTwo.startAnimation(shakeLeftAnimation);
-                    cradleBallThree.startAnimation(shakeLeftAnimation);
-                    cradleBallFour.startAnimation(shakeLeftAnimation);
+                    cradleBallTwo!!.startAnimation(shakeLeftAnimation)
+                    cradleBallThree!!.startAnimation(shakeLeftAnimation)
+                    cradleBallFour!!.startAnimation(shakeLeftAnimation)
 
-                    cradleBallFive.startAnimation(rotateRightAnimation);
+                    cradleBallFive!!.startAnimation(rotateRightAnimation)
                 }
             }
 
-            @Override
-            public void onAnimationRepeat(Animation animation) {
+            override fun onAnimationRepeat(animation: Animation) {
 
             }
-        });
+        })
 
 
-        shakeRightAnimation = new TranslateAnimation(0, -SHAKE_DISTANCE, 0, 0);
-        shakeRightAnimation.setDuration(DURATION);
-        shakeRightAnimation.setInterpolator(new CycleInterpolator(2));
-        shakeRightAnimation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
+        shakeRightAnimation = TranslateAnimation(0f, (-SHAKE_DISTANCE).toFloat(), 0f, 0f)
+        shakeRightAnimation.duration = DURATION.toLong()
+        shakeRightAnimation.interpolator = CycleInterpolator(2f)
+        shakeRightAnimation.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation) {
                 if (isStart)
-                    startLeftAnim();
+                    startLeftAnim()
             }
 
-            @Override
-            public void onAnimationEnd(Animation animation) {
+            override fun onAnimationEnd(animation: Animation) {
 
             }
 
-            @Override
-            public void onAnimationRepeat(Animation animation) {
+            override fun onAnimationRepeat(animation: Animation) {
 
             }
-        });
+        })
     }
 
-    private void startLeftAnim() {
-        cradleBallOne.startAnimation(rotateLeftAnimation);
+    private fun startLeftAnim() {
+        cradleBallOne!!.startAnimation(rotateLeftAnimation)
     }
 
-    private void startRightAnim() {
-        cradleBallTwo.startAnimation(shakeRightAnimation);
-        cradleBallThree.startAnimation(shakeRightAnimation);
-        cradleBallFour.startAnimation(shakeRightAnimation);
+    private fun startRightAnim() {
+        cradleBallTwo!!.startAnimation(shakeRightAnimation)
+        cradleBallThree!!.startAnimation(shakeRightAnimation)
+        cradleBallFour!!.startAnimation(shakeRightAnimation)
     }
 
-    public void start() {
+    fun start() {
         if (!isStart) {
-            isStart = true;
-            startLeftAnim();
+            isStart = true
+            startLeftAnim()
         }
     }
 
-    public void stop() {
-        isStart = false;
-        cradleBallOne.clearAnimation();
-        cradleBallTwo.clearAnimation();
-        cradleBallThree.clearAnimation();
-        cradleBallFour.clearAnimation();
-        cradleBallFive.clearAnimation();
+    fun stop() {
+        isStart = false
+        cradleBallOne!!.clearAnimation()
+        cradleBallTwo!!.clearAnimation()
+        cradleBallThree!!.clearAnimation()
+        cradleBallFour!!.clearAnimation()
+        cradleBallFive!!.clearAnimation()
     }
 
-    public boolean isStart() {
-        return isStart;
+    fun setLoadingColor(color: Int) {
+        cradleBallOne!!.setLoadingColor(color)
+        cradleBallTwo!!.setLoadingColor(color)
+        cradleBallThree!!.setLoadingColor(color)
+        cradleBallFour!!.setLoadingColor(color)
+        cradleBallFive!!.setLoadingColor(color)
     }
 
-    public void setLoadingColor(int color) {
-        cradleBallOne.setLoadingColor(color);
-        cradleBallTwo.setLoadingColor(color);
-        cradleBallThree.setLoadingColor(color);
-        cradleBallFour.setLoadingColor(color);
-        cradleBallFive.setLoadingColor(color);
+    companion object {
+
+        private val DURATION = 400
+        private val SHAKE_DISTANCE = 2
+        private val PIVOT_X = 0.5f
+        private val PIVOT_Y = -3f
+        private val DEGREE = 30
     }
 }

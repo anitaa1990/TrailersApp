@@ -16,8 +16,7 @@
 
         <activity
             android:name=".ui.main.activity.MainActivity"
-            android:label="@string/app_name"
-            android:screenOrientation="portrait"
+            android:exported="true"
             android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,25 +26,22 @@
 
         <activity
             android:name=".ui.detail.activity.MovieDetailActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"
-            android:configChanges="orientation|screenSize"/>
+            android:configChanges="orientation|screenSize"
+            android:theme="@style/AppTheme" />
 
 
         <activity
             android:name=".ui.detail.activity.TvDetailActivity"
-            android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
 
         <activity
             android:name=".ui.detail.activity.VideoActivity"
-            android:screenOrientation="landscape"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
 
         <activity
             android:name=".ui.search.activity.MovieSearchActivity"
-            android:screenOrientation="portrait"
+            android:exported="true"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             android:windowSoftInputMode="stateVisible|adjustPan">
             <intent-filter>
@@ -59,7 +55,7 @@
 
         <activity
             android:name=".ui.search.activity.TvSearchActivity"
-            android:screenOrientation="portrait"
+            android:exported="true"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             android:windowSoftInputMode="stateVisible|adjustPan">
             <intent-filter>

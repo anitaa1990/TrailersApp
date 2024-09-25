@@ -1,32 +1,30 @@
-package com.an.trailers.data.local.dao;
+package com.an.trailers.data.local.dao
 
-import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.OnConflictStrategy;
-import android.arch.persistence.room.Query;
-import android.arch.persistence.room.Update;
-import com.an.trailers.data.local.entity.TvEntity;
-import java.util.List;
-import io.reactivex.Flowable;
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
+import com.an.trailers.data.local.entity.TvEntity
+import io.reactivex.Flowable
 
 @Dao
-public interface TvDao {
+interface TvDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertTvList(tvEntities: List<TvEntity>): LongArray
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    long[] insertTvList(List<TvEntity> tvEntities);
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    long insertTv(TvEntity tvEntity);
+    fun insertTv(tvEntity: TvEntity): Long
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    int updateTv(TvEntity tvEntity);
+    fun updateTv(tvEntity: TvEntity): Int
 
     @Query("SELECT * FROM `TvEntity` where id = :id")
-    TvEntity getTvEntityById(Long id);
+    fun getTvById(id: Long?): TvEntity?
 
     @Query("SELECT * FROM `TvEntity` where id = :id")
-    Flowable<TvEntity> getTvDetailById(Long id);
+    fun getTvDetailById(id: Long?): Flowable<TvEntity>
 
     @Query("SELECT * FROM `TvEntity` where page = :page")
-    List<TvEntity> getTvListByPage(Long page);
+    fun getTvsByPage(page: Long): List<TvEntity>
 }

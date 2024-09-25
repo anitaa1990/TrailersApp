@@ -1,28 +1,28 @@
-package com.an.trailers.di.module;
+package com.an.trailers.di.module
 
-import com.an.trailers.ui.detail.activity.MovieDetailActivity;
-import com.an.trailers.ui.detail.activity.TvDetailActivity;
-import com.an.trailers.ui.main.activity.MainActivity;
-import com.an.trailers.ui.search.activity.MovieSearchActivity;
-import com.an.trailers.ui.search.activity.TvSearchActivity;
-
-import dagger.Module;
-import dagger.android.ContributesAndroidInjector;
+import com.an.trailers.ui.detail.activity.MovieDetailActivity
+import com.an.trailers.ui.detail.activity.TvDetailActivity
+import com.an.trailers.ui.main.activity.MainActivity
+import com.an.trailers.ui.search.activity.MovieSearchActivity
+import com.an.trailers.ui.search.activity.TvSearchActivity
+import dagger.Module
+import dagger.android.ContributesAndroidInjector
 
 @Module
-public abstract class ActivityModule {
-    @ContributesAndroidInjector(modules = FragmentModule.class)
-    abstract MainActivity contributeMainActivity();
+abstract class ActivityModule {
 
-    @ContributesAndroidInjector()
-    abstract MovieDetailActivity contributeMovieDetailActivity();
+    @ContributesAndroidInjector(modules = [FragmentModule::class])
+    abstract fun contributeMainActivity(): MainActivity
 
-    @ContributesAndroidInjector()
-    abstract TvDetailActivity contributeTvDetailActivity();
+    @ContributesAndroidInjector
+    abstract fun contributeMovieDetailActivity(): MovieDetailActivity
 
-    @ContributesAndroidInjector()
-    abstract MovieSearchActivity contributeMovieSearchActivity();
+    @ContributesAndroidInjector
+    abstract fun contributeTvDetailActivity(): TvDetailActivity
 
-    @ContributesAndroidInjector()
-    abstract TvSearchActivity contributeTvSearchActivity();
+    @ContributesAndroidInjector
+    abstract fun contributeMovieSearchActivity(): MovieSearchActivity
+
+    @ContributesAndroidInjector
+    abstract fun contributeTvSearchActivity(): TvSearchActivity
 }

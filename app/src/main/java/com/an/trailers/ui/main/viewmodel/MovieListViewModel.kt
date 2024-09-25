@@ -1,44 +1,44 @@
-package com.an.trailers.ui.main.viewmodel;
+package com.an.trailers.ui.main.viewmodel
 
-import android.arch.lifecycle.MutableLiveData;
-import com.an.trailers.data.Resource;
-import com.an.trailers.data.local.dao.MovieDao;
-import com.an.trailers.data.local.entity.MovieEntity;
-import com.an.trailers.data.remote.api.MovieApiService;
-import com.an.trailers.data.repository.MovieRepository;
-import com.an.trailers.ui.base.BaseViewModel;
-import java.util.List;
-import javax.inject.Inject;
+import android.annotation.SuppressLint
+import androidx.lifecycle.MutableLiveData
+import com.an.trailers.data.Resource
+import com.an.trailers.data.local.dao.MovieDao
+import com.an.trailers.data.local.entity.MovieEntity
+import com.an.trailers.data.remote.api.MovieApiService
+import com.an.trailers.data.repository.MovieRepository
+import com.an.trailers.ui.base.BaseViewModel
+import javax.inject.Inject
 
-public class MovieListViewModel extends BaseViewModel {
+class MovieListViewModel@Inject constructor(
+    movieDao: MovieDao,
+    movieApiService: MovieApiService) : BaseViewModel() {
 
-    @Inject
-    public MovieListViewModel(MovieDao movieDao, MovieApiService movieApiService) {
-        movieRepository = new MovieRepository(movieDao, movieApiService);
+    private lateinit var type: String
+    private val movieRepository: MovieRepository = MovieRepository(movieDao, movieApiService)
+    private val moviesLiveData = MutableLiveData<Resource<List<MovieEntity>>>()
+
+
+    fun setType(type: String) {
+        this.type = type
     }
 
-    private String type;
-    private MovieRepository movieRepository;
-    private MutableLiveData<Resource<List<MovieEntity>>> moviesLiveData = new MutableLiveData<>();
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public void loadMoreMovies(Long currentPage) {
+    @SuppressLint("CheckResult")
+    fun loadMoreMovies(currentPage: Long) {
         movieRepository.loadMoviesByType(currentPage, type)
-                .doOnSubscribe(disposable -> addToDisposable(disposable))
-                .subscribe(resource -> getMoviesLiveData().postValue(resource));
+                .doOnSubscribe { disposable -> addToDisposable(disposable) }
+                .subscribe { resource -> getMoviesLiveData().postValue(resource) }
     }
 
-    public boolean isLastPage() {
-        return moviesLiveData.getValue() != null &&
-                !moviesLiveData.getValue().data.isEmpty() ?
-                moviesLiveData.getValue().data.get(0).isLastPage() :
-                false;
+    fun isLastPage(): Boolean {
+        if(moviesLiveData.value != null &&
+                moviesLiveData.value!!.data != null &&
+                !moviesLiveData.value!!.data!!.isEmpty()) {
+            return moviesLiveData.value!!.data!![0].isLastPage()
+        }
+
+        return true
     }
 
-    public MutableLiveData<Resource<List<MovieEntity>>> getMoviesLiveData() {
-        return moviesLiveData;
-    }
+    fun getMoviesLiveData() = moviesLiveData
 }

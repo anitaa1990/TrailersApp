@@ -1,328 +1,278 @@
-package com.an.trailers.ui.base.custom.expandableLayout;
+package com.an.trailers.ui.base.custom.expandableLayout
 
-import android.animation.Animator;
-import android.animation.ValueAnimator;
-import android.content.Context;
-import android.content.res.Configuration;
-import android.content.res.TypedArray;
-import android.os.Bundle;
-import android.os.Parcelable;
-import android.support.v4.view.animation.FastOutSlowInInterpolator;
-import android.util.AttributeSet;
-import android.view.View;
-import android.view.animation.Interpolator;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-
-import com.an.trailers.R;
-
-import static com.an.trailers.ui.base.custom.expandableLayout.ExpandableLayout.State.COLLAPSED;
-import static com.an.trailers.ui.base.custom.expandableLayout.ExpandableLayout.State.COLLAPSING;
-import static com.an.trailers.ui.base.custom.expandableLayout.ExpandableLayout.State.EXPANDED;
-import static com.an.trailers.ui.base.custom.expandableLayout.ExpandableLayout.State.EXPANDING;
+import android.animation.Animator
+import android.animation.ValueAnimator
+import android.content.Context
+import android.content.res.Configuration
+import android.os.Bundle
+import android.os.Parcelable
+import android.util.AttributeSet
+import android.view.View
+import android.view.animation.Interpolator
+import android.widget.FrameLayout
+import android.widget.LinearLayout
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import com.an.trailers.R
+import com.an.trailers.ui.base.custom.expandableLayout.ExpandableLayout.State.Companion.COLLAPSED
+import com.an.trailers.ui.base.custom.expandableLayout.ExpandableLayout.State.Companion.COLLAPSING
+import com.an.trailers.ui.base.custom.expandableLayout.ExpandableLayout.State.Companion.EXPANDED
+import com.an.trailers.ui.base.custom.expandableLayout.ExpandableLayout.State.Companion.EXPANDING
 
 
-public class ExpandableLayout extends FrameLayout {
-    public interface State {
-        int COLLAPSED = 0;
-        int COLLAPSING = 1;
-        int EXPANDING = 2;
-        int EXPANDED = 3;
-    }
+class ExpandableLayout @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
+    FrameLayout(context, attrs) {
 
-    public static final String KEY_SUPER_STATE = "super_state";
-    public static final String KEY_EXPANSION = "expansion";
+    var duration = DEFAULT_DURATION
+    private var parallax: Float = 0.toFloat()
+    private var expansion: Float = 0.toFloat()
+    private var orientation: Int = 0
 
-    public static final int HORIZONTAL = 0;
-    public static final int VERTICAL = 1;
+    var state: Int = 0
+        private set
 
-    private static final int DEFAULT_DURATION = 300;
+    private var interpolator: Interpolator = FastOutSlowInInterpolator()
+    private var animator: ValueAnimator? = null
 
-    private int duration = DEFAULT_DURATION;
-    private float parallax;
-    private float expansion;
-    private int orientation;
-    private int state;
+    private var listener: OnExpansionUpdateListener? = null
 
-    private Interpolator interpolator = new FastOutSlowInInterpolator();
-    private ValueAnimator animator;
+    var isExpanded: Boolean
+        get() = state == EXPANDING || state == EXPANDED
+        set(expand) = setExpanded(expand, true)
 
-    private OnExpansionUpdateListener listener;
-
-    public ExpandableLayout(Context context) {
-        this(context, null);
-    }
-
-    public ExpandableLayout(Context context, AttributeSet attrs) {
-        super(context, attrs);
-
-        if (attrs != null) {
-            TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.ExpandableLayout);
-            duration = a.getInt(R.styleable.ExpandableLayout_el_duration, DEFAULT_DURATION);
-            expansion = a.getBoolean(R.styleable.ExpandableLayout_el_expanded, false) ? 1 : 0;
-            orientation = a.getInt(R.styleable.ExpandableLayout_android_orientation, VERTICAL);
-            parallax = a.getFloat(R.styleable.ExpandableLayout_el_parallax, 1);
-            a.recycle();
-
-            state = expansion == 0 ? COLLAPSED : EXPANDED;
-            setParallax(parallax);
+    interface State {
+        companion object {
+            val COLLAPSED = 0
+            val COLLAPSING = 1
+            val EXPANDING = 2
+            val EXPANDED = 3
         }
     }
 
-    @Override
-    protected Parcelable onSaveInstanceState() {
-        Parcelable superState = super.onSaveInstanceState();
-        Bundle bundle = new Bundle();
+    init {
 
-        expansion = isExpanded() ? 1 : 0;
+        if (attrs != null) {
+            val a = getContext().obtainStyledAttributes(attrs, R.styleable.ExpandableLayout)
+            duration = a.getInt(R.styleable.ExpandableLayout_el_duration, DEFAULT_DURATION)
+            expansion = (if (a.getBoolean(R.styleable.ExpandableLayout_el_expanded, false)) 1 else 0).toFloat()
+            orientation = a.getInt(R.styleable.ExpandableLayout_android_orientation, VERTICAL)
+            parallax = a.getFloat(R.styleable.ExpandableLayout_el_parallax, 1f)
+            a.recycle()
 
-        bundle.putFloat(KEY_EXPANSION, expansion);
-        bundle.putParcelable(KEY_SUPER_STATE, superState);
-
-        return bundle;
+            state = if (expansion == 0f) COLLAPSED else EXPANDED
+            setParallax(parallax)
+        }
     }
 
-    @Override
-    protected void onRestoreInstanceState(Parcelable parcelable) {
-        Bundle bundle = (Bundle) parcelable;
-        expansion = bundle.getFloat(KEY_EXPANSION);
-        state = expansion == 1 ? EXPANDED : COLLAPSED;
-        Parcelable superState = bundle.getParcelable(KEY_SUPER_STATE);
+    override fun onSaveInstanceState(): Parcelable {
+        val superState = super.onSaveInstanceState()
+        val bundle = Bundle()
 
-        super.onRestoreInstanceState(superState);
+        expansion = (if (isExpanded) 1 else 0).toFloat()
+
+        bundle.putFloat(KEY_EXPANSION, expansion)
+        bundle.putParcelable(KEY_SUPER_STATE, superState)
+
+        return bundle
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    override fun onRestoreInstanceState(parcelable: Parcelable) {
+        val bundle = parcelable as Bundle
+        expansion = bundle.getFloat(KEY_EXPANSION)
+        state = if (expansion == 1f) EXPANDED else COLLAPSED
+        val superState = bundle.getParcelable<Parcelable>(KEY_SUPER_STATE)
 
-        int width = getMeasuredWidth();
-        int height = getMeasuredHeight();
+        super.onRestoreInstanceState(superState)
+    }
 
-        int size = orientation == LinearLayout.HORIZONTAL ? width : height;
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
-        setVisibility(expansion == 0 && size == 0 ? GONE : VISIBLE);
+        val width = measuredWidth
+        val height = measuredHeight
 
-        int expansionDelta = size - Math.round(size * expansion);
+        val size = if (orientation == LinearLayout.HORIZONTAL) width else height
+
+        visibility = if (expansion == 0f && size == 0) View.GONE else View.VISIBLE
+
+        val expansionDelta = size - Math.round(size * expansion)
         if (parallax > 0) {
-            float parallaxDelta = expansionDelta * parallax;
-            for (int i = 0; i < getChildCount(); i++) {
-                View child = getChildAt(i);
+            val parallaxDelta = expansionDelta * parallax
+            for (i in 0 until childCount) {
+                val child = getChildAt(i)
                 if (orientation == HORIZONTAL) {
-                    int direction = -1;
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1 && getLayoutDirection() == LAYOUT_DIRECTION_RTL) {
-                        direction = 1;
+                    var direction = -1
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1 && layoutDirection == View.LAYOUT_DIRECTION_RTL) {
+                        direction = 1
                     }
-                    child.setTranslationX(direction * parallaxDelta);
+                    child.translationX = direction * parallaxDelta
                 } else {
-                    child.setTranslationY(-parallaxDelta);
+                    child.translationY = -parallaxDelta
                 }
             }
         }
 
         if (orientation == HORIZONTAL) {
-            setMeasuredDimension(width - expansionDelta, height);
+            setMeasuredDimension(width - expansionDelta, height)
         } else {
-            setMeasuredDimension(width, height - expansionDelta);
+            setMeasuredDimension(width, height - expansionDelta)
         }
     }
 
-    @Override
-    protected void onConfigurationChanged(Configuration newConfig) {
+    override fun onConfigurationChanged(newConfig: Configuration) {
         if (animator != null) {
-            animator.cancel();
+            animator!!.cancel()
         }
-        super.onConfigurationChanged(newConfig);
+        super.onConfigurationChanged(newConfig)
     }
 
-    /**
-     * Get expansion state
-     *
-     * @return one of {@link State}
-     */
-    public int getState() {
-        return state;
-    }
-
-    public boolean isExpanded() {
-        return state == EXPANDING || state == EXPANDED;
-    }
-
-    public void toggle() {
-        toggle(true);
-    }
-
-    public void toggle(boolean animate) {
-        if (isExpanded()) {
-            collapse(animate);
+    @JvmOverloads
+    fun toggle(animate: Boolean = true) {
+        if (isExpanded) {
+            collapse(animate)
         } else {
-            expand(animate);
+            expand(animate)
         }
     }
 
-    public void expand() {
-        expand(true);
+    @JvmOverloads
+    fun expand(animate: Boolean = true) {
+        setExpanded(true, animate)
     }
 
-    public void expand(boolean animate) {
-        setExpanded(true, animate);
+    @JvmOverloads
+    fun collapse(animate: Boolean = true) {
+        setExpanded(false, animate)
     }
 
-    public void collapse() {
-        collapse(true);
-    }
-
-    public void collapse(boolean animate) {
-        setExpanded(false, animate);
-    }
-
-    /**
-     * Convenience method - same as calling setExpanded(expanded, true)
-     */
-    public void setExpanded(boolean expand) {
-        setExpanded(expand, true);
-    }
-
-    public void setExpanded(boolean expand, boolean animate) {
-        if (expand == isExpanded()) {
-            return;
+    fun setExpanded(expand: Boolean, animate: Boolean) {
+        if (expand == isExpanded) {
+            return
         }
 
-        int targetExpansion = expand ? 1 : 0;
+        val targetExpansion = if (expand) 1 else 0
         if (animate) {
-            animateSize(targetExpansion);
+            animateSize(targetExpansion)
         } else {
-            setExpansion(targetExpansion);
+            setExpansion(targetExpansion.toFloat())
         }
     }
 
-    public int getDuration() {
-        return duration;
+    fun setInterpolator(interpolator: Interpolator) {
+        this.interpolator = interpolator
     }
 
-    public void setInterpolator(Interpolator interpolator) {
-        this.interpolator = interpolator;
+    fun getExpansion(): Float {
+        return expansion
     }
 
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
-
-    public float getExpansion() {
-        return expansion;
-    }
-
-    public void setExpansion(float expansion) {
+    fun setExpansion(expansion: Float) {
         if (this.expansion == expansion) {
-            return;
+            return
         }
 
         // Infer state from previous value
-        float delta = expansion - this.expansion;
-        if (expansion == 0) {
-            state = COLLAPSED;
-        } else if (expansion == 1) {
-            state = EXPANDED;
+        val delta = expansion - this.expansion
+        if (expansion == 0f) {
+            state = COLLAPSED
+        } else if (expansion == 1f) {
+            state = EXPANDED
         } else if (delta < 0) {
-            state = COLLAPSING;
+            state = COLLAPSING
         } else if (delta > 0) {
-            state = EXPANDING;
+            state = EXPANDING
         }
 
-        setVisibility(state == COLLAPSED ? GONE : VISIBLE);
-        this.expansion = expansion;
-        requestLayout();
+        visibility = if (state == COLLAPSED) View.GONE else View.VISIBLE
+        this.expansion = expansion
+        requestLayout()
 
         if (listener != null) {
-            listener.onExpansionUpdate(expansion, state);
+            listener!!.onExpansionUpdate(expansion, state)
         }
     }
 
-    public float getParallax() {
-        return parallax;
+    fun getParallax(): Float {
+        return parallax
     }
 
-    public void setParallax(float parallax) {
+    fun setParallax(parallax: Float) {
+        var parallax = parallax
         // Make sure parallax is between 0 and 1
-        parallax = Math.min(1, Math.max(0, parallax));
-        this.parallax = parallax;
+        parallax = Math.min(1f, Math.max(0f, parallax))
+        this.parallax = parallax
     }
 
-    public int getOrientation() {
-        return orientation;
+    fun getOrientation(): Int {
+        return orientation
     }
 
-    public void setOrientation(int orientation) {
+    fun setOrientation(orientation: Int) {
         if (orientation < 0 || orientation > 1) {
-            throw new IllegalArgumentException("Orientation must be either 0 (horizontal) or 1 (vertical)");
+            throw IllegalArgumentException("Orientation must be either 0 (horizontal) or 1 (vertical)")
         }
-        this.orientation = orientation;
+        this.orientation = orientation
     }
 
-    public void setOnExpansionUpdateListener(OnExpansionUpdateListener listener) {
-        this.listener = listener;
+    fun setOnExpansionUpdateListener(listener: OnExpansionUpdateListener) {
+        this.listener = listener
     }
 
-    private void animateSize(int targetExpansion) {
+    private fun animateSize(targetExpansion: Int) {
         if (animator != null) {
-            animator.cancel();
-            animator = null;
+            animator!!.cancel()
+            animator = null
         }
 
-        animator = ValueAnimator.ofFloat(expansion, targetExpansion);
-        animator.setInterpolator(interpolator);
-        animator.setDuration(duration);
+        animator = ValueAnimator.ofFloat(expansion, targetExpansion.toFloat())
+        animator!!.interpolator = interpolator
+        animator!!.duration = duration.toLong()
 
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                setExpansion((float) valueAnimator.getAnimatedValue());
-            }
-        });
+        animator!!.addUpdateListener { valueAnimator -> setExpansion(valueAnimator.animatedValue as Float) }
 
-        animator.addListener(new ExpansionListener(targetExpansion));
+        animator!!.addListener(ExpansionListener(targetExpansion))
 
-        animator.start();
+        animator!!.start()
     }
 
-    public interface OnExpansionUpdateListener {
+    interface OnExpansionUpdateListener {
         /**
          * Callback for expansion updates
          *
          * @param expansionFraction Value between 0 (collapsed) and 1 (expanded) representing the the expansion progress
-         * @param state             One of {@link State} repesenting the current expansion state
+         * @param state             One of [State] repesenting the current expansion state
          */
-        void onExpansionUpdate(float expansionFraction, int state);
+        fun onExpansionUpdate(expansionFraction: Float, state: Int)
     }
 
-    private class ExpansionListener implements Animator.AnimatorListener {
-        private int targetExpansion;
-        private boolean canceled;
+    private inner class ExpansionListener(private val targetExpansion: Int) : Animator.AnimatorListener {
+        private var canceled: Boolean = false
 
-        public ExpansionListener(int targetExpansion) {
-            this.targetExpansion = targetExpansion;
+        override fun onAnimationStart(animation: Animator) {
+            state = if (targetExpansion == 0) COLLAPSING else EXPANDING
         }
 
-        @Override
-        public void onAnimationStart(Animator animation) {
-            state = targetExpansion == 0 ? COLLAPSING : EXPANDING;
-        }
-
-        @Override
-        public void onAnimationEnd(Animator animation) {
+        override fun onAnimationEnd(animation: Animator) {
             if (!canceled) {
-                state = targetExpansion == 0 ? COLLAPSED : EXPANDED;
-                setExpansion(targetExpansion);
+                state = if (targetExpansion == 0) COLLAPSED else EXPANDED
+                setExpansion(targetExpansion.toFloat())
             }
         }
 
-        @Override
-        public void onAnimationCancel(Animator animation) {
-            canceled = true;
+        override fun onAnimationCancel(animation: Animator) {
+            canceled = true
         }
 
-        @Override
-        public void onAnimationRepeat(Animator animation) {
-        }
+        override fun onAnimationRepeat(animation: Animator) {}
+    }
+
+    companion object {
+
+        val KEY_SUPER_STATE = "super_state"
+        val KEY_EXPANSION = "expansion"
+
+        val HORIZONTAL = 0
+        val VERTICAL = 1
+
+        private val DEFAULT_DURATION = 300
     }
 }

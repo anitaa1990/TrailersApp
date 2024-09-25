@@ -1,35 +1,23 @@
-package com.an.trailers.ui.base.custom;
+package com.an.trailers.ui.base.custom
 
-import android.content.Context;
-import android.support.design.card.MaterialCardView;
-import android.util.AttributeSet;
-import android.view.ViewGroup;
+import android.content.Context
+import android.util.AttributeSet
+import com.google.android.material.card.MaterialCardView
 
-public class AspectRatioCardView extends MaterialCardView {
+class AspectRatioCardView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) : MaterialCardView(context, attrs, defStyleAttr) {
 
-    private float ratio = 1.4f;
+    private val ratio = 1.4f
 
-    public AspectRatioCardView(Context context) {
-        this(context, null);
-    }
-
-    public AspectRatioCardView(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
-    }
-
-    public AspectRatioCardView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-    }
-
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        if (ratio > 0) {
-            int ratioHeight = (int) (getMeasuredWidth() * ratio);
-            setMeasuredDimension(getMeasuredWidth(), ratioHeight);
-            ViewGroup.LayoutParams lp = getLayoutParams();
-            lp.height = ratioHeight;
-            setLayoutParams(lp);
-        }
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        val ratioHeight = (measuredWidth * ratio).toInt()
+        setMeasuredDimension(measuredWidth, ratioHeight)
+        val lp = layoutParams
+        lp.height = ratioHeight
+        layoutParams = lp
     }
 }

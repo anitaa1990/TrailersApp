@@ -1,26 +1,26 @@
-package com.an.trailers.utils;
+package com.an.trailers.utils
 
-import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.TranslateAnimation;
+import android.view.animation.Animation
+import android.view.animation.AnimationSet
+import android.view.animation.DecelerateInterpolator
+import android.view.animation.TranslateAnimation
 
-public class AnimUtils {
+object AnimUtils {
 
-    public static Animation createBgImageInAnimation(int fromX, int toX, int transitionDuration) {
-        TranslateAnimation translate = new TranslateAnimation(fromX, toX, 0, 0);
-        translate.setDuration(transitionDuration);
+    fun createBgImageInAnimation(fromX: Int, toX: Int, transitionDuration: Int): Animation {
+        val translate = TranslateAnimation(fromX.toFloat(), toX.toFloat(), 0f, 0f)
+        translate.duration = transitionDuration.toLong()
 
-        AnimationSet set = new AnimationSet(true);
-        set.setInterpolator(new DecelerateInterpolator());
-        set.addAnimation(translate);
-        return set;
+        val set = AnimationSet(true)
+        set.interpolator = DecelerateInterpolator()
+        set.addAnimation(translate)
+        return set
     }
 
-    public static Animation createBgImageOutAnimation(int fromX, int toX, int transitionDuration) {
-        TranslateAnimation ta = new TranslateAnimation(fromX, toX, 0, 0);
-        ta.setDuration(transitionDuration);
-        ta.setInterpolator(new DecelerateInterpolator());
-        return ta;
+    fun createBgImageOutAnimation(fromX: Int, toX: Int, transitionDuration: Int): Animation {
+        val ta = TranslateAnimation(fromX.toFloat(), toX.toFloat(), 0f, 0f)
+        ta.duration = transitionDuration.toLong()
+        ta.interpolator = DecelerateInterpolator()
+        return ta
     }
 }

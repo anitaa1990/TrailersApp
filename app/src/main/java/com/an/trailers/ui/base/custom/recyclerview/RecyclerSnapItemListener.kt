@@ -1,5 +1,5 @@
-package com.an.trailers.ui.base.custom.recyclerview;
+package com.an.trailers.ui.base.custom.recyclerview
 
-public interface RecyclerSnapItemListener {
-    void onItemSnap(int position);
+interface RecyclerSnapItemListener {
+    fun onItemSnap(position: Int)
 }

@@ -1,284 +1,120 @@
-package com.an.trailers.data.local.entity;
+package com.an.trailers.data.local.entity
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.TypeConverters;
-import android.os.Parcel;
-import android.os.Parcelable;
+import android.os.Parcel
+import android.os.Parcelable
+import androidx.room.Entity
+import androidx.room.TypeConverters
+import com.an.trailers.AppConstants
+import com.an.trailers.data.local.converter.CastListTypeConverter
+import com.an.trailers.data.local.converter.CrewListTypeConverter
+import com.an.trailers.data.local.converter.StringListConverter
+import com.an.trailers.data.local.converter.TvListTypeConverter
+import com.an.trailers.data.local.converter.VideoListTypeConverter
+import com.an.trailers.data.remote.model.Cast
+import com.an.trailers.data.remote.model.Crew
+import com.an.trailers.data.remote.model.Genre
+import com.an.trailers.data.remote.model.Video
+import com.google.gson.annotations.SerializedName
 
-import com.an.trailers.AppConstants;
-import com.an.trailers.data.local.converter.CastListTypeConverter;
-import com.an.trailers.data.local.converter.CrewListTypeConverter;
-import com.an.trailers.data.local.converter.ReviewListTypeConverter;
-import com.an.trailers.data.local.converter.StringListConverter;
-import com.an.trailers.data.local.converter.TvListTypeConverter;
-import com.an.trailers.data.local.converter.VideoListTypeConverter;
-import com.an.trailers.data.remote.model.Cast;
-import com.an.trailers.data.remote.model.Crew;
-import com.an.trailers.data.remote.model.Genre;
-import com.an.trailers.data.remote.model.Review;
-import com.an.trailers.data.remote.model.Video;
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+@Entity(primaryKeys = ["id"])
+data class TvEntity(
+        @SerializedName("id")
+        val id: Long,
 
-import java.util.ArrayList;
-import java.util.List;
+        var page: Long,
+        var totalPages: Long,
 
-@Entity(primaryKeys = ("id"))
-public class TvEntity implements Parcelable {
+        @SerializedName(value = "header", alternate = ["title", "name"])
+        val header: String?,
 
-    @SerializedName("id")
-    @Expose
-    private Long id;
+        @SerializedName("poster_path")
+        var posterPath: String?,
 
-    @Expose
-    private Long page;
+        @SerializedName(value = "description", alternate = ["overview", "synopsis"])
+        var description: String?,
 
-    @Expose
-    private Long totalPages;
+        @SerializedName("release_date")
+        var releaseDate: String?,
 
-    @SerializedName(value="header", alternate={"title", "name"})
-    @Expose
-    private String header;
+        @SerializedName("genres")
+        var genres: List<Genre>? = ArrayList(),
 
-    @SerializedName("poster_path")
-    @Expose
-    private String posterPath;
+        @SerializedName("videos")
+        @TypeConverters(VideoListTypeConverter::class)
+        var videos: List<Video>? = ArrayList(),
 
-    @SerializedName(value="description", alternate={"overview", "synopsis"})
-    private String description;
+        @TypeConverters(CrewListTypeConverter::class)
+        var crews: List<Crew>? = ArrayList(),
 
+        @TypeConverters(CastListTypeConverter::class)
+        var casts: List<Cast>? = ArrayList(),
 
-    @SerializedName("genres")
-    @Expose
-    private List<Genre> genres = null;
+        @TypeConverters(StringListConverter::class)
+        var categoryTypes: List<String>? = ArrayList(),
 
+        @TypeConverters(TvListTypeConverter::class)
+        var similarTvEntities: List<TvEntity>? = ArrayList(),
 
-    @SerializedName("videos")
-    @Expose
-    @TypeConverters(VideoListTypeConverter.class)
-    private List<Video> videos;
-
-    @Expose
-    @TypeConverters(CrewListTypeConverter.class)
-    private List<Crew> crews;
+        @SerializedName("number_of_seasons")
+        var numberOfSeasons: Long?,
+        var status: String?
+) : Parcelable {
 
 
-    @Expose
-    @TypeConverters(CastListTypeConverter.class)
-    private List<Cast> casts;
-
-    @Expose
-    @TypeConverters(ReviewListTypeConverter.class)
-    private List<Review> reviews;
-
-    @Expose
-    @TypeConverters(StringListConverter.class)
-    private List<String> categoryTypes;
-
-    @Expose
-    @TypeConverters(TvListTypeConverter.class)
-    private List<TvEntity> similarTvEntities;
-
-
-    @SerializedName("status")
-    @Expose
-    private String status;
-
-    @SerializedName("number_of_seasons")
-    @Expose
-    private Long numberOfSeasons;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getHeader() {
-        return header;
-    }
-
-    public void setHeader(String header) {
-        this.header = header;
-    }
-
-    public String getPosterPath() {
-        if(posterPath != null && !posterPath.startsWith("http")) {
-            posterPath = String.format(AppConstants.IMAGE_URL, posterPath);
+    fun getFormattedPosterPath(): String? {
+        if (posterPath != null && !posterPath!!.startsWith("http")) {
+            posterPath = String.format(AppConstants.IMAGE_URL, posterPath)
         }
-        return posterPath;
+        return posterPath
     }
 
-    public void setPosterPath(String posterPath) {
-        this.posterPath = posterPath;
+    fun isLastPage() : Boolean {
+        return page >= totalPages
     }
 
-    public String getDescription() {
-        return description;
+    constructor(source: Parcel) : this(
+            source.readLong(),
+            source.readLong(),
+            source.readLong(),
+            source.readString(),
+            source.readString(),
+            source.readString(),
+            source.readString(),
+            source.createTypedArrayList(Genre.CREATOR),
+            source.createTypedArrayList(Video.CREATOR),
+            source.createTypedArrayList(Crew.CREATOR),
+            source.createTypedArrayList(Cast.CREATOR),
+            source.createStringArrayList(),
+            source.createTypedArrayList(CREATOR),
+            source.readValue(Long::class.java.classLoader) as Long?,
+            source.readString()
+    )
+
+    override fun describeContents() = 0
+
+    override fun writeToParcel(dest: Parcel, flags: Int) = with(dest) {
+        writeLong(id)
+        writeLong(page)
+        writeLong(totalPages)
+        writeString(header)
+        writeString(posterPath)
+        writeString(description)
+        writeString(releaseDate)
+        writeTypedList(genres)
+        writeTypedList(videos)
+        writeTypedList(crews)
+        writeTypedList(casts)
+        writeStringList(categoryTypes)
+        writeTypedList(similarTvEntities)
+        writeValue(numberOfSeasons)
+        writeString(status)
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public List<Genre> getGenres() {
-        return genres;
-    }
-
-    public void setGenres(List<Genre> genres) {
-        this.genres = genres;
-    }
-
-    public List<Video> getVideos() {
-        return videos;
-    }
-
-    public void setVideos(List<Video> videos) {
-        this.videos = videos;
-    }
-
-    public List<Crew> getCrews() {
-        return crews;
-    }
-
-    public void setCrews(List<Crew> crews) {
-        this.crews = crews;
-    }
-
-    public List<Cast> getCasts() {
-        return casts;
-    }
-
-    public void setCasts(List<Cast> casts) {
-        this.casts = casts;
-    }
-
-    public List<Review> getReviews() {
-        return reviews;
-    }
-
-    public void setReviews(List<Review> reviews) {
-        this.reviews = reviews;
-    }
-
-    public List<TvEntity> getSimilarTvEntities() {
-        return similarTvEntities;
-    }
-
-    public void setSimilarTvEntities(List<TvEntity> similarTvEntities) {
-        this.similarTvEntities = similarTvEntities;
-    }
-
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public Long getNumberOfSeasons() {
-        return numberOfSeasons;
-    }
-
-    public void setNumberOfSeasons(Long numberOfSeasons) {
-        this.numberOfSeasons = numberOfSeasons;
-    }
-
-    public Long getPage() {
-        return page;
-    }
-
-    public void setPage(Long page) {
-        this.page = page;
-    }
-
-    public Long getTotalPages() {
-        return totalPages;
-    }
-
-    public void setTotalPages(Long totalPages) {
-        this.totalPages = totalPages;
-    }
-
-    public List<String> getCategoryTypes() {
-        return categoryTypes;
-    }
-
-    public void setCategoryTypes(List<String> categoryTypes) {
-        this.categoryTypes = categoryTypes;
-    }
-
-    public boolean isLastPage() {
-        return getPage() >= getTotalPages();
-    }
-
-
-    public TvEntity() {
-        this.casts = new ArrayList<>();
-        this.crews = new ArrayList<>();
-        this.genres = new ArrayList<>();
-        this.videos = new ArrayList<>();
-        this.reviews = new ArrayList<>();
-        this.categoryTypes = new ArrayList<>();
-        this.similarTvEntities = new ArrayList<>();
-    }
-
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(this.id);
-        dest.writeValue(this.page);
-        dest.writeValue(this.totalPages);
-        dest.writeString(this.header);
-        dest.writeString(this.posterPath);
-        dest.writeString(this.description);
-        dest.writeTypedList(this.genres);
-        dest.writeTypedList(this.videos);
-        dest.writeTypedList(this.crews);
-        dest.writeTypedList(this.casts);
-        dest.writeTypedList(this.reviews);
-        dest.writeStringList(this.categoryTypes);
-        dest.writeTypedList(this.similarTvEntities);
-        dest.writeString(this.status);
-        dest.writeValue(this.numberOfSeasons);
-    }
-
-    protected TvEntity(Parcel in) {
-        this.id = (Long) in.readValue(Long.class.getClassLoader());
-        this.page = (Long) in.readValue(Long.class.getClassLoader());
-        this.totalPages = (Long) in.readValue(Long.class.getClassLoader());
-        this.header = in.readString();
-        this.posterPath = in.readString();
-        this.description = in.readString();
-        this.genres = in.createTypedArrayList(Genre.CREATOR);
-        this.videos = in.createTypedArrayList(Video.CREATOR);
-        this.crews = in.createTypedArrayList(Crew.CREATOR);
-        this.casts = in.createTypedArrayList(Cast.CREATOR);
-        this.reviews = in.createTypedArrayList(Review.CREATOR);
-        this.categoryTypes = in.createStringArrayList();
-        this.similarTvEntities = in.createTypedArrayList(TvEntity.CREATOR);
-        this.status = in.readString();
-        this.numberOfSeasons = (Long) in.readValue(Long.class.getClassLoader());
-    }
-
-    public static final Creator<TvEntity> CREATOR = new Creator<TvEntity>() {
-        @Override
-        public TvEntity createFromParcel(Parcel source) {
-            return new TvEntity(source);
+    companion object {
+        @JvmField
+        val CREATOR: Parcelable.Creator<TvEntity> = object : Parcelable.Creator<TvEntity> {
+            override fun createFromParcel(source: Parcel): TvEntity = TvEntity(source)
+            override fun newArray(size: Int): Array<TvEntity?> = arrayOfNulls(size)
         }
-
-        @Override
-        public TvEntity[] newArray(int size) {
-            return new TvEntity[size];
-        }
-    };
+    }
 }

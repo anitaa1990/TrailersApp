@@ -1,375 +1,353 @@
-package com.an.trailers.ui.base.custom.collectionpicker;
+package com.an.trailers.ui.base.custom.collectionpicker
 
-import android.animation.Animator;
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.res.TypedArray;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.StateListDrawable;
-import android.support.v4.content.res.ResourcesCompat;
-import android.util.AttributeSet;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.view.animation.DecelerateInterpolator;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.animation.Animator
+import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.Color
+import android.graphics.Typeface
+import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.StateListDrawable
+import android.util.AttributeSet
+import android.view.*
+import android.view.animation.DecelerateInterpolator
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
+import com.an.trailers.R
+import java.util.*
 
-import com.an.trailers.R;
+class CollectionPicker(context: Context, attrs: AttributeSet?, defStyle: Int) : LinearLayout(context, attrs, defStyle) {
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+    private val genresList = Arrays.asList("#febf9b", "#f47f87", "#6ac68d", "#fbe0a5")
 
-public class CollectionPicker extends LinearLayout {
+    private val mViewTreeObserver: ViewTreeObserver
+    private val mInflater: LayoutInflater
 
-    private List<String> genresList = Arrays.asList("#febf9b", "#f47f87", "#6ac68d", "#fbe0a5");
+    private var mItems: MutableList<String> = ArrayList()
+    private var mRow: LinearLayout? = null
 
-    private ViewTreeObserver mViewTreeObserver;
-    private LayoutInflater mInflater;
+    private var mClickListener: OnItemClickListener? = null
+    private var mWidth: Int = 0
+    private var mItemMargin = 10
+    private var textPaddingLeft = 5
+    private var textPaddingRight = 5
+    private var textPaddingTop = 5
+    private var texPaddingBottom = 5
+    private var mAddIcon = android.R.drawable.ic_menu_add
+    private var mCancelIcon = android.R.drawable.ic_menu_close_clear_cancel
+    private var mLayoutBackgroundColorNormal = ContextCompat.getColor(context, R.color.blue)
+    private var mLayoutBackgroundColorPressed = ContextCompat.getColor(context, R.color.red)
+    private var mTextColor = ContextCompat.getColor(context, android.R.color.white)
+    private var mRadius = 5
+    private var mInitialized: Boolean = false
+    private val tf: Typeface?
 
-    private List<String> mItems = new ArrayList<>();
-    private LinearLayout mRow;
-    private HashMap<String, Object> mCheckedItems = new HashMap<>();
-    private OnItemClickListener mClickListener;
-    private int mWidth;
-    private int mItemMargin = 10;
-    private int textPaddingLeft = 5;
-    private int textPaddingRight = 5;
-    private int textPaddingTop = 5;
-    private int texPaddingBottom = 5;
-    private int mAddIcon = android.R.drawable.ic_menu_add;
-    private int mCancelIcon = android.R.drawable.ic_menu_close_clear_cancel;
-    private int mLayoutBackgroundColorNormal = R.color.blue;
-    private int mLayoutBackgroundColorPressed = R.color.red;
-    private int mTextColor = android.R.color.white;
-    private int mRadius = 5;
-    private boolean mInitialized;
-    private Typeface tf;
+    private val simplifiedTags: Boolean
+    var isUseRandomColor: Boolean = false
 
-    private boolean simplifiedTags;
-    private boolean useRandomColor;
+    private val itemLayoutParams: LayoutParams
+        get() {
+            val itemParams = LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
 
-    public CollectionPicker(Context context) {
-        this(context, null);
-    }
+            itemParams.bottomMargin = mItemMargin / 2
+            itemParams.topMargin = 0
+            itemParams.rightMargin = mItemMargin
 
-    public CollectionPicker(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
-    }
-
-
-    @SuppressLint("ResourceAsColor")
-    public CollectionPicker(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-        mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-        TypedArray typeArray = context.obtainStyledAttributes(attrs, R.styleable.CollectionPicker);
-        this.mItemMargin = (int) typeArray.getDimension(R.styleable.CollectionPicker_cp_itemMargin, dpToPx(this.getContext(), mItemMargin));
-        this.textPaddingLeft = (int) typeArray.getDimension(R.styleable.CollectionPicker_cp_textPaddingLeft, dpToPx(this.getContext(), textPaddingLeft));
-        this.textPaddingRight = (int) typeArray.getDimension(R.styleable.CollectionPicker_cp_textPaddingRight, dpToPx(this.getContext(), textPaddingRight));
-        this.textPaddingTop = (int) typeArray.getDimension(R.styleable.CollectionPicker_cp_textPaddingTop, dpToPx(this.getContext(), textPaddingTop));
-        this.texPaddingBottom = (int) typeArray.getDimension(R.styleable.CollectionPicker_cp_textPaddingBottom, dpToPx(this.getContext(), texPaddingBottom));
-        this.mAddIcon = typeArray.getResourceId(R.styleable.CollectionPicker_cp_addIcon, mAddIcon);
-        this.mCancelIcon = typeArray.getResourceId(R.styleable.CollectionPicker_cp_cancelIcon, mCancelIcon);
-        this.mLayoutBackgroundColorNormal = typeArray.getColor(R.styleable.CollectionPicker_cp_itemBackgroundNormal, mLayoutBackgroundColorNormal);
-        this.mLayoutBackgroundColorPressed = typeArray.getColor(R.styleable.CollectionPicker_cp_itemBackgroundPressed, mLayoutBackgroundColorPressed);
-        this.mRadius = (int) typeArray.getDimension(R.styleable.CollectionPicker_cp_itemRadius, mRadius);
-        this.mTextColor = typeArray.getColor(R.styleable.CollectionPicker_cp_itemTextColor, mTextColor);
-        this.simplifiedTags = typeArray.getBoolean(R.styleable.CollectionPicker_cp_simplified, false);
-        this.tf = ResourcesCompat.getFont(getContext(), R.font.gt_medium);
-        typeArray.recycle();
-
-        setOrientation(VERTICAL);
-        setGravity(Gravity.LEFT);
-
-        mViewTreeObserver = getViewTreeObserver();
-        mViewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                if (!mInitialized) {
-                    mInitialized = true;
-                    drawItemView();
-                }
-            }
-        });
-    }
-
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        mWidth = w;
-    }
-
-    /**
-     * Selected flags
-     */
-    public void setCheckedItems(HashMap<String, Object> checkedItems) {
-        mCheckedItems = checkedItems;
-    }
-
-    public HashMap<String, Object> getCheckedItems() {
-        return mCheckedItems;
-    }
-
-    public void drawItemView() {
-        if (!mInitialized) {
-            return;
+            return itemParams
         }
 
-        clearUi();
 
-        float totalPadding = getPaddingLeft() + getPaddingRight();
-        int indexFrontView = 0;
+    private val selectorNormal: StateListDrawable
+        @SuppressLint("ResourceAsColor")
+        get() {
+            val states = StateListDrawable()
 
-        LayoutParams itemParams = getItemLayoutParams();
+            var gradientDrawable = GradientDrawable()
+            gradientDrawable.setColor(mLayoutBackgroundColorPressed)
+            gradientDrawable.cornerRadius = mRadius.toFloat()
 
-        for (int i = 0; i < mItems.size(); i++) {
-            final String item = mItems.get(i);
+            states.addState(intArrayOf(android.R.attr.state_pressed), gradientDrawable)
 
-            final int position = i;
-            final View itemLayout = createItemView(item);
+            gradientDrawable = GradientDrawable()
+            val index = Random().nextInt(genresList.size)
+            if (isUseRandomColor) mLayoutBackgroundColorNormal = Color.parseColor(genresList[index])
+            gradientDrawable.setColor(mLayoutBackgroundColorNormal)
+            gradientDrawable.cornerRadius = mRadius.toFloat()
+
+            states.addState(intArrayOf(), gradientDrawable)
+
+            return states
+        }
 
 
-            TextView itemTextView = (TextView) itemLayout.findViewById(R.id.item_text);
-            itemTextView.setAllCaps(true);
-            itemTextView.setTypeface(tf);
-            itemTextView.setTextSize(10);
-            itemTextView.setText(item);
-            itemTextView.setPadding(textPaddingLeft, textPaddingTop, textPaddingRight,
-                    texPaddingBottom);
-            itemTextView.setTextColor(getResources().getColor(mTextColor));
+    private val selectorSelected: StateListDrawable
+        @SuppressLint("ResourceAsColor")
+        get() {
+            val states = StateListDrawable()
+            var gradientDrawable = GradientDrawable()
+            gradientDrawable.setColor(mLayoutBackgroundColorNormal)
+            gradientDrawable.cornerRadius = mRadius.toFloat()
 
-            float itemWidth = itemTextView.getPaint().measureText(item) + textPaddingLeft
-                    + textPaddingRight;
+            states.addState(intArrayOf(android.R.attr.state_pressed), gradientDrawable)
 
-            itemWidth += dpToPx(getContext(), 20) + textPaddingLeft
-                    + textPaddingRight;
-            if (mWidth <= (itemWidth + totalPadding)) {
-                totalPadding = getPaddingLeft() + getPaddingRight();
-                indexFrontView = i;
-                addItemView(itemLayout, itemParams, true, i);
+            gradientDrawable = GradientDrawable()
+            gradientDrawable.setColor(mLayoutBackgroundColorPressed)
+            gradientDrawable.cornerRadius = mRadius.toFloat()
+
+            states.addState(intArrayOf(), gradientDrawable)
+
+            return states
+        }
+
+    var items: MutableList<String>
+        get() = mItems
+        set(items) {
+            mItems = items
+            drawItemView()
+        }
+
+    private val isJellyBeanAndAbove: Boolean
+        get() = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN
+
+    @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : this(context, attrs, 0)
+
+
+    init {
+        mInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+
+        val typeArray = context.obtainStyledAttributes(attrs, R.styleable.CollectionPicker)
+        this.mItemMargin = typeArray.getDimension(
+            R.styleable.CollectionPicker_cp_itemMargin,
+            dpToPx(this.context, mItemMargin).toFloat()
+        ).toInt()
+        this.textPaddingLeft = typeArray.getDimension(
+            R.styleable.CollectionPicker_cp_textPaddingLeft,
+            dpToPx(this.context, textPaddingLeft).toFloat()
+        ).toInt()
+        this.textPaddingRight = typeArray.getDimension(
+            R.styleable.CollectionPicker_cp_textPaddingRight,
+            dpToPx(this.context, textPaddingRight).toFloat()
+        ).toInt()
+        this.textPaddingTop = typeArray.getDimension(
+            R.styleable.CollectionPicker_cp_textPaddingTop,
+            dpToPx(this.context, textPaddingTop).toFloat()
+        ).toInt()
+        this.texPaddingBottom = typeArray.getDimension(
+            R.styleable.CollectionPicker_cp_textPaddingBottom,
+            dpToPx(this.context, texPaddingBottom).toFloat()
+        ).toInt()
+        this.mAddIcon = typeArray.getResourceId(R.styleable.CollectionPicker_cp_addIcon, mAddIcon)
+        this.mCancelIcon = typeArray.getResourceId(R.styleable.CollectionPicker_cp_cancelIcon, mCancelIcon)
+        this.mLayoutBackgroundColorNormal =
+                typeArray.getColor(R.styleable.CollectionPicker_cp_itemBackgroundNormal, mLayoutBackgroundColorNormal)
+        this.mLayoutBackgroundColorPressed =
+                typeArray.getColor(R.styleable.CollectionPicker_cp_itemBackgroundPressed, mLayoutBackgroundColorPressed)
+        this.mRadius = typeArray.getDimension(R.styleable.CollectionPicker_cp_itemRadius, mRadius.toFloat()).toInt()
+        this.mTextColor = typeArray.getColor(R.styleable.CollectionPicker_cp_itemTextColor, mTextColor)
+        this.simplifiedTags = typeArray.getBoolean(R.styleable.CollectionPicker_cp_simplified, false)
+        this.tf = ResourcesCompat.getFont(getContext(), R.font.gt_medium)
+        typeArray.recycle()
+
+        orientation = VERTICAL
+        gravity = Gravity.LEFT
+
+        mViewTreeObserver = viewTreeObserver
+        mViewTreeObserver.addOnGlobalLayoutListener {
+            if (!mInitialized) {
+                mInitialized = true
+                drawItemView()
+            }
+        }
+    }
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        mWidth = w
+    }
+
+    fun drawItemView() {
+        if (!mInitialized) {
+            return
+        }
+
+        clearUi()
+
+        var totalPadding = (paddingLeft + paddingRight).toFloat()
+        var indexFrontView = 0
+
+        val itemParams = itemLayoutParams
+
+        for (i in mItems.indices) {
+            val item = mItems[i]
+
+            val position = i
+            val itemLayout = createItemView(item)
+
+
+            val itemTextView = itemLayout.findViewById<View>(R.id.item_text) as TextView
+            itemTextView.isAllCaps = true
+            itemTextView.typeface = tf
+            itemTextView.textSize = 10f
+            itemTextView.text = item
+            itemTextView.setPadding(
+                textPaddingLeft, textPaddingTop, textPaddingRight,
+                texPaddingBottom
+            )
+            itemTextView.setTextColor(mTextColor)
+
+            var itemWidth = (itemTextView.paint.measureText(item) + textPaddingLeft.toFloat()
+                    + textPaddingRight.toFloat())
+
+            itemWidth += (dpToPx(context, 20) + textPaddingLeft
+                    + textPaddingRight).toFloat()
+            if (mWidth <= itemWidth + totalPadding) {
+                totalPadding = (paddingLeft + paddingRight).toFloat()
+                indexFrontView = i
+                addItemView(itemLayout, itemParams, true, i)
             } else {
                 if (i != indexFrontView) {
-                    itemParams.rightMargin = mItemMargin;
-                    totalPadding += mItemMargin;
+                    itemParams.rightMargin = mItemMargin
+                    totalPadding += mItemMargin.toFloat()
                 }
-                addItemView(itemLayout, itemParams, false, i);
+                addItemView(itemLayout, itemParams, false, i)
             }
-            totalPadding += itemWidth;
+            totalPadding += itemWidth
         }
         // }
     }
 
-    private View createItemView(String s) {
-        View view = mInflater.inflate(R.layout.list_item_genre, this, false);
-        if (isJellyBeanAndAbove()) {
-            view.setBackground(getSelector(s));
+    private fun createItemView(s: String): View {
+        val view = mInflater.inflate(R.layout.list_item_genre, this, false)
+        if (isJellyBeanAndAbove) {
+            view.background = getSelector(s)
         } else {
-            view.setBackgroundDrawable(getSelector(s));
+            view.setBackgroundDrawable(getSelector(s))
         }
 
-        return view;
+        return view
     }
 
-    private LayoutParams getItemLayoutParams() {
-        LayoutParams itemParams = new LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
-
-        itemParams.bottomMargin = mItemMargin / 2;
-        itemParams.topMargin = 0;
-        itemParams.rightMargin = mItemMargin;
-
-        return itemParams;
+    private fun getItemIcon(isSelected: Boolean): Int {
+        return if (isSelected) mCancelIcon else mAddIcon
     }
 
-    private int getItemIcon(Boolean isSelected) {
-        return isSelected ? mCancelIcon : mAddIcon;
+    private fun clearUi() {
+        removeAllViews()
+        mRow = null
     }
 
-    private void clearUi() {
-        removeAllViews();
-        mRow = null;
-    }
-
-    private void addItemView(View itemView, ViewGroup.LayoutParams chipParams, boolean newLine,
-                             int position) {
+    private fun addItemView(
+        itemView: View, chipParams: ViewGroup.LayoutParams, newLine: Boolean,
+        position: Int
+    ) {
         if (mRow == null || newLine) {
-            mRow = new LinearLayout(getContext());
-            mRow.setGravity(Gravity.LEFT);
-            mRow.setOrientation(HORIZONTAL);
+            mRow = LinearLayout(context)
+            mRow!!.gravity = Gravity.LEFT
+            mRow!!.orientation = HORIZONTAL
 
-            LayoutParams params = new LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            val params = LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
 
-            mRow.setLayoutParams(params);
+            mRow!!.layoutParams = params
 
-            addView(mRow);
+            addView(mRow)
         }
 
-        mRow.addView(itemView, chipParams);
-        animateItemView(itemView, position);
+        mRow!!.addView(itemView, chipParams)
+        animateItemView(itemView, position)
     }
 
-    private StateListDrawable getSelector(String s) {
-        return getSelectorNormal();
+    private fun getSelector(s: String): StateListDrawable {
+        return selectorNormal
     }
 
-
-    @SuppressLint("ResourceAsColor")
-    private StateListDrawable getSelectorNormal() {
-        StateListDrawable states = new StateListDrawable();
-
-        GradientDrawable gradientDrawable = new GradientDrawable();
-        gradientDrawable.setColor(mLayoutBackgroundColorPressed);
-        gradientDrawable.setCornerRadius(mRadius);
-
-        states.addState(new int[]{android.R.attr.state_pressed}, gradientDrawable);
-
-        gradientDrawable = new GradientDrawable();
-        int index = new Random().nextInt(genresList.size());
-        if (useRandomColor) mLayoutBackgroundColorNormal = Color.parseColor(genresList.get(index));
-        gradientDrawable.setColor(mLayoutBackgroundColorNormal);
-        gradientDrawable.setCornerRadius(mRadius);
-
-        states.addState(new int[]{}, gradientDrawable);
-
-        return states;
+    fun setSelector(colorCode: Int) {
+        this.mLayoutBackgroundColorNormal = colorCode
+        selectorNormal
     }
 
-    public void setSelector(int colorCode) {
-        this.mLayoutBackgroundColorNormal = colorCode;
-        getSelectorNormal();
+    fun clearItems() {
+        mItems.clear()
     }
 
-    public boolean isUseRandomColor() {
-        return useRandomColor;
+    fun setTextColor(color: Int) {
+        this.mTextColor = color
     }
 
-    public void setUseRandomColor(boolean useRandomColor) {
-        this.useRandomColor = useRandomColor;
+    fun setOnItemClickListener(clickListener: OnItemClickListener) {
+        mClickListener = clickListener
     }
 
-
-    @SuppressLint("ResourceAsColor")
-    private StateListDrawable getSelectorSelected() {
-        StateListDrawable states = new StateListDrawable();
-        GradientDrawable gradientDrawable = new GradientDrawable();
-        gradientDrawable.setColor(mLayoutBackgroundColorNormal);
-        gradientDrawable.setCornerRadius(mRadius);
-
-        states.addState(new int[]{android.R.attr.state_pressed}, gradientDrawable);
-
-        gradientDrawable = new GradientDrawable();
-        gradientDrawable.setColor(mLayoutBackgroundColorPressed);
-        gradientDrawable.setCornerRadius(mRadius);
-
-        states.addState(new int[]{}, gradientDrawable);
-
-        return states;
-    }
-
-    public List<String> getItems() {
-        return mItems;
-    }
-
-    public void setItems(List<String> items) {
-        mItems = items;
-        drawItemView();
-    }
-
-    public void clearItems() {
-        mItems.clear();
-    }
-
-    public void setTextColor(int color) {
-        this.mTextColor = color;
-    }
-
-    public void setOnItemClickListener(OnItemClickListener clickListener) {
-        mClickListener = clickListener;
-    }
-
-    private boolean isJellyBeanAndAbove() {
-        return android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN;
-    }
-
-    private void animateView(final View view) {
-        view.setScaleY(1f);
-        view.setScaleX(1f);
+    private fun animateView(view: View) {
+        view.scaleY = 1f
+        view.scaleX = 1f
 
         view.animate()
-                .scaleX(1.2f)
-                .scaleY(1.2f)
-                .setDuration(100)
-                .setStartDelay(0)
-                .setInterpolator(new DecelerateInterpolator())
-                .setListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animation) {
+            .scaleX(1.2f)
+            .scaleY(1.2f)
+            .setDuration(100)
+            .setStartDelay(0)
+            .setInterpolator(DecelerateInterpolator())
+            .setListener(object : Animator.AnimatorListener {
+                override fun onAnimationStart(animation: Animator) {
 
-                    }
+                }
 
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        reverseAnimation(view);
-                    }
+                override fun onAnimationEnd(animation: Animator) {
+                    reverseAnimation(view)
+                }
 
-                    @Override
-                    public void onAnimationCancel(Animator animation) {
+                override fun onAnimationCancel(animation: Animator) {
 
-                    }
+                }
 
-                    @Override
-                    public void onAnimationRepeat(Animator animation) {
+                override fun onAnimationRepeat(animation: Animator) {
 
-                    }
-                })
-                .start();
+                }
+            })
+            .start()
     }
 
-    private void reverseAnimation(View view) {
-        view.setScaleY(1.2f);
-        view.setScaleX(1.2f);
+    private fun reverseAnimation(view: View) {
+        view.scaleY = 1.2f
+        view.scaleX = 1.2f
 
         view.animate()
-                .scaleX(1f)
-                .scaleY(1f)
-                .setDuration(100)
-                .setListener(null)
-                .start();
+            .scaleX(1f)
+            .scaleY(1f)
+            .setDuration(100)
+            .setListener(null)
+            .start()
     }
 
-    private void animateItemView(View view, int position) {
-        long animationDelay = 600;
+    private fun animateItemView(view: View, position: Int) {
+        var animationDelay: Long = 600
 
-        animationDelay += position * 30;
+        animationDelay += (position * 30).toLong()
 
-        view.setScaleY(0);
-        view.setScaleX(0);
+        view.scaleY = 0f
+        view.scaleX = 0f
         view.animate()
-                .scaleY(1)
-                .scaleX(1)
-                .setDuration(200)
-                .setInterpolator(new DecelerateInterpolator())
-                .setListener(null)
-                .setStartDelay(animationDelay)
-                .start();
+            .scaleY(1f)
+            .scaleX(1f)
+            .setDuration(200)
+            .setInterpolator(DecelerateInterpolator())
+            .setListener(null)
+            .setStartDelay(animationDelay)
+            .start()
     }
 
-    private static int dpToPx(Context context, int dp) {
-        float density = context.getResources().getDisplayMetrics().density;
-        return Math.round((float) dp * density);
+    private fun dpToPx(context: Context, dp: Int): Int {
+        val density = context.resources.displayMetrics.density
+        return Math.round(dp.toFloat() * density)
     }
 
-    public interface OnItemClickListener {
-        void onClick(String s, int position);
+    interface OnItemClickListener {
+        fun onClick(s: String, position: Int)
     }
 }

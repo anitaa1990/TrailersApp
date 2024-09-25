@@ -1,6 +1,6 @@
-package com.an.trailers.data;
+package com.an.trailers.data
 
-public enum Status {
+enum class Status {
     SUCCESS,
     ERROR,
     LOADING
