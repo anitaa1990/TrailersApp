@@ -101,7 +101,7 @@ object AppUtils {
         for (movieEntity in movieEntities) {
             var add = false
             if(movieEntity.categoryTypes != null) {
-                for (categoryType in movieEntity.categoryTypes) {
+                for (categoryType in movieEntity.categoryTypes!!) {
                     if (type.equals(categoryType, ignoreCase = true)) {
                         add = true
                     }
