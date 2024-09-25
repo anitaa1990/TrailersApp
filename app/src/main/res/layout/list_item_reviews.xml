@@ -4,7 +4,7 @@
 
     <data class="ReviewItemBinding" />
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -13,7 +13,7 @@
         android:paddingRight="@dimen/padding_large"
         android:paddingBottom="@dimen/padding_small">
 
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/item_review_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -49,5 +49,5 @@
             android:background="@color/search_overlay"
             app:layout_constraintTop_toBottomOf="@+id/item_review_desc" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
