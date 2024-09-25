@@ -5,35 +5,33 @@ import java.util.HashMap
 
 interface AppConstants {
     companion object {
+        const val PAGE_LIMIT = 10
 
-        val PAGE_LIMIT = 10
+        const val CREDIT_CAST = "cast"
+        const val CREDIT_CREW = "crew"
 
+        const val INTENT_MOVIE = "movie"
+        const val INTENT_CATEGORY = "category"
+        const val INTENT_VIDEO_KEY = "intent_video_key"
 
-        val CREDIT_CAST = "cast"
-        val CREDIT_CREW = "crew"
+        const val TRANSITION_IMAGE_NAME = "image"
 
-        val INTENT_MOVIE = "movie"
-        val INTENT_CATEGORY = "category"
-        val INTENT_VIDEO_KEY = "intent_video_key"
+        const val TYPE_MOVIES = "movie"
+        const val TYPE_TVS = "tv"
+        const val MOVIES_POPULAR = "popular"
+        const val MOVIES_UPCOMING = "upcoming"
+        const val MOVIES_TOP_RATED = "top_rated"
+        const val TV_ON_THE_AIR = "on_the_air"
 
-        val TRANSITION_IMAGE_NAME = "image"
+        const val MOVIE_STATUS_RELEASED = "Released"
 
-        val TYPE_MOVIES = "movie"
-        val TYPE_TVS = "tv"
-        val MOVIES_POPULAR = "popular"
-        val MOVIES_UPCOMING = "upcoming"
-        val MOVIES_TOP_RATED = "top_rated"
-        val TV_ON_THE_AIR = "on_the_air"
+        const val BASE_URL = "https://api.themoviedb.org/3/"
+        const val IMAGE_URL = "https://image.tmdb.org/t/p/w500%s"
 
-        val MOVIE_STATUS_RELEASED = "Released"
+        const val TMDB_API_KEY = "5e74ee79280d770dc8ed5a2fbdda955a"
+        const val YOUTUBE_API_KEY = "AIzaSyCZY8Vnw_6GcJcESL-NilTZDMSvg9ViLt8"
 
-        val BASE_URL = "https://api.themoviedb.org/3/"
-        val IMAGE_URL = "https://image.tmdb.org/t/p/w500%s"
-
-        val TMDB_API_KEY = "5e74ee79280d770dc8ed5a2fbdda955a"
-        val YOUTUBE_API_KEY = "AIzaSyCZY8Vnw_6GcJcESL-NilTZDMSvg9ViLt8"
-
-        val MENU_MOVIE_ITEM = Collections.unmodifiableMap(
+        val MENU_MOVIE_ITEM: MutableMap<Int, String> = Collections.unmodifiableMap(
             object : HashMap<Int, String>() {
                 init {
                     put(0, MOVIES_POPULAR)
@@ -42,7 +40,7 @@ interface AppConstants {
                 }
             })
 
-        val MENU_TV_ITEM = Collections.unmodifiableMap(
+        val MENU_TV_ITEM: MutableMap<Int, String> = Collections.unmodifiableMap(
             object : HashMap<Int, String>() {
                 init {
                     put(0, MOVIES_POPULAR)
@@ -52,7 +50,7 @@ interface AppConstants {
             })
 
 
-        val MENU_ITEM = Collections.unmodifiableMap(
+        val MENU_ITEM: MutableMap<Int, String> = Collections.unmodifiableMap(
             object : HashMap<Int, String>() {
                 init {
                     put(R.id.btn_movie, TYPE_MOVIES)
