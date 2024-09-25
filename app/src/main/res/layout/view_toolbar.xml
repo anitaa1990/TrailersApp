@@ -1,6 +1,6 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <android.support.v7.widget.Toolbar
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -21,7 +21,7 @@
                 android:orientation="horizontal"
                 android:padding="@dimen/padding">
 
-                <android.support.v7.widget.AppCompatRadioButton
+                <androidx.appcompat.widget.AppCompatRadioButton
                     android:id="@+id/btn_movie"
                     android:checked="true"
                     android:layout_width="wrap_content"
@@ -39,7 +39,7 @@
                     android:background="@android:color/white" />
 
 
-                <android.support.v7.widget.AppCompatRadioButton
+                <androidx.appcompat.widget.AppCompatRadioButton
                     android:id="@+id/btn_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -56,15 +56,16 @@
                 android:id="@+id/search_icon"
                 android:layout_width="@dimen/search_icon_size"
                 android:layout_height="@dimen/search_icon_size"
-                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="@dimen/margin_large"
+                android:layout_marginEnd="@dimen/margin_large"
+                android:contentDescription=""
                 android:background="@drawable/ic_search"
                 android:onClick="handleSearchIconClick" />
 
 
         </RelativeLayout>
 
-    </android.support.v7.widget.Toolbar>
+    </androidx.appcompat.widget.Toolbar>
 
 </layout>

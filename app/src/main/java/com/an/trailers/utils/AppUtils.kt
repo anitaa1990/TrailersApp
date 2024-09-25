@@ -54,8 +54,7 @@ object AppUtils {
     fun getScreenWidth(mContext: Context): Int {
         val wm = mContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val display = wm.defaultDisplay
-        val width1: Int
-        width1 = if (Build.VERSION.SDK_INT > 12) {
+        val width1: Int = if (Build.VERSION.SDK_INT > 12) {
             val size = Point()
             display.getSize(size)
             size.x
@@ -102,7 +101,7 @@ object AppUtils {
         for (movieEntity in movieEntities) {
             var add = false
             if(movieEntity.categoryTypes != null) {
-                for (categoryType in movieEntity.categoryTypes!!) {
+                for (categoryType in movieEntity.categoryTypes) {
                     if (type.equals(categoryType, ignoreCase = true)) {
                         add = true
                     }

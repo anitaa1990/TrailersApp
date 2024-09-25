@@ -1,14 +1,13 @@
 package com.an.trailers.ui.detail.adapter
 
-import android.app.Activity
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.an.trailers.data.local.entity.MovieEntity
 import com.an.trailers.databinding.SimilarMoviesListItemBinding
 import com.squareup.picasso.Picasso
 
-class SimilarMoviesListAdapter(private val activity: Activity, private val movies: List<MovieEntity>) :
+class SimilarMoviesListAdapter(private val movies: List<MovieEntity>) :
     RecyclerView.Adapter<SimilarMoviesListAdapter.CustomViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CustomViewHolder {

@@ -1,7 +1,7 @@
 package com.an.trailers.data
 
-import android.support.annotation.MainThread
-import android.support.annotation.WorkerThread
+import androidx.annotation.MainThread
+import androidx.annotation.WorkerThread
 import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -14,37 +14,35 @@ protected constructor() {
 
     init {
         val source: Observable<Resource<ResultType>>
-        if (shouldFetch()) {
+        if (this.shouldFetch()) {
 
-            source = createCall()
+            source = this.createCall()
                 .subscribeOn(Schedulers.io())
                 .doOnNext {
                     saveCallResult(processResponse(it)!!) }
-
+                .doOnError { onFetchFailed() }
+                .observeOn(AndroidSchedulers.mainThread())
                 .flatMap {
                     loadFromDb().toObservable()
-                        .map { Resource.success(it) } }
-
-                .doOnError { onFetchFailed() }
-
-                .onErrorResumeNext { t : Throwable ->
-                    loadFromDb().toObservable().map {
-                        Resource.error(t.message!!, it) }
+                        .map { Resource.success(it) }
                 }
-
-                .observeOn(AndroidSchedulers.mainThread())
+//                .onErrorResumeNext { t : Throwable ->
+//                    loadFromDb().toObservable().map {
+//                        Resource.error(t.message!!, it)
+//                    }
+//                }
 
         } else {
-            source = loadFromDb()
+            source = this.loadFromDb()
                 .toObservable()
                 .map { Resource.success(it) }
         }
 
         asObservable = Observable.concat(
-            loadFromDb()
+            this.loadFromDb()
                 .toObservable()
-                .map { Resource.loading(it) }
-                .take(1),
+                .take(1)
+                .map { Resource.loading(it) },
             source
         )
     }

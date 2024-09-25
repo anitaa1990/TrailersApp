@@ -4,18 +4,15 @@ import android.animation.Animator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.res.Configuration
-import android.content.res.TypedArray
 import android.os.Bundle
 import android.os.Parcelable
-import android.support.v4.view.animation.FastOutSlowInInterpolator
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.Interpolator
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.an.trailers.R
-
-import com.an.trailers.ui.base.custom.expandableLayout.ExpandableLayout.State.*
 import com.an.trailers.ui.base.custom.expandableLayout.ExpandableLayout.State.Companion.COLLAPSED
 import com.an.trailers.ui.base.custom.expandableLayout.ExpandableLayout.State.Companion.COLLAPSING
 import com.an.trailers.ui.base.custom.expandableLayout.ExpandableLayout.State.Companion.EXPANDED
@@ -66,7 +63,7 @@ class ExpandableLayout @JvmOverloads constructor(context: Context, attrs: Attrib
         }
     }
 
-    override fun onSaveInstanceState(): Parcelable? {
+    override fun onSaveInstanceState(): Parcelable {
         val superState = super.onSaveInstanceState()
         val bundle = Bundle()
 

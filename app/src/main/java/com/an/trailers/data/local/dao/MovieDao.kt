@@ -1,6 +1,10 @@
 package com.an.trailers.data.local.dao
 
-import android.arch.persistence.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
 import com.an.trailers.data.local.entity.MovieEntity
 import io.reactivex.Flowable
 
@@ -17,7 +21,7 @@ interface MovieDao {
     fun updateMovie(movie: MovieEntity): Int
 
     @Query("SELECT * FROM `MovieEntity` where id = :id")
-    fun getMovieById(id: Long?): MovieEntity
+    fun getMovieById(id: Long?): MovieEntity?
 
     @Query("SELECT * FROM `MovieEntity` where id = :id")
     fun getMovieDetailById(id: Long?): Flowable<MovieEntity>

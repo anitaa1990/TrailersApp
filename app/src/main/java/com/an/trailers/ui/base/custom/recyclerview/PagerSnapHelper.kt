@@ -1,10 +1,12 @@
 package com.an.trailers.ui.base.custom.recyclerview
 
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.LinearSnapHelper
-import android.support.v7.widget.OrientationHelper
-import android.support.v7.widget.RecyclerView
 import android.view.View
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSnapHelper
+import androidx.recyclerview.widget.OrientationHelper
+import androidx.recyclerview.widget.RecyclerView
+import kotlin.math.max
+import kotlin.math.min
 
 
 class PagerSnapHelper(private val recyclerSnapItemListener: RecyclerSnapItemListener) : LinearSnapHelper() {
@@ -19,7 +21,7 @@ class PagerSnapHelper(private val recyclerSnapItemListener: RecyclerSnapItemList
     override fun calculateDistanceToFinalSnap(
         layoutManager: RecyclerView.LayoutManager,
         targetView: View
-    ): IntArray? {
+    ): IntArray {
         val out = IntArray(2)
 
         if (layoutManager.canScrollHorizontally()) {
@@ -61,24 +63,24 @@ class PagerSnapHelper(private val recyclerSnapItemListener: RecyclerSnapItemList
         val position = layoutManager.getPosition(centerView)
         var targetPosition = -1
         if (layoutManager.canScrollHorizontally()) {
-            if (velocityX < 0) {
-                targetPosition = position - 1
+            targetPosition = if (velocityX < 0) {
+                position - 1
             } else {
-                targetPosition = position + 1
+                position + 1
             }
         }
 
         if (layoutManager.canScrollVertically()) {
-            if (velocityY < 0) {
-                targetPosition = position - 1
+            targetPosition = if (velocityY < 0) {
+                position - 1
             } else {
-                targetPosition = position + 1
+                position + 1
             }
         }
 
         val firstItem = 0
         val lastItem = layoutManager.itemCount - 1
-        targetPosition = Math.min(lastItem, Math.max(targetPosition, firstItem))
+        targetPosition = min(lastItem, max(targetPosition, firstItem))
         if (targetPosition >= 0) recyclerSnapItemListener.onItemSnap(targetPosition)
         return targetPosition
     }

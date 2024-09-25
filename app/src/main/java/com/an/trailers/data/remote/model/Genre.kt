@@ -7,23 +7,27 @@ data class Genre(
     val id: Long,
     val name: String
 ) : Parcelable {
-    constructor(source: Parcel) : this(
-        source.readLong(),
-        source.readString()
+    constructor(parcel: Parcel) : this(
+        parcel.readLong(),
+        parcel.readString().toString()
     )
 
-    override fun describeContents() = 0
-
-    override fun writeToParcel(dest: Parcel, flags: Int) = with(dest) {
-        writeLong(id)
-        writeString(name)
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeLong(id)
+        parcel.writeString(name)
     }
 
-    companion object {
-        @JvmField
-        val CREATOR: Parcelable.Creator<Genre> = object : Parcelable.Creator<Genre> {
-            override fun createFromParcel(source: Parcel): Genre = Genre(source)
-            override fun newArray(size: Int): Array<Genre?> = arrayOfNulls(size)
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<Genre> {
+        override fun createFromParcel(parcel: Parcel): Genre {
+            return Genre(parcel)
+        }
+
+        override fun newArray(size: Int): Array<Genre?> {
+            return arrayOfNulls(size)
         }
     }
 }

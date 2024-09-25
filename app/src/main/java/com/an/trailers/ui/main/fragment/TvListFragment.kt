@@ -1,16 +1,13 @@
 package com.an.trailers.ui.main.fragment
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
-import android.databinding.DataBindingUtil
+import androidx.databinding.DataBindingUtil
 import android.os.Bundle
-import android.os.Handler
-import android.support.v4.app.ActivityOptionsCompat
-import android.support.v4.util.Pair
-import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.app.ActivityOptionsCompat
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.an.trailers.AppConstants.Companion.INTENT_CATEGORY
 import com.an.trailers.AppConstants.Companion.MENU_TV_ITEM
 import com.an.trailers.AppConstants.Companion.TRANSITION_IMAGE_NAME
@@ -46,7 +43,7 @@ class TvListFragment : BaseFragment(), RecyclerItemClickListener.OnRecyclerViewI
         initialiseViewModel()
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_movie_list, container, false)
         return binding.root
     }
@@ -88,16 +85,16 @@ class TvListFragment : BaseFragment(), RecyclerItemClickListener.OnRecyclerViewI
 
     private fun initialiseViewModel() {
         tvListViewModel = ViewModelProviders.of(this, viewModelFactory).get(TvListViewModel::class.java)
-        tvListViewModel.setType(MENU_TV_ITEM.get(arguments!!.getInt(INTENT_CATEGORY))!!)
-        tvListViewModel.getTvListLiveData().observe(this, Observer { resource ->
+        tvListViewModel.setType(MENU_TV_ITEM[requireArguments().getInt(INTENT_CATEGORY)]!!)
+        tvListViewModel.getTvListLiveData().observe(this) { resource ->
             if (resource!!.isLoading) {
 
-            } else if (resource.data != null && !resource.data.isEmpty()) {
+            } else if (!resource.data.isNullOrEmpty()) {
                 updateTvsList(resource.data)
 
             } else
                 handleErrorResponse()
-        })
+        }
     }
 
     private fun updateTvsList(movies: List<TvEntity>) {
@@ -132,7 +129,7 @@ class TvListFragment : BaseFragment(), RecyclerItemClickListener.OnRecyclerViewI
     override fun onItemClick(parentView: View, childView: View, position: Int) {
         tvListViewModel.onStop()
         val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-            activity, Pair(childView.findViewById(R.id.image), TRANSITION_IMAGE_NAME))
+            activity, androidx.core.util.Pair(childView.findViewById(R.id.image), TRANSITION_IMAGE_NAME))
 
         NavigationUtils.redirectToTvDetailScreen(
             activity, tvListAdapter.getItem(position),

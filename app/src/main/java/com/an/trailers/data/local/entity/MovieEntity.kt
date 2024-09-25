@@ -1,16 +1,15 @@
 package com.an.trailers.data.local.entity
 
-import android.arch.persistence.room.Entity
-import android.arch.persistence.room.TypeConverters
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.room.Entity
+import androidx.room.TypeConverters
 import com.an.trailers.AppConstants
 import com.an.trailers.data.local.converter.*
 import com.an.trailers.data.remote.model.Cast
 import com.an.trailers.data.remote.model.Crew
 import com.an.trailers.data.remote.model.Genre
 import com.an.trailers.data.remote.model.Video
-import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
 import java.util.ArrayList
@@ -24,7 +23,7 @@ data class MovieEntity(
         var totalPages: Long,
 
         @SerializedName(value = "header", alternate = ["title", "name"])
-        val header: String,
+        val header: String?,
 
         @SerializedName("poster_path")
         var posterPath: String?,

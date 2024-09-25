@@ -1,22 +1,19 @@
 package com.an.trailers.ui.search.activity
 
 import android.app.SearchManager
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
-import android.databinding.DataBindingUtil
-import android.graphics.Typeface
 import android.os.Bundle
 import android.os.Handler
-import android.support.v4.app.ActivityOptionsCompat
-import android.support.v4.content.res.ResourcesCompat
-import android.support.v4.util.Pair
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.SearchView
-import android.support.v7.widget.SnapHelper
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
+import androidx.appcompat.widget.SearchView
+import androidx.core.app.ActivityOptionsCompat
+import androidx.core.content.res.ResourcesCompat
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.an.trailers.AppConstants.Companion.TRANSITION_IMAGE_NAME
 import com.an.trailers.R
 import com.an.trailers.data.local.entity.TvEntity
@@ -31,7 +28,6 @@ import com.an.trailers.ui.search.viewmodel.TvSearchViewModel
 import com.an.trailers.utils.AppUtils
 import com.an.trailers.utils.NavigationUtils
 import dagger.android.AndroidInjection
-
 import javax.inject.Inject
 
 class TvSearchActivity : BaseActivity(), SearchView.OnQueryTextListener,
@@ -43,7 +39,6 @@ class TvSearchActivity : BaseActivity(), SearchView.OnQueryTextListener,
     internal lateinit var searchViewModel: TvSearchViewModel
     private lateinit var binding: SearchActivityBinding
     private lateinit var searchListAdapter: TvSearchListAdapter
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AndroidInjection.inject(this)
@@ -59,7 +54,7 @@ class TvSearchActivity : BaseActivity(), SearchView.OnQueryTextListener,
         binding.search.setIconifiedByDefault(false)
         binding.search.setOnQueryTextListener(this)
 
-        val searchEditText = binding.search.findViewById<EditText>(android.support.v7.appcompat.R.id.search_src_text)
+        val searchEditText = binding.search.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)
         searchEditText.setTextColor(resources.getColor(android.R.color.white))
         searchEditText.setHintTextColor(resources.getColor(android.R.color.white))
         val myCustomFont = ResourcesCompat.getFont(applicationContext, R.font.gt_medium)
@@ -94,7 +89,7 @@ class TvSearchActivity : BaseActivity(), SearchView.OnQueryTextListener,
             if (resource!!.isLoading) {
                 displayLoader()
 
-            } else if (resource.data != null && !resource.data.isEmpty()) {
+            } else if (!resource.data.isNullOrEmpty()) {
                 handleSuccessResponse(resource.data)
 
             } else
@@ -137,7 +132,7 @@ class TvSearchActivity : BaseActivity(), SearchView.OnQueryTextListener,
     override fun onItemClick(parentView: View, childView: View, position: Int) {
         searchViewModel.getTvListLiveData().removeObservers(this)
         val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-            this, Pair(childView.findViewById(R.id.image), TRANSITION_IMAGE_NAME))
+            this, androidx.core.util.Pair(childView.findViewById(R.id.image), TRANSITION_IMAGE_NAME))
 
         NavigationUtils.redirectToTvDetailScreen(
             this, searchListAdapter.getItem(position),

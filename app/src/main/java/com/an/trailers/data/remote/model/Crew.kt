@@ -8,19 +8,19 @@ data class Crew(
     val id: Long,
     @SerializedName("credit_id")
     val creditId: String,
-    var name: String?,
+    var name: String,
     @SerializedName("profile_path")
-    var profilePath: String?,
-    val job: String?,
+    var profilePath: String,
+    val job: String,
     val department: String
 ) : Parcelable {
     constructor(source: Parcel) : this(
         source.readLong(),
-        source.readString(),
-        source.readString(),
-        source.readString(),
-        source.readString(),
-        source.readString()
+        source.readString().toString(),
+        source.readString().toString(),
+        source.readString().toString(),
+        source.readString().toString(),
+        source.readString().toString()
     )
 
     override fun describeContents() = 0

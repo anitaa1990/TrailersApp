@@ -1,21 +1,20 @@
 package com.an.trailers
 
-import android.app.Activity
 import android.app.Application
 import com.an.trailers.di.module.ApiModule
 import com.an.trailers.di.module.DbModule
 import com.an.trailers.di.component.DaggerApiComponent
+import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
-import dagger.android.HasActivityInjector
+import dagger.android.HasAndroidInjector
 import javax.inject.Inject
 
 
-class AppController : Application(), HasActivityInjector {
+class AppController : Application(), HasAndroidInjector {
 
     @Inject
-    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Activity>
-
-    override fun activityInjector(): DispatchingAndroidInjector<Activity>? {
+    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Any>
+    override fun androidInjector(): AndroidInjector<Any> {
         return dispatchingAndroidInjector
     }
 

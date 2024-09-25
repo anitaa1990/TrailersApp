@@ -1,6 +1,6 @@
 package com.an.trailers.ui.detail.activity
 
-import android.databinding.DataBindingUtil
+import androidx.databinding.DataBindingUtil
 import android.os.Bundle
 import android.widget.Toast
 import com.an.trailers.AppConstants

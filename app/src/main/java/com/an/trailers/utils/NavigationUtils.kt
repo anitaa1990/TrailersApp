@@ -3,9 +3,11 @@ package com.an.trailers.utils
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
-import android.support.v4.app.ActivityCompat
-import android.support.v4.app.ActivityOptionsCompat
+import android.os.Parcelable
+import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityOptionsCompat
 import androidx.navigation.NavOptions
 import androidx.navigation.Navigation
 import com.an.trailers.AppConstants
@@ -20,6 +22,7 @@ import com.an.trailers.ui.detail.activity.TvDetailActivity
 import com.an.trailers.ui.detail.activity.VideoActivity
 import com.an.trailers.ui.search.activity.MovieSearchActivity
 import com.an.trailers.ui.search.activity.TvSearchActivity
+import java.io.Serializable
 
 class NavigationUtils : AppConstants {
     companion object {
@@ -82,4 +85,11 @@ class NavigationUtils : AppConstants {
                 )
         }
     }
+}
+
+fun <T : Parcelable> Intent.getParcelable(key: String, mClass: Class<T>): T {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+        this.getParcelableExtra(key, mClass)!!
+    else
+        this.getParcelableExtra(key)!!
 }

@@ -1,16 +1,15 @@
 package com.an.trailers.ui.main.fragment
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProvider
-import android.arch.lifecycle.ViewModelProviders
-import android.databinding.DataBindingUtil
+import androidx.databinding.DataBindingUtil
 import android.os.Bundle
-import android.support.v4.app.ActivityOptionsCompat
-import android.support.v4.util.Pair
-import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.app.ActivityOptionsCompat
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.an.trailers.AppConstants.Companion.INTENT_CATEGORY
 import com.an.trailers.AppConstants.Companion.MENU_MOVIE_ITEM
 import com.an.trailers.AppConstants.Companion.TRANSITION_IMAGE_NAME
@@ -47,7 +46,7 @@ class MovieListFragment : BaseFragment(), RecyclerItemClickListener.OnRecyclerVi
         initialiseViewModel()
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_movie_list, container, false)
         return binding.root
     }
@@ -90,11 +89,11 @@ class MovieListFragment : BaseFragment(), RecyclerItemClickListener.OnRecyclerVi
 
     private fun initialiseViewModel() {
         moviesListViewModel = ViewModelProviders.of(this, viewModelFactory).get(MovieListViewModel::class.java)
-        moviesListViewModel.setType(MENU_MOVIE_ITEM[if (arguments == null) 0 else arguments!!.getInt(INTENT_CATEGORY)]!!)
+        moviesListViewModel.setType(MENU_MOVIE_ITEM[if (arguments == null) 0 else requireArguments().getInt(INTENT_CATEGORY)]!!)
         moviesListViewModel.getMoviesLiveData().observe(this, Observer { resource ->
             if (resource!!.isLoading) {
 
-            } else if (resource.data != null && !resource.data.isEmpty()) {
+            } else if (!resource.data.isNullOrEmpty()) {
                 updateMoviesList(resource.data)
 
             } else
@@ -134,7 +133,7 @@ class MovieListFragment : BaseFragment(), RecyclerItemClickListener.OnRecyclerVi
     override fun onItemClick(parentView: View, childView: View, position: Int) {
         moviesListViewModel.onStop()
         val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-            requireActivity(), Pair(childView.findViewById(R.id.image), TRANSITION_IMAGE_NAME))
+            requireActivity(), androidx.core.util.Pair(childView.findViewById(R.id.image), TRANSITION_IMAGE_NAME))
 
         NavigationUtils.redirectToDetailScreen(
             requireActivity(), moviesListAdapter.getItem(position), options

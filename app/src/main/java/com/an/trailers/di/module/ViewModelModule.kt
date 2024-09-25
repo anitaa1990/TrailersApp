@@ -1,7 +1,7 @@
 package com.an.trailers.di.module
 
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.an.trailers.factory.ViewModelFactory
 import com.an.trailers.ui.detail.viewmodel.MovieDetailViewModel
 import com.an.trailers.ui.detail.viewmodel.TvDetailViewModel

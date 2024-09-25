@@ -9,44 +9,34 @@ import com.an.trailers.data.remote.api.MovieApiService
 import com.an.trailers.data.remote.model.CreditResponse
 import com.an.trailers.data.remote.model.MovieApiResponse
 import com.an.trailers.data.remote.model.VideoResponse
+import com.an.trailers.utils.AppUtils
 import io.reactivex.Flowable
 import io.reactivex.Observable
-import io.reactivex.functions.Function4
-import java.util.*
-
 import javax.inject.Singleton
-import kotlin.collections.ArrayList
-import com.an.trailers.utils.AppUtils
-
-
 
 @Singleton
 class MovieRepository(
     private val movieDao: MovieDao,
     private val movieApiService: MovieApiService
 ) {
-
-    fun loadMoviesByType(page: Long,
-                         type: String): Observable<Resource<List<MovieEntity>>> {
+   fun loadMoviesByType(page: Long,
+                        type: String
+   ): Observable<Resource<List<MovieEntity>>> {
         return object : NetworkBoundResource<List<MovieEntity>, MovieApiResponse>() {
 
             override fun saveCallResult(item: MovieApiResponse) {
                 val movieEntities = ArrayList<MovieEntity>()
                 for (movieEntity in item.results) {
-
                     val storedEntity = movieDao.getMovieById(movieEntity.id)
-                    if(storedEntity == null) {
-                        movieEntity.categoryTypes = Arrays.asList(type)
-                    } else {
+                    storedEntity?.let {
                         val categories: MutableList<String> = mutableListOf()
-                        if(storedEntity.categoryTypes != null) categories.addAll(storedEntity.categoryTypes!!)
+                        if(storedEntity.categoryTypes != null) categories.addAll(it.categoryTypes!!)
                         categories.add(type)
                         movieEntity.categoryTypes = categories
+                        movieEntity.page = item.page
+                        movieEntity.totalPages = item.totalPages
+                        movieEntities.add(movieEntity)
                     }
-
-                    movieEntity.page = item.page
-                    movieEntity.totalPages = item.total_pages
-                    movieEntities.add(movieEntity)
                 }
                 movieDao.insertMovies(movieEntities)
             }
@@ -57,7 +47,7 @@ class MovieRepository(
 
             override fun loadFromDb(): Flowable<List<MovieEntity>> {
                 val movieEntities = movieDao.getMoviesByPage(page)
-                return if (movieEntities == null || movieEntities.isEmpty()) {
+                return if (movieEntities.isEmpty()) {
                     Flowable.empty()
                 } else Flowable.just(AppUtils.getMoviesByType(type, movieEntities))
             }
@@ -66,10 +56,9 @@ class MovieRepository(
                 return movieApiService.fetchMoviesByType(type, page)
                     .flatMap { movieApiResponse ->
                         Observable.just(
-                            if (movieApiResponse == null)
-                                Resource.error("", MovieApiResponse(page, emptyList(), 0, 1))
-                            else
-                                Resource.success(movieApiResponse)
+                            if (movieApiResponse.results.isEmpty())
+                                Resource.error("", MovieApiResponse(1, emptyList(), 0, 1))
+                            else Resource.success(movieApiResponse)
                         )
                     }
             }
@@ -80,7 +69,7 @@ class MovieRepository(
     fun fetchMovieDetails(movieId: Long): Observable<Resource<MovieEntity>> {
         return object : NetworkBoundResource<MovieEntity, MovieEntity>() {
             override fun saveCallResult(item: MovieEntity) {
-                val movieEntity: MovieEntity = movieDao.getMovieById(movieId)
+                val movieEntity = movieDao.getMovieById(movieId)
                 if(null == movieEntity) movieDao.insertMovie(item)
                 else {
                     item.page = movieEntity.page
@@ -95,8 +84,7 @@ class MovieRepository(
             }
 
             override fun loadFromDb(): Flowable<MovieEntity> {
-                val movieEntity: MovieEntity = movieDao.getMovieById(movieId)
-                if(null == movieEntity) return Flowable.empty()
+                val movieEntity = movieDao.getMovieById(movieId) ?: return Flowable.empty()
                 return Flowable.just(movieEntity)
             }
 
@@ -106,34 +94,35 @@ class MovieRepository(
                     movieApiService.fetchMovieDetail(id),
                     movieApiService.fetchMovieVideo(id),
                     movieApiService.fetchCastDetail(id),
-                    movieApiService.fetchSimilarMovie(id, 1),
-                    Function4
-                    { movieEntity: MovieEntity,
-                      videoResponse: VideoResponse,
-                      creditResponse: CreditResponse,
-                      movieApiResponse: MovieApiResponse ->
+                    movieApiService.fetchSimilarMovie(id, 1)
+                ) { movieEntity: MovieEntity,
+                    videoResponse: VideoResponse,
+                    creditResponse: CreditResponse,
+                    movieApiResponse: MovieApiResponse ->
 
-                        if (videoResponse != null) {
-                            movieEntity.videos = videoResponse.results
-                        }
-
-                        if (creditResponse != null) {
-                            movieEntity.crews = creditResponse.crew
-                            movieEntity.casts = creditResponse.cast
-                        }
-
-                        if (movieApiResponse != null) {
-                            movieEntity.similarMovies = movieApiResponse.results
-                        }
-                        Resource.success(movieEntity)
-                    })
+                    if (videoResponse.results.isNotEmpty()) {
+                        movieEntity.videos = videoResponse.results
+                    }
+                    if (creditResponse.crew.isNotEmpty()) {
+                        movieEntity.crews = creditResponse.crew
+                    }
+                    if (creditResponse.cast.isNotEmpty()) {
+                        movieEntity.casts = creditResponse.cast
+                    }
+                    if (movieApiResponse.results.isNotEmpty()) {
+                        movieEntity.similarMovies = movieApiResponse.results
+                    }
+                    Resource.success(movieEntity)
+                }
             }
         }.getAsObservable()
     }
 
 
-    fun searchMovies(page: Long,
-                     query: String): Observable<Resource<List<MovieEntity>>> {
+    fun searchMovies(
+        page: Long,
+        query: String
+    ): Observable<Resource<List<MovieEntity>>> {
         return object : NetworkBoundResource<List<MovieEntity>, MovieApiResponse>() {
 
             override fun saveCallResult(item: MovieApiResponse) {
@@ -141,16 +130,16 @@ class MovieRepository(
                 for (movieEntity in item.results) {
                     val storedEntity = movieDao.getMovieById(movieEntity.id)
                     if(storedEntity == null) {
-                        movieEntity.categoryTypes = Arrays.asList(query)
+                        movieEntity.categoryTypes = listOf(query)
                     } else {
                         val categories: MutableList<String> = mutableListOf()
-                        if(storedEntity.categoryTypes != null) categories.addAll(storedEntity.categoryTypes!!)
+                        if(!storedEntity.categoryTypes.isNullOrEmpty()) categories.addAll(storedEntity.categoryTypes!!)
                         categories.add(query)
                         movieEntity.categoryTypes = categories
                     }
 
                     movieEntity.page = item.page
-                    movieEntity.totalPages = item.total_pages
+                    movieEntity.totalPages = item.totalPages
                     movieEntities.add(movieEntity)
                 }
                 movieDao.insertMovies(movieEntities)
@@ -162,7 +151,7 @@ class MovieRepository(
 
             override fun loadFromDb(): Flowable<List<MovieEntity>> {
                 val movieEntities = movieDao.getMoviesByPage(page)
-                return if (movieEntities == null || movieEntities.isEmpty()) {
+                return if (movieEntities.isEmpty()) {
                     Flowable.empty()
                 } else Flowable.just(AppUtils.getMoviesByType(query, movieEntities))
             }
@@ -171,8 +160,9 @@ class MovieRepository(
                 return movieApiService.searchMoviesByQuery(query, "1")
                     .flatMap { movieApiResponse ->
                         Observable.just(
-                            if (movieApiResponse == null) Resource.error("", MovieApiResponse(1, emptyList(), 0, 1))
-                            else Resource.success(movieApiResponse)
+                            if (movieApiResponse.results.isEmpty()) {
+                                Resource.error("", MovieApiResponse(1, emptyList(), 0, 1))
+                            } else Resource.success(movieApiResponse)
                         )
 
                     }

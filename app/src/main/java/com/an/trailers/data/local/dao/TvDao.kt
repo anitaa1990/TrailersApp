@@ -1,12 +1,15 @@
 package com.an.trailers.data.local.dao
 
-import android.arch.persistence.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
 import com.an.trailers.data.local.entity.TvEntity
 import io.reactivex.Flowable
 
 @Dao
 interface TvDao {
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertTvList(tvEntities: List<TvEntity>): LongArray
 
@@ -17,7 +20,7 @@ interface TvDao {
     fun updateTv(tvEntity: TvEntity): Int
 
     @Query("SELECT * FROM `TvEntity` where id = :id")
-    fun getTvById(id: Long?): TvEntity
+    fun getTvById(id: Long?): TvEntity?
 
     @Query("SELECT * FROM `TvEntity` where id = :id")
     fun getTvDetailById(id: Long?): Flowable<TvEntity>

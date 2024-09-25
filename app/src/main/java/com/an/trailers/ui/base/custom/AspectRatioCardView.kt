@@ -1,8 +1,8 @@
 package com.an.trailers.ui.base.custom
 
 import android.content.Context
-import android.support.design.card.MaterialCardView
 import android.util.AttributeSet
+import com.google.android.material.card.MaterialCardView
 
 class AspectRatioCardView @JvmOverloads constructor(
     context: Context,

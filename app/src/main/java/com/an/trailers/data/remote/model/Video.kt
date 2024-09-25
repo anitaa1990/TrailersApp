@@ -9,8 +9,8 @@ data class Video(
     val key: String
 ) : Parcelable {
     constructor(source: Parcel) : this(
-        source.readString(),
-        source.readString()
+        source.readString().toString(),
+        source.readString().toString()
     )
 
     override fun describeContents() = 0

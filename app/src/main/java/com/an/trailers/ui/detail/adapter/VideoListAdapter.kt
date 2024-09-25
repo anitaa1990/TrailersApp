@@ -2,10 +2,10 @@ package com.an.trailers.ui.detail.adapter
 
 
 import android.content.Context
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.an.trailers.AppConstants
 import com.an.trailers.R
 import com.an.trailers.data.remote.model.Video
@@ -38,7 +38,7 @@ class VideoListAdapter(context: Context, private val videoList: List<Video>) :
                     youTubeThumbnailView: YouTubeThumbnailView,
                     youTubeThumbnailLoader: YouTubeThumbnailLoader
                 ) {
-                    val item = getItem(position)
+                    val item = getItem(holder.adapterPosition)
                     youTubeThumbnailLoader.setVideo(item.key)
                     youTubeThumbnailView.setImageBitmap(null)
 
@@ -82,7 +82,7 @@ class VideoListAdapter(context: Context, private val videoList: List<Video>) :
     inner class CustomViewHolder(internal val binding: VideoListItemBinding) : RecyclerView.ViewHolder(binding.root) {
         init {
 
-            val lp = binding.youtubeThumbnail.getLayoutParams()
+            val lp = binding.youtubeThumbnail.layoutParams
 
             val width = Math.ceil(ASPECT_RATIO_WIDTH * screenWidth / 100)
             val height = Math.ceil(ASPECT_RATIO_HEIGHT * screenHeight / 100)

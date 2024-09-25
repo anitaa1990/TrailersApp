@@ -1,15 +1,13 @@
 package com.an.trailers.ui.detail.activity
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
-import android.databinding.DataBindingUtil
 import android.graphics.Paint
 import android.os.Bundle
-import android.support.v4.app.ActivityOptionsCompat
-import android.support.v4.util.Pair
-import android.support.v4.view.ViewCompat
-import android.support.v7.widget.LinearLayoutManager
 import android.view.View
+import androidx.core.app.ActivityOptionsCompat
+import androidx.core.view.ViewCompat
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.an.trailers.AppConstants.Companion.CREDIT_CREW
 import com.an.trailers.AppConstants.Companion.INTENT_MOVIE
 import com.an.trailers.AppConstants.Companion.TRANSITION_IMAGE_NAME
@@ -28,11 +26,10 @@ import com.an.trailers.ui.detail.adapter.VideoListAdapter
 import com.an.trailers.ui.detail.viewmodel.MovieDetailViewModel
 import com.an.trailers.utils.AppUtils
 import com.an.trailers.utils.NavigationUtils
+import com.an.trailers.utils.getParcelable
 import com.squareup.picasso.Picasso
 import dagger.android.AndroidInjection
-
 import javax.inject.Inject
-import java.util.Arrays
 
 class MovieDetailActivity : BaseActivity() {
 
@@ -52,7 +49,7 @@ class MovieDetailActivity : BaseActivity() {
     private fun initialiseView() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detail)
 
-        val movie = intent.getParcelableExtra<MovieEntity>(INTENT_MOVIE)
+        val movie = intent.getParcelable(INTENT_MOVIE, MovieEntity::class.java)
         Picasso.get().load(movie.getFormattedPosterPath()).into(binding.image)
         ViewCompat.setTransitionName(binding.image, TRANSITION_IMAGE_NAME)
         binding.expandButton.paintFlags = binding.expandButton.paintFlags or Paint.UNDERLINE_TEXT_FLAG
@@ -62,31 +59,32 @@ class MovieDetailActivity : BaseActivity() {
 
     private fun initialiseViewModel() {
         movieDetailViewModel = ViewModelProviders.of(this, viewModelFactory).get(MovieDetailViewModel::class.java)
-        movieDetailViewModel.fetchMovieDetail(intent.getParcelableExtra(INTENT_MOVIE))
-        movieDetailViewModel.getMovieDetailsLiveData().observe(this, Observer { movieEntity ->
+        val movie = intent.getParcelable(INTENT_MOVIE, MovieEntity::class.java)
+        movieDetailViewModel.fetchMovieDetail(movie)
+        movieDetailViewModel.getMovieDetailsLiveData().observe(this) { movieEntity ->
             updateMovieDetailView(movieEntity!!)
-            if (movieEntity.videos != null && !movieEntity.videos!!.isEmpty()) {
+            if (movieEntity.videos != null && movieEntity.videos!!.isNotEmpty()) {
                 updateMovieVideos(movieEntity.videos!!)
             }
-            if (movieEntity.crews != null && !movieEntity.crews!!.isEmpty()) {
+            if (!movieEntity.crews.isNullOrEmpty()) {
                 updateMovieCrewDetails(movieEntity.crews!!)
             }
 
-            if (movieEntity.casts != null && !movieEntity.casts!!.isEmpty()) {
+            if (!movieEntity.casts.isNullOrEmpty()) {
                 binding.expandButton.visibility = View.VISIBLE
                 updateMovieCastDetails(movieEntity.casts!!)
             }
-            if (movieEntity.similarMovies != null && !movieEntity.similarMovies!!.isEmpty()) {
+            if (!movieEntity.similarMovies.isNullOrEmpty()) {
                 updateSimilarMoviesView(movieEntity.similarMovies!!)
             }
-        })
+        }
     }
 
 
     private fun updateMovieDetailView(movie: MovieEntity) {
         binding.movieTitle.text = movie.header
         binding.movieDesc.text = movie.description
-        if (movie.status != null) binding.movieStatus.items = Arrays.asList(movie.status)
+        if (movie.status != null) binding.movieStatus.items = mutableListOf(movie.status!!)
         binding.collectionItemPicker.isUseRandomColor = true
         if (movie.genres != null) binding.collectionItemPicker.items = AppUtils.getGenres(movie.genres!!)
         binding.txtRuntime.text = AppUtils.getRunTimeInMins(movie.status, movie.runTime, movie.releaseDate)
@@ -132,7 +130,7 @@ class MovieDetailActivity : BaseActivity() {
         binding.includedSimilarLayout.moviesList.layoutManager =
                 LinearLayoutManager(applicationContext, LinearLayoutManager.HORIZONTAL, false)
         binding.includedSimilarLayout.moviesList.visibility = View.VISIBLE
-        val similarMoviesListAdapter = SimilarMoviesListAdapter(this, movies)
+        val similarMoviesListAdapter = SimilarMoviesListAdapter(movies)
         binding.includedSimilarLayout.moviesList.adapter = similarMoviesListAdapter
 
         binding.includedSimilarLayout.moviesList.addOnItemTouchListener(

@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Handler
+import android.os.Looper
 import android.util.AttributeSet
 import android.view.animation.Animation
 import android.widget.ImageSwitcher
@@ -14,7 +15,7 @@ import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 
 class BackgroundSwitcherView : ImageSwitcher {
-    private val NORMAL_ORDER = intArrayOf(0, 1)
+    private val normalOrder = intArrayOf(0, 1)
 
     private var bgImageGap: Int = 0
     private var bgImageWidth: Int = 0
@@ -60,7 +61,7 @@ class BackgroundSwitcherView : ImageSwitcher {
 
 
     override fun getChildDrawingOrder(childCount: Int, i: Int): Int {
-        return NORMAL_ORDER[i]
+        return normalOrder[i]
     }
 
     @Synchronized
@@ -113,7 +114,7 @@ class BackgroundSwitcherView : ImageSwitcher {
 
             override fun onAnimationEnd(animation: Animator) {
                 image.setImageBitmap(bitmap)
-                Handler().postDelayed({ animate().alpha(0.4f).duration = duration.toLong() }, 200)
+                Handler(Looper.getMainLooper()).postDelayed({ animate().alpha(0.4f).duration = duration.toLong() }, 200)
             }
 
             override fun onAnimationCancel(animation: Animator) {}

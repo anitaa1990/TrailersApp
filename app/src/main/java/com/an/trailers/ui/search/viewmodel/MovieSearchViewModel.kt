@@ -1,7 +1,7 @@
 package com.an.trailers.ui.search.viewmodel
 
-import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.an.trailers.data.Resource
 import com.an.trailers.data.local.dao.MovieDao
 import com.an.trailers.data.local.entity.MovieEntity

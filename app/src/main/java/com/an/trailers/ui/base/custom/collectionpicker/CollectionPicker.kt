@@ -3,23 +3,21 @@ package com.an.trailers.ui.base.custom.collectionpicker
 import android.animation.Animator
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.res.TypedArray
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.StateListDrawable
-import android.support.v4.content.res.ResourcesCompat
 import android.util.AttributeSet
 import android.view.*
 import android.view.animation.DecelerateInterpolator
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import com.an.trailers.R
-
 import java.util.*
 
-class CollectionPicker
-constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : LinearLayout(context, attrs, defStyle) {
+class CollectionPicker(context: Context, attrs: AttributeSet?, defStyle: Int) : LinearLayout(context, attrs, defStyle) {
 
     private val genresList = Arrays.asList("#febf9b", "#f47f87", "#6ac68d", "#fbe0a5")
 
@@ -38,9 +36,9 @@ constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : LinearLayou
     private var texPaddingBottom = 5
     private var mAddIcon = android.R.drawable.ic_menu_add
     private var mCancelIcon = android.R.drawable.ic_menu_close_clear_cancel
-    private var mLayoutBackgroundColorNormal = R.color.blue
-    private var mLayoutBackgroundColorPressed = R.color.red
-    private var mTextColor = android.R.color.white
+    private var mLayoutBackgroundColorNormal = ContextCompat.getColor(context, R.color.blue)
+    private var mLayoutBackgroundColorPressed = ContextCompat.getColor(context, R.color.red)
+    private var mTextColor = ContextCompat.getColor(context, android.R.color.white)
     private var mRadius = 5
     private var mInitialized: Boolean = false
     private val tf: Typeface?
@@ -48,9 +46,9 @@ constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : LinearLayou
     private val simplifiedTags: Boolean
     var isUseRandomColor: Boolean = false
 
-    private val itemLayoutParams: LinearLayout.LayoutParams
+    private val itemLayoutParams: LayoutParams
         get() {
-            val itemParams = LinearLayout.LayoutParams(
+            val itemParams = LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
@@ -115,7 +113,7 @@ constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : LinearLayou
     private val isJellyBeanAndAbove: Boolean
         get() = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN
 
-    @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : this(context, attrs, 0) {}
+    @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : this(context, attrs, 0)
 
 
     init {
@@ -154,7 +152,7 @@ constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : LinearLayou
         this.tf = ResourcesCompat.getFont(getContext(), R.font.gt_medium)
         typeArray.recycle()
 
-        orientation = LinearLayout.VERTICAL
+        orientation = VERTICAL
         gravity = Gravity.LEFT
 
         mViewTreeObserver = viewTreeObserver
@@ -198,7 +196,7 @@ constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : LinearLayou
                 textPaddingLeft, textPaddingTop, textPaddingRight,
                 texPaddingBottom
             )
-            itemTextView.setTextColor(resources.getColor(mTextColor))
+            itemTextView.setTextColor(mTextColor)
 
             var itemWidth = (itemTextView.paint.measureText(item) + textPaddingLeft.toFloat()
                     + textPaddingRight.toFloat())
@@ -248,9 +246,9 @@ constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : LinearLayou
         if (mRow == null || newLine) {
             mRow = LinearLayout(context)
             mRow!!.gravity = Gravity.LEFT
-            mRow!!.orientation = LinearLayout.HORIZONTAL
+            mRow!!.orientation = HORIZONTAL
 
-            val params = LinearLayout.LayoutParams(
+            val params = LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )

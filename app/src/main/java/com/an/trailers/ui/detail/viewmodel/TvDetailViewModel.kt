@@ -1,7 +1,7 @@
 package com.an.trailers.ui.detail.viewmodel
 
-import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.an.trailers.data.local.dao.TvDao
 import com.an.trailers.data.local.entity.TvEntity
 import com.an.trailers.data.remote.api.TvApiService

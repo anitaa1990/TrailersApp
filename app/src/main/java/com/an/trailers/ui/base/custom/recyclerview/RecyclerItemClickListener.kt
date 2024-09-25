@@ -1,10 +1,10 @@
 package com.an.trailers.ui.base.custom.recyclerview
 
 import android.content.Context
-import android.support.v7.widget.RecyclerView
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
+import androidx.recyclerview.widget.RecyclerView
 
 class RecyclerItemClickListener(
     context: Context,
@@ -20,7 +20,7 @@ class RecyclerItemClickListener(
     override fun onInterceptTouchEvent(view: RecyclerView, e: MotionEvent): Boolean {
         val childView = view.findChildViewUnder(e.x, e.y)
 
-        if (childView != null && recyclerViewItemClickListener != null && mGestureDetector.onTouchEvent(e)) {
+        if (childView != null && mGestureDetector.onTouchEvent(e)) {
             recyclerViewItemClickListener.onItemClick(view, childView, view.getChildLayoutPosition(childView))
         }
         return false
