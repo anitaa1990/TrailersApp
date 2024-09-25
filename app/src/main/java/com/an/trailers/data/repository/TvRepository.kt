@@ -30,20 +30,17 @@ class TvRepository(
                 val tvEntities = ArrayList<TvEntity>()
                 for (tvEntity in item.results) {
                     val storedEntity = tvDao.getTvById(tvEntity.id)
-                    storedEntity?.let {
-                        if(it.categoryTypes.isNullOrEmpty()) {
-                            tvEntity.categoryTypes = listOf(type)
-                        } else {
-                            val categories: MutableList<String> = mutableListOf()
-                            categories.addAll(it.categoryTypes!!)
-                            categories.add(type)
-                            tvEntity.categoryTypes = categories
-                        }
-
-                        tvEntity.page = item.page
-                        tvEntity.totalPages = item.totalPages
-                        tvEntities.add(tvEntity)
+                    if(storedEntity == null) {
+                        tvEntity.categoryTypes = listOf(type)
+                    } else {
+                        val categories: MutableList<String> = mutableListOf()
+                        if(storedEntity.categoryTypes != null) categories.addAll(storedEntity.categoryTypes!!)
+                        categories.add(type)
+                        tvEntity.categoryTypes = categories
                     }
+                    tvEntity.page = item.page
+                    tvEntity.totalPages = item.totalPages
+                    tvEntities.add(tvEntity)
                 }
                 tvDao.insertTvList(tvEntities)
             }

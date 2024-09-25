@@ -1,5 +1,6 @@
 package com.an.trailers.ui.main.viewmodel
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.MutableLiveData
 import com.an.trailers.data.Resource
 import com.an.trailers.data.local.dao.MovieDao
@@ -22,6 +23,7 @@ class MovieListViewModel@Inject constructor(
         this.type = type
     }
 
+    @SuppressLint("CheckResult")
     fun loadMoreMovies(currentPage: Long) {
         movieRepository.loadMoviesByType(currentPage, type)
                 .doOnSubscribe { disposable -> addToDisposable(disposable) }

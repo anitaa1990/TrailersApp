@@ -88,9 +88,9 @@ class MovieListFragment : BaseFragment(), RecyclerItemClickListener.OnRecyclerVi
 
 
     private fun initialiseViewModel() {
-        moviesListViewModel = ViewModelProviders.of(this, viewModelFactory).get(MovieListViewModel::class.java)
+        moviesListViewModel = ViewModelProviders.of(this, viewModelFactory)[MovieListViewModel::class.java]
         moviesListViewModel.setType(MENU_MOVIE_ITEM[if (arguments == null) 0 else requireArguments().getInt(INTENT_CATEGORY)]!!)
-        moviesListViewModel.getMoviesLiveData().observe(this, Observer { resource ->
+        moviesListViewModel.getMoviesLiveData().observe(this) { resource ->
             if (resource!!.isLoading) {
 
             } else if (!resource.data.isNullOrEmpty()) {
@@ -98,7 +98,7 @@ class MovieListFragment : BaseFragment(), RecyclerItemClickListener.OnRecyclerVi
 
             } else
                 handleErrorResponse()
-        })
+        }
     }
 
     private fun updateMoviesList(movies: List<MovieEntity>) {

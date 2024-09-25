@@ -28,15 +28,18 @@ class MovieRepository(
                 val movieEntities = ArrayList<MovieEntity>()
                 for (movieEntity in item.results) {
                     val storedEntity = movieDao.getMovieById(movieEntity.id)
-                    storedEntity?.let {
+                    if(storedEntity == null) {
+                        movieEntity.categoryTypes = listOf(type)
+                    } else {
                         val categories: MutableList<String> = mutableListOf()
-                        if(storedEntity.categoryTypes != null) categories.addAll(it.categoryTypes!!)
+                        if(storedEntity.categoryTypes != null) categories.addAll(storedEntity.categoryTypes!!)
                         categories.add(type)
                         movieEntity.categoryTypes = categories
-                        movieEntity.page = item.page
-                        movieEntity.totalPages = item.totalPages
-                        movieEntities.add(movieEntity)
                     }
+
+                    movieEntity.page = item.page
+                    movieEntity.totalPages = item.totalPages
+                    movieEntities.add(movieEntity)
                 }
                 movieDao.insertMovies(movieEntities)
             }
